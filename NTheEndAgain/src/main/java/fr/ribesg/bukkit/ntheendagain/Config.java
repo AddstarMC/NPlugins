@@ -87,7 +87,8 @@ public class Config extends AbstractConfig<NTheEndAgain> {
     private static final int DEFAULT_slowSoftRegenTimer = 5;
     private int slowSoftRegenTimer;
 
-    // Respawn
+    private int maxDragons;
+    
     private static final int DEFAULT_respawnNumber = 1;
     private int respawnNumber;
 
@@ -283,6 +284,7 @@ public class Config extends AbstractConfig<NTheEndAgain> {
         }
 
         // Respawn
+        
         this.setRespawnNumber(config.getInt("respawnNumber", DEFAULT_respawnNumber));
         if (!this.match(this.respawnNumber, 0, Integer.MAX_VALUE)) {
             this.wrongValue(fileName, "respawnNumber", this.respawnNumber, DEFAULT_respawnNumber);
@@ -869,10 +871,14 @@ public class Config extends AbstractConfig<NTheEndAgain> {
 
     // Respawn
 
+    public int getMaxDragons() {
+    	return this.maxDragons;
+    }
+    
     public int getRespawnNumber() {
         return this.respawnNumber;
     }
-
+    
     private void setRespawnNumber(final int respawnNumber) {
         this.respawnNumber = respawnNumber;
     }

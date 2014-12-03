@@ -25,7 +25,6 @@ import java.util.HashMap;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
-import org.bukkit.World.Environment;
 import org.bukkit.configuration.InvalidConfigurationException;
 
 import org.mcstats.Metrics;
@@ -70,7 +69,6 @@ public class NTheEndAgain extends NPlugin implements TheEndAgainNode {
         this.debug("Analysing all worlds...");
         for (final World w : Bukkit.getWorlds()) {
             this.debug("World " + w.getName() + " is of type " + w.getEnvironment());
-            if (w.getEnvironment() == Environment.THE_END) {
                 try {
                     this.debug("Trying to load world " + w.getName());
                     res = this.loadWorld(w);
@@ -82,7 +80,6 @@ public class NTheEndAgain extends NPlugin implements TheEndAgainNode {
                     this.error("An error occured when NTheEndAgain tried to load \"" + w.getName() + "\"'s config file.", e);
                     break;
                 }
-            }
         }
         if (!res) {
             this.error("Failed to load a configuration, please triple-check them. Disabling plugin...");

@@ -440,9 +440,6 @@ public class EnderDragonListener implements Listener {
         if (event.getEntityType() == EntityType.ENDER_DRAGON) {
             final EndWorldHandler handler = this.plugin.getHandler(StringUtil.toLowerCamelCase(event.getLocation().getWorld().getName()));
             if (handler != null) {
-                if (handler.getNumberOfAliveEnderDragons() >= handler.getConfig().getRespawnNumber()) {
-                    event.setCancelled(true);
-                } else {
                     if (event.getSpawnReason() != SpawnReason.CUSTOM && event.getSpawnReason() != SpawnReason.SPAWNER_EGG) {
                         event.setCancelled(true);
                     } else {
@@ -454,7 +451,6 @@ public class EnderDragonListener implements Listener {
                         handler.getLoadedDragons().add(event.getEntity().getUniqueId());
                     }
                 }
-            }
         }
     }
 

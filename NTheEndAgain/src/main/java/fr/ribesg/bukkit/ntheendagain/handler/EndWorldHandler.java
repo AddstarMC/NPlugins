@@ -29,6 +29,7 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.World;
+import org.bukkit.World.Environment;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.Entity;
@@ -114,7 +115,7 @@ public class EndWorldHandler {
      */
     public void init() {
         // Config is now loaded
-
+    	if(this.endWorld.getEnvironment() == Environment.THE_END){
         this.countEntities();
 
         if (this.config.getRespawnType() == 3) {
@@ -142,6 +143,7 @@ public class EndWorldHandler {
         if (this.config.getRegenTimer() != 0 && (this.config.getRegenType() == 2 || this.config.getRegenType() == 3)) {
             this.tasks.add(new RegenTask(this).schedule(this.plugin));
         }
+    	}
     }
 
     /**
@@ -193,7 +195,8 @@ public class EndWorldHandler {
      * - EnderCrystals
      */
     private void countEntities() {
-        this.plugin.getLogger().info("Counting existing EDs in " + this.endWorld.getName() + "...");
+    	if(this.endWorld.getEnvironment() == Environment.THE_END){
+    	this.plugin.getLogger().info("Counting existing EDs in " + this.endWorld.getName() + "...");
         for (final EndChunk c : this.chunks.getSafeChunksList()) {
             if (this.endWorld.isChunkLoaded(c.getX(), c.getZ())) {
                 final Chunk chunk = this.endWorld.getChunkAt(c.getX(), c.getZ());
@@ -217,6 +220,7 @@ public class EndWorldHandler {
             }
         }
         this.plugin.getLogger().info("Done, " + this.getNumberOfAliveEnderDragons() + " EnderDragon(s) found.");
+    	}
     }
 
     /**

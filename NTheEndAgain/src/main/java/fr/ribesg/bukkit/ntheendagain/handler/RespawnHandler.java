@@ -107,11 +107,11 @@ public class RespawnHandler {
         final World world = this.worldHandler.getEndWorld();
         final EndChunks chunks = this.worldHandler.getChunks();
         // Create a random location near the center
-        final int x = RANDOM.nextInt(81) - 40; // [-40;40]
-        final int y = 100 + RANDOM.nextInt(21); // [100;120]
-        final int z = RANDOM.nextInt(81) - 40; // [-40;40]
-        final Location loc = new Location(world, x, y, z);
-
+        final int x = RANDOM.nextInt(81) - 40; // [-40;40];
+    	final int y = 100 + RANDOM.nextInt(21); // [100;120]
+    	final int z = RANDOM.nextInt(81) - 40; // [-40;40]
+    	final Location loc = new Location(world, x, y, z);;
+        
         this.plugin.debug("Will spawn at " + NLocation.toString(loc));
 
         boolean regenerated = false;

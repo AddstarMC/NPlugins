@@ -105,7 +105,7 @@ public class ChunkListener implements Listener {
                         endChunk = chunks.addChunk(chunk);
                     }
                     for (final Entity e : chunk.getEntities()) {
-                        if (e.getType() == EntityType.ENDER_DRAGON) {
+                        if (e.getType() == EntityType.ENDER_DRAGON && event.getWorld().getEnvironment() == Environment.THE_END) {
                             final EnderDragon ed = (EnderDragon)e;
                             if (!handler.getDragons().containsKey(ed.getUniqueId())) {
                                 ed.setMaxHealth(handler.getConfig().getEdHealth());
