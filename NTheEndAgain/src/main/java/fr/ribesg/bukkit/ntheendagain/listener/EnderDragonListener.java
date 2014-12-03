@@ -33,6 +33,7 @@ import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.World.Environment;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -441,9 +442,7 @@ public class EnderDragonListener implements Listener {
             final EndWorldHandler handler = this.plugin.getHandler(StringUtil.toLowerCamelCase(event.getLocation().getWorld().getName()));
             if (handler != null) {
                     if (event.getSpawnReason() != SpawnReason.CUSTOM && event.getSpawnReason() != SpawnReason.SPAWNER_EGG) {
-                        event.setCancelled(true);
-                    } else {
-                        if (!handler.getDragons().containsKey(event.getEntity().getUniqueId())) {
+                        if (!handler.getDragons().containsKey(event.getEntity().getUniqueId()) && event.getLocation().getWorld().getEnvironment() == Environment.THE_END) {
                             handler.getDragons().put(event.getEntity().getUniqueId(), new HashMap<String, Double>());
                             event.getEntity().setMaxHealth(handler.getConfig().getEdHealth());
                             event.getEntity().setHealth(event.getEntity().getMaxHealth());
