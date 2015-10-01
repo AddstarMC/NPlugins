@@ -9,6 +9,8 @@
 
 package fr.ribesg.bukkit.ncore.util;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -210,7 +212,7 @@ public final class AsyncPermAccessor implements Listener {
                 return a.getName().compareTo(b.getName());
             }
         });
-        Collections.addAll(this.players, Bukkit.getOnlinePlayers());
+        Collections.addAll(this.players, (Player)Bukkit.getOnlinePlayers());
         this.playerCount = this.players.size();
 
         Bukkit.getPluginManager().registerEvents(this, this.plugin);

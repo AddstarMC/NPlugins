@@ -12,8 +12,11 @@ package fr.ribesg.bukkit.ncore.util;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import org.bukkit.Bukkit;
 
 /**
  * This class is a tool to build Framed text for nice output, in configs
@@ -78,7 +81,8 @@ public class FrameBuilder {
      * @param options options about this line
      */
     public void addLine(final String content, final Option... options) {
-        final Set<Option> optionSet = EnumSet.copyOf(Arrays.asList(options));
+    	List<Option> L = Arrays.asList(options);
+        final Set<Option> optionSet = new HashSet<Option>(L);
         final Line line = new Line(content, optionSet);
         this.lines.add(line);
         this.maxLength = content.length() > this.maxLength ? content.length() : this.maxLength;

@@ -49,7 +49,7 @@ public class WelcomeListener implements Listener {
         final String motd = server.getMotd();
         final String name = server.getName();
         final String onlineMode = server.getOnlineMode() ? "§aOnline" : "§cOffline";
-        final String onlinePlayersCount = Integer.toString(server.getOnlinePlayers().length);
+        final String onlinePlayersCount = Integer.toString(server.getOnlinePlayers().size());
         final String port = Integer.toString(server.getPort());
         final String serverId = server.getServerId();
         final String serverName = server.getServerName();

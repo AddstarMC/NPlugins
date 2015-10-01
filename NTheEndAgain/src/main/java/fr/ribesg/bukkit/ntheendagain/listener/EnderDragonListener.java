@@ -77,7 +77,7 @@ public class EnderDragonListener implements Listener {
      */
     @EventHandler(priority = EventPriority.NORMAL)
     public void onEnderDragonDeath(final EntityDeathEvent event) {
-        if (event.getEntityType() == EntityType.ENDER_DRAGON) {
+    	if (event.getEntityType() == EntityType.ENDER_DRAGON) {
             final World endWorld = event.getEntity().getWorld();
             final EndWorldHandler handler = this.plugin.getHandler(StringUtil.toLowerCamelCase(endWorld.getName()));
             if (handler != null) {
@@ -439,6 +439,7 @@ public class EnderDragonListener implements Listener {
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onEnderDragonSpawn(final CreatureSpawnEvent event) {
         if (event.getEntityType() == EntityType.ENDER_DRAGON) {
+        	if(event.getEntity().getWorld().getEnvironment() == Environment.THE_END){
             final EndWorldHandler handler = this.plugin.getHandler(StringUtil.toLowerCamelCase(event.getLocation().getWorld().getName()));
             if (handler != null) {
                     if (event.getSpawnReason() != SpawnReason.CUSTOM && event.getSpawnReason() != SpawnReason.SPAWNER_EGG) {
@@ -450,6 +451,7 @@ public class EnderDragonListener implements Listener {
                         handler.getLoadedDragons().add(event.getEntity().getUniqueId());
                     }
                 }
+        	}
         }
     }
 
@@ -460,6 +462,7 @@ public class EnderDragonListener implements Listener {
      */
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onEnderDragonRegainHealth(final EntityRegainHealthEvent event) {
+    	if(event.getEntity().getWorld().getEnvironment() == Environment.THE_END){
         if (event.getEntityType() == EntityType.ENDER_DRAGON && event.getRegainReason() == RegainReason.ENDER_CRYSTAL) {
             final EndWorldHandler handler = this.plugin.getHandler(StringUtil.toLowerCamelCase(event.getEntity().getLocation().getWorld().getName()));
             if (handler != null) {
@@ -473,5 +476,6 @@ public class EnderDragonListener implements Listener {
                 }
             }
         }
+    	}
     }
 }
