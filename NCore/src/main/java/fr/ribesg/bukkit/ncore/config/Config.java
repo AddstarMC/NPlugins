@@ -144,7 +144,7 @@ public class Config extends AbstractConfig<NCore> {
         // Header
         frame = new FrameBuilder();
         frame.addLine("Config file for NCore plugin", FrameBuilder.Option.CENTER);
-        frame.addLine("If you don't understand something, please ask on dev.bukkit.org", FrameBuilder.Option.CENTER);
+        frame.addLine("If you don't understand something, please ask on dev.bukkit.org");
         frame.addLine("Ribesg", FrameBuilder.Option.RIGHT);
         for (final String line : frame.build()) {
             content.append(line + '\n');
