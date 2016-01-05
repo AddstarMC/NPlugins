@@ -25,19 +25,17 @@ import fr.ribesg.bukkit.ncore.node.world.WorldNode;
 import fr.ribesg.bukkit.ncore.updater.Updater;
 import fr.ribesg.bukkit.ncore.updater.UpdaterListener;
 import fr.ribesg.bukkit.ncore.util.FrameBuilder;
+import org.bukkit.Bukkit;
+import org.bukkit.configuration.InvalidConfigurationException;
+import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.mcstats.Metrics;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import org.bukkit.Bukkit;
-import org.bukkit.configuration.InvalidConfigurationException;
-import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
-
-import org.mcstats.Metrics;
 
 /**
  * The Core of the N Plugin Suite
@@ -264,9 +262,10 @@ public class NCore extends JavaPlugin {
     }
 
     public void set(final String nodeName, final Node node) {
-        if (this.nodes.containsKey(nodeName.toLowerCase())) {
+        /*if (this.nodes.containsKey(nodeName.toLowerCase())) {
             throw new IllegalStateException("Registering the same node twice!");
-        } else {
+        } else*/
+	    if(!this.nodes.containsKey(nodeName.toLowerCase())){
             this.nodes.put(nodeName.toLowerCase(), node);
         }
     }
