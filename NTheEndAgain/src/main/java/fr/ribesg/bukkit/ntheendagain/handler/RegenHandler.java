@@ -230,9 +230,13 @@ public class RegenHandler {
                 } else {
                     spawnLoc = worldNode.getWorldSpawnLocation(world.getName());
                 }
-                for (final Player p : endWorld.getPlayers()) {
-                    p.teleport(spawnLoc);
-                    plugin.sendMessage(p, MessageId.theEndAgain_worldRegenerating);
+                //for (final Player p : endWorld.getPlayers()) {
+                for (final Player player : Bukkit.getOnlinePlayers()) {
+	                if(player.getWorld().getEnvironment() == World.Environment.THE_END)
+	                {
+		                player.teleport(spawnLoc);
+	                }
+                    plugin.sendMessage(player, MessageId.theEndAgain_worldRegenerating);
                 }
                 break;
             case 2:

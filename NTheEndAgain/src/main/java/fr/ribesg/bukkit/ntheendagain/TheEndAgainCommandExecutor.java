@@ -16,16 +16,16 @@ import fr.ribesg.bukkit.ncore.util.WorldUtil;
 import fr.ribesg.bukkit.ntheendagain.handler.EndWorldHandler;
 import fr.ribesg.bukkit.ntheendagain.world.EndChunk;
 import fr.ribesg.bukkit.ntheendagain.world.EndChunks;
+import org.bukkit.World;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 public class TheEndAgainCommandExecutor implements CommandExecutor {
 
@@ -133,7 +133,8 @@ public class TheEndAgainCommandExecutor implements CommandExecutor {
 
     private boolean cmdRegen(final CommandSender sender, final String[] args) {
         final String[] parsedArgs = this.checkWorldArgument(sender, args);
-        if (parsedArgs == null) {
+
+        /*if (parsedArgs == null) {
             // The sender already received a message
             return true;
         } else {
@@ -148,7 +149,7 @@ public class TheEndAgainCommandExecutor implements CommandExecutor {
             } else {
                 this.plugin.sendMessage(sender, MessageId.unknownWorld, parsedArgs[0]);
             }
-        }
+        }*/
         return true;
     }
 
@@ -376,18 +377,30 @@ public class TheEndAgainCommandExecutor implements CommandExecutor {
                 this.plugin.sendMessage(sender, MessageId.missingWorldArg);
                 return null;
             } else {
-                result = new String[args.length + 1];
-                result[0] = ((Player)sender).getWorld().getName();
-                System.arraycopy(args, 0, result, 1, args.length);
+	            if(((Player) sender).getWorld().getEnvironment() == World.Environment.THE_END) {
+		            result = new String[args.length + 1];
+		            result[0] = ((Player)sender).getWorld().getName();
+		            System.arraycopy(args, 0, result, 1, args.length);
+	            }
+	            else {
+		            this.plugin.sendMessage(sender, MessageId.theEndAgain_notInAnEndWorld);
+		            return null;
+	            }
             }
         } else {
             final String supposedWorldName = args[0];
             final String realWorldName = WorldUtil.getRealWorldName(supposedWorldName);
             if (realWorldName == null) { // No world argument provided, use Player's world
                 if (senderIsAPlayer) {
-                    result = new String[args.length + 1];
-                    result[0] = ((Player)sender).getWorld().getName();
-                    System.arraycopy(args, 0, result, 1, args.length);
+	                if(((Player) sender).getWorld().getEnvironment() == World.Environment.THE_END) {
+		                result = new String[args.length + 1];
+		                result[0] = ((Player)sender).getWorld().getName();
+		                System.arraycopy(args, 0, result, 1, args.length);
+	                }
+	                else {
+		                this.plugin.sendMessage(sender, MessageId.theEndAgain_notInAnEndWorld);
+		                return null;
+	                }
                 } else {
                     this.plugin.sendMessage(sender, MessageId.missingWorldArg);
                     return null;
