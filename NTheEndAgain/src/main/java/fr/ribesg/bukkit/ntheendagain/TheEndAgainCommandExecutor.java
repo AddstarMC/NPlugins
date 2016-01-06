@@ -133,8 +133,7 @@ public class TheEndAgainCommandExecutor implements CommandExecutor {
 
     private boolean cmdRegen(final CommandSender sender, final String[] args) {
         final String[] parsedArgs = this.checkWorldArgument(sender, args);
-
-        /*if (parsedArgs == null) {
+        if (parsedArgs == null) {
             // The sender already received a message
             return true;
         } else {
@@ -149,7 +148,7 @@ public class TheEndAgainCommandExecutor implements CommandExecutor {
             } else {
                 this.plugin.sendMessage(sender, MessageId.unknownWorld, parsedArgs[0]);
             }
-        }*/
+        }
         return true;
     }
 
