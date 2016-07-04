@@ -167,21 +167,21 @@ public class ItemMetaUtil {
         final ItemMeta meta = is.getItemMeta();
 
         if (meta instanceof BookMeta) {
-            saveBookMetaToConfigSection(itemSection, (BookMeta)meta);
+            saveBookMetaToConfigSection(createAndGetSection(itemSection, "meta"), (BookMeta)meta);
         } else if (meta instanceof EnchantmentStorageMeta) {
-            saveEnchantmentStorageMetaToConfigSection(itemSection, (EnchantmentStorageMeta)meta);
+            saveEnchantmentStorageMetaToConfigSection(createAndGetSection(itemSection, "meta"), (EnchantmentStorageMeta)meta);
         } else if (meta instanceof FireworkEffectMeta) {
-            saveFireworkEffectMetaToConfigSection(itemSection, (FireworkEffectMeta)meta);
+            saveFireworkEffectMetaToConfigSection(createAndGetSection(itemSection, "meta"), (FireworkEffectMeta)meta);
         } else if (meta instanceof FireworkMeta) {
-            saveFireworkMetaToConfigSection(itemSection, (FireworkMeta)meta);
+            saveFireworkMetaToConfigSection(createAndGetSection(itemSection, "meta"), (FireworkMeta)meta);
         } else if (meta instanceof LeatherArmorMeta) {
-            saveLeatherArmorMetaToConfigSection(itemSection, (LeatherArmorMeta)meta);
+            saveLeatherArmorMetaToConfigSection(createAndGetSection(itemSection, "meta"), (LeatherArmorMeta)meta);
         } else if (meta instanceof MapMeta) {
-            saveMapMetaToConfigSection(itemSection, (MapMeta)meta);
+            saveMapMetaToConfigSection(createAndGetSection(itemSection, "meta"), (MapMeta)meta);
         } else if (meta instanceof PotionMeta) {
-            savePotionMetaToConfigSection(itemSection, (PotionMeta)meta);
+            savePotionMetaToConfigSection(createAndGetSection(itemSection, "meta"), (PotionMeta)meta);
         } else if (meta instanceof SkullMeta) {
-            saveSkullMetaToConfigSection(itemSection, (SkullMeta)meta);
+            saveSkullMetaToConfigSection(createAndGetSection(itemSection, "meta"), (SkullMeta)meta);
         }
 
         if (meta.hasDisplayName()) {
@@ -476,7 +476,7 @@ public class ItemMetaUtil {
     }
 
     private static void saveFireworkEffectMetaToConfigSection(final ConfigurationSection metaSection, final FireworkEffectMeta meta) {
-        saveFireworkEffectMetaToConfigSection(metaSection, meta, "FireworkEffect");
+        saveFireworkEffectMetaToConfigSection(metaSection, meta, "fireworkEffect");
     }
 
     private static void saveFireworkEffectMetaToConfigSection(final ConfigurationSection metaSection, final FireworkEffectMeta meta, final String sectionName) {
@@ -696,7 +696,7 @@ public class ItemMetaUtil {
             final ConfigurationSection potionSection = metaSection.getConfigurationSection("potion");
             for (final String key : potionSection.getKeys(false)) {
                 if (key.startsWith("potionEffect") && potionSection.isConfigurationSection(key)) {
-                    final ConfigurationSection potionEffectSection = metaSection.getConfigurationSection(key);
+                    final ConfigurationSection potionEffectSection = potionSection.getConfigurationSection(key);
                     final PotionEffectType type = PotionEffectType.getByName(potionEffectSection.getString("type"));
                     final int duration = potionEffectSection.getInt("duration");
                     final int amplifier = potionEffectSection.getInt("amplifier");

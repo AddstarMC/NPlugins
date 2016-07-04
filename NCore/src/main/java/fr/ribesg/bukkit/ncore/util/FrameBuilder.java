@@ -81,8 +81,7 @@ public class FrameBuilder {
      * @param options options about this line
      */
     public void addLine(final String content, final Option... options) {
-    	List<Option> L = Arrays.asList(options);
-        final Set<Option> optionSet = new HashSet<Option>(L);
+        final Set<Option> optionSet = options.length == 0 ? EnumSet.noneOf(Option.class) : EnumSet.copyOf(Arrays.asList(options));
         final Line line = new Line(content, optionSet);
         this.lines.add(line);
         this.maxLength = content.length() > this.maxLength ? content.length() : this.maxLength;

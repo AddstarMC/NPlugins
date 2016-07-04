@@ -47,7 +47,6 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent.RegainReason;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
 
 /**
  * Handles EnderDragons spawn, health regain and death
@@ -414,16 +413,18 @@ public class EnderDragonListener implements Listener {
                 } else if (handler.getNumberOfAliveEnderDragons() == 0) {
                     if (config.getRespawnType() == 2) {
                         handler.getRespawnHandler().respawnLater();
-                    } else if (config.getRespawnType() == 6) {
+                    }/* else if (config.getRespawnType() == 6) {
+                        // Type 6 (deprecated):
+                        // Respawn every X seconds after the last Dragon alive's death, persistent through reboots/reloads
                         config.setNextRespawnTaskTime(System.currentTimeMillis() + config.getRandomRespawnTimer() * 1000);
-                        handler.getTasks().add(Bukkit.getScheduler().runTaskLater(this.plugin, new BukkitRunnable() {
+                        handler.getTasks().add(Bukkit.getScheduler().runTaskLater(this.plugin, new Runnable() {
 
                             @Override
                             public void run() {
                                 handler.getRespawnHandler().respawn();
                             }
                         }, config.getNextRespawnTaskTime() / 1000 * 20));
-                    }
+                    }*/
                 }
             }
         }
@@ -439,9 +440,9 @@ public class EnderDragonListener implements Listener {
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onEnderDragonSpawn(final CreatureSpawnEvent event) {
         if (event.getEntityType() == EntityType.ENDER_DRAGON) {
-        	if(event.getEntity().getWorld().getEnvironment() == Environment.THE_END){
-            final EndWorldHandler handler = this.plugin.getHandler(StringUtil.toLowerCamelCase(event.getLocation().getWorld().getName()));
-            if (handler != null) {
+        	if(event.getEntity().getWorld().getEnvironment() == Environment.THE_END) {
+                final EndWorldHandler handler = this.plugin.getHandler(StringUtil.toLowerCamelCase(event.getLocation().getWorld().getName()));
+                if (handler != null) {
                     if (event.getSpawnReason() != SpawnReason.CUSTOM && event.getSpawnReason() != SpawnReason.SPAWNER_EGG) {
                         if (!handler.getDragons().containsKey(event.getEntity().getUniqueId()) && event.getLocation().getWorld().getEnvironment() == Environment.THE_END) {
                             handler.getDragons().put(event.getEntity().getUniqueId(), new HashMap<String, Double>());
