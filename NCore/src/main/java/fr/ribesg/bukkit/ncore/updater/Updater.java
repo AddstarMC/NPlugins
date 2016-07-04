@@ -167,7 +167,7 @@ public class Updater {
     }
 
     public void checkForUpdates(@Nullable final CommandSender sender, @Nullable final String nodeName) {
-        Bukkit.getScheduler().runTaskAsynchronously(this.plugin, new BukkitRunnable() {
+        Bukkit.getScheduler().runTaskAsynchronously(this.plugin, new Runnable() {
 
             @Override
             public void run() {

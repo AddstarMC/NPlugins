@@ -41,9 +41,7 @@ import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitRunnable;
 
 public class LoggedOutUserHandler implements Listener {
 
@@ -54,7 +52,7 @@ public class LoggedOutUserHandler implements Listener {
         this.plugin = plugin;
         this.loggedOutPlayers = new HashMap<>();
 
-        Bukkit.getScheduler().runTaskTimer(plugin, new BukkitRunnable() {
+        Bukkit.getScheduler().runTaskTimer(plugin, new Runnable() {
 
             @Override
             public void run() {

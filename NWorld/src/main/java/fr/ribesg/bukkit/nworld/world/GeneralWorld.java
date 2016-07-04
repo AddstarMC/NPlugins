@@ -21,7 +21,6 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 
 /**
  * @author Ribesg
@@ -167,7 +166,7 @@ public abstract class GeneralWorld implements Comparable<GeneralWorld> {
         }
 
         // Unload the world
-        Bukkit.getScheduler().runTaskLater(this.plugin, new BukkitRunnable() {
+        Bukkit.getScheduler().runTaskLater(this.plugin, new Runnable() {
 
             @Override
             public void run() {

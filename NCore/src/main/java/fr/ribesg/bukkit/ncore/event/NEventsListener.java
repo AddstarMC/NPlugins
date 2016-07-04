@@ -19,7 +19,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.scheduler.BukkitRunnable;
 
 public class NEventsListener implements Listener {
 
@@ -36,7 +35,7 @@ public class NEventsListener implements Listener {
      */
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerJoin(final PlayerJoinEvent event) {
-        Bukkit.getScheduler().runTaskLater(this.plugin, new BukkitRunnable() {
+        Bukkit.getScheduler().runTaskLater(this.plugin, new Runnable() {
 
             @Override
             public void run() {

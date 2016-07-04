@@ -30,7 +30,6 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
-import org.bukkit.scheduler.BukkitRunnable;
 
 public class PlayerListener implements Listener {
 
@@ -68,7 +67,7 @@ public class PlayerListener implements Listener {
             case SKULL: // Creating an Altar by placing the Wither Skull last
                 this.plugin.debug("Placing a Skull");
                 final Player player = event.getPlayer();
-                Bukkit.getScheduler().runTaskLater(this.plugin, new BukkitRunnable() {
+                Bukkit.getScheduler().runTaskLater(this.plugin, new Runnable() {
 
                     @Override
                     public void run() {

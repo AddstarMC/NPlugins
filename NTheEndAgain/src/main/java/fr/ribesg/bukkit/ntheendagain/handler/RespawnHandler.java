@@ -59,7 +59,7 @@ public class RespawnHandler {
     public void respawnLater() {
         this.plugin.entering(this.getClass(), "respawnLater");
 
-        Bukkit.getScheduler().runTaskLater(this.worldHandler.getPlugin(), new BukkitRunnable() {
+        Bukkit.getScheduler().runTaskLater(this.worldHandler.getPlugin(), new Runnable() {
 
             @Override
             public void run() {
@@ -110,7 +110,7 @@ public class RespawnHandler {
         final int x = RANDOM.nextInt(81) - 40; // [-40;40];
     	final int y = 100 + RANDOM.nextInt(21); // [100;120]
     	final int z = RANDOM.nextInt(81) - 40; // [-40;40]
-    	final Location loc = new Location(world, x, y, z);;
+    	final Location loc = new Location(world, x, y, z);
         
         this.plugin.debug("Will spawn at " + NLocation.toString(loc));
 
@@ -130,7 +130,7 @@ public class RespawnHandler {
         }
         if (regenerated) {
             this.plugin.debug("At least one chunk has been regen, respawn later");
-            Bukkit.getScheduler().runTaskLater(this.worldHandler.getPlugin(), new BukkitRunnable() {
+            Bukkit.getScheduler().runTaskLater(this.worldHandler.getPlugin(), new Runnable() {
 
                 @Override
                 public void run() {

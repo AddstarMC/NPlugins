@@ -30,7 +30,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.bukkit.scheduler.BukkitRunnable;
 
 public class TalkListener implements Listener {
 
@@ -179,7 +178,7 @@ public class TalkListener implements Listener {
         }
 
         final String normalMessage = String.format(formats[1], event.getPlayer().getDisplayName(), message);
-        Bukkit.getScheduler().runTask(this.plugin, new BukkitRunnable() {
+        Bukkit.getScheduler().runTask(this.plugin, new Runnable() {
 
             @Override
             public void run() {

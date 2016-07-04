@@ -39,7 +39,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerLoginEvent;
-import org.bukkit.scheduler.BukkitRunnable;
 
 /**
  * @author Ribesg
@@ -172,7 +171,7 @@ public class UuidDb extends AbstractConfig<NCore> implements Listener {
         this.byName = new LinkedHashMap<>();
         this.updated = false;
         Bukkit.getPluginManager().registerEvents(this, instance);
-        Bukkit.getScheduler().runTaskTimerAsynchronously(instance, new BukkitRunnable() {
+        Bukkit.getScheduler().runTaskTimerAsynchronously(instance, new Runnable() {
 
             @Override
             public void run() {

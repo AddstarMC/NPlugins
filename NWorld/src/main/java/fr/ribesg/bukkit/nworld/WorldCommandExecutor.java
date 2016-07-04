@@ -33,7 +33,6 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.ChatPaginator;
 
 /**
@@ -163,7 +162,7 @@ public class WorldCommandExecutor implements CommandExecutor {
             if (Perms.has(player, world.getRequiredPermission()) || Perms.hasWorldWarpAll(player)) {
                 final Location loc = world.getSpawnLocation().toBukkitLocation();
                 loc.getChunk().load();
-                Bukkit.getScheduler().runTaskLater(this.plugin, new BukkitRunnable() {
+                Bukkit.getScheduler().runTaskLater(this.plugin, new Runnable() {
 
                     @Override
                     public void run() {
@@ -659,7 +658,7 @@ public class WorldCommandExecutor implements CommandExecutor {
                     this.plugin.sendMessage(sender, MessageId.world_warpUnloadedWorld, warp.getLocation().getWorldName(), warp.getName());
                 } else {
                     loc.getChunk().load();
-                    Bukkit.getScheduler().runTaskLater(this.plugin, new BukkitRunnable() {
+                    Bukkit.getScheduler().runTaskLater(this.plugin, new Runnable() {
 
                         @Override
                         public void run() {

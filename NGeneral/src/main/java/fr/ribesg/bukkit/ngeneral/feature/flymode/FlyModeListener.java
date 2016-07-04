@@ -20,7 +20,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.scheduler.BukkitRunnable;
 
 public class FlyModeListener implements Listener {
 
@@ -52,7 +51,7 @@ public class FlyModeListener implements Listener {
             final boolean wasFlying = event.getPlayer().isFlying();
             final Player player = event.getPlayer();
             if (Perms.hasFly(event.getPlayer()) && this.feature.hasFlyMode(event.getPlayer())) {
-                Bukkit.getScheduler().runTaskLater(this.feature.getPlugin(), new BukkitRunnable() {
+                Bukkit.getScheduler().runTaskLater(this.feature.getPlugin(), new Runnable() {
 
                     @Override
                     public void run() {

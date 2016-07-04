@@ -34,7 +34,6 @@ import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
 public class EndWorldHandler {
@@ -98,7 +97,7 @@ public class EndWorldHandler {
     }
 
     public void initLater() {
-        Bukkit.getScheduler().runTaskLater(this.plugin, new BukkitRunnable() {
+        Bukkit.getScheduler().runTaskLater(this.plugin, new Runnable() {
 
             @Override
             public void run() {
@@ -122,7 +121,7 @@ public class EndWorldHandler {
             this.respawnHandler.respawnNoRegen();
         } else if (this.config.getRespawnType() == 6) {
             if (this.config.getNextRespawnTaskTime() > System.currentTimeMillis()) {
-                this.tasks.add(Bukkit.getScheduler().runTaskLater(this.plugin, new BukkitRunnable() {
+                this.tasks.add(Bukkit.getScheduler().runTaskLater(this.plugin, new Runnable() {
 
                     @Override
                     public void run() {

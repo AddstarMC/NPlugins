@@ -23,7 +23,6 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 
 /**
  * @author Ribesg
@@ -62,7 +61,7 @@ public class RegenHandler {
         this.kickPlayers();
 
         this.plugin.debug("Schedule regen task in " + EndWorldHandler.KICK_TO_REGEN_DELAY + " ticks");
-        Bukkit.getScheduler().runTaskLater(this.worldHandler.getPlugin(), new BukkitRunnable() {
+        Bukkit.getScheduler().runTaskLater(this.worldHandler.getPlugin(), new Runnable() {
 
             @Override
             public void run() {
@@ -106,7 +105,7 @@ public class RegenHandler {
         this.regen();
 
         this.plugin.debug("Scheduling respawn task in " + EndWorldHandler.REGEN_TO_RESPAWN_DELAY + "ticks");
-        Bukkit.getScheduler().runTaskLater(this.worldHandler.getPlugin(), new BukkitRunnable() {
+        Bukkit.getScheduler().runTaskLater(this.worldHandler.getPlugin(), new Runnable() {
 
             @Override
             public void run() {

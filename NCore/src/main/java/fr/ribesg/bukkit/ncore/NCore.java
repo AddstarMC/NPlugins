@@ -28,7 +28,6 @@ import fr.ribesg.bukkit.ncore.util.FrameBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.mcstats.Metrics;
 
 import java.io.IOException;
@@ -87,7 +86,7 @@ public class NCore extends JavaPlugin {
 
         this.nodes = new HashMap<>();
 
-        Bukkit.getScheduler().runTaskLaterAsynchronously(this, new BukkitRunnable() {
+        Bukkit.getScheduler().runTaskLaterAsynchronously(this, new Runnable() {
 
             @Override
             public void run() {
@@ -207,7 +206,7 @@ public class NCore extends JavaPlugin {
         if (noNodeFound) {
             final FrameBuilder frame = new FrameBuilder();
             frame.addLine("This plugin can be safely removed", FrameBuilder.Option.CENTER);
-            frame.addLine("It seems that you are using this plugin, NCore, while note using any");
+            frame.addLine("It seems that you are using this plugin, NCore, while not using any");
             frame.addLine("node of the NPlugins suite. Maybe you forgot to add the Node(s) you");
             frame.addLine("wanted to use, or you forgot to remove NCore after removing all nodes.");
             frame.addLine("Ribesg", FrameBuilder.Option.RIGHT);

@@ -21,7 +21,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
-import org.bukkit.scheduler.BukkitRunnable;
 
 public abstract class Transition {
 
@@ -79,7 +78,7 @@ public abstract class Transition {
                 altar.setPreviousState(altar.getState());
                 altar.setState(AltarState.IN_TRANSITION);
                 for (final Entry<Integer, Set<Step>> e : this.stepsPerDelay.entrySet()) {
-                    Bukkit.getScheduler().runTaskLater(this.plugin, new BukkitRunnable() {
+                    Bukkit.getScheduler().runTaskLater(this.plugin, new Runnable() {
 
                         @Override
                         public void run() {
@@ -89,7 +88,7 @@ public abstract class Transition {
                         }
                     }, e.getKey());
                 }
-                Bukkit.getScheduler().runTaskLater(this.plugin, new BukkitRunnable() {
+                Bukkit.getScheduler().runTaskLater(this.plugin, new Runnable() {
 
                     @Override
                     public void run() {

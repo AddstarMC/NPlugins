@@ -29,7 +29,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
-import org.bukkit.scheduler.BukkitRunnable;
 
 /**
  * Handles Chunk Load and Unload events
@@ -83,7 +82,7 @@ public class ChunkListener implements Listener {
                         endChunk.cleanCrystalLocations();
                         final int x = endChunk.getX(), z = endChunk.getZ();
                         event.getWorld().regenerateChunk(x, z);
-                        Bukkit.getScheduler().runTaskLater(this.plugin, new BukkitRunnable() {
+                        Bukkit.getScheduler().runTaskLater(this.plugin, new Runnable() {
 
                             @Override
                             public void run() {

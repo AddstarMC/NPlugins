@@ -11,7 +11,6 @@ package fr.ribesg.bukkit.ncore.common;
 
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.scheduler.BukkitRunnable;
 
 /**
  * Represents an operation composed of an asynchronous part and
@@ -60,11 +59,11 @@ public abstract class AsyncThenSyncOperation {
             throw new IllegalStateException("Can only run once.");
         }
         this.ran = true;
-        Bukkit.getScheduler().runTaskAsynchronously(this.plugin, new BukkitRunnable() {
+        Bukkit.getScheduler().runTaskAsynchronously(this.plugin, new Runnable() {
             @Override
             public void run() {
                 fr.ribesg.bukkit.ncore.common.AsyncThenSyncOperation.this.execAsyncFirst();
-                Bukkit.getScheduler().runTask(fr.ribesg.bukkit.ncore.common.AsyncThenSyncOperation.this.plugin, new BukkitRunnable() {
+                Bukkit.getScheduler().runTask(fr.ribesg.bukkit.ncore.common.AsyncThenSyncOperation.this.plugin, new Runnable() {
                     @Override
                     public void run() {
                         fr.ribesg.bukkit.ncore.common.AsyncThenSyncOperation.this.execSyncThen();

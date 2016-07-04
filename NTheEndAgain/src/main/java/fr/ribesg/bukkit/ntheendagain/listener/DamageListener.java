@@ -25,7 +25,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 /**
@@ -92,7 +91,7 @@ public class DamageListener implements Listener {
                         velocity.setY(10);
                     }
                     velocity.normalize().multiply(handler.getConfig().getEdPushForce());
-                    Bukkit.getScheduler().runTask(this.plugin, new BukkitRunnable() {
+                    Bukkit.getScheduler().runTask(this.plugin, new Runnable() {
 
                         @Override
                         public void run() {

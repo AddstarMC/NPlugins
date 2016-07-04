@@ -33,7 +33,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.bukkit.scheduler.BukkitRunnable;
 
 public class PlayerCommandHandler implements CommandExecutor, Listener {
 
@@ -368,7 +367,7 @@ public class PlayerCommandHandler implements CommandExecutor, Listener {
                     } else {
                         this.plugin.sendMessage(player, MessageId.player_teleportingToUserHome, realUserName);
                         dest.getChunk().load(true);
-                        this.plugin.getServer().getScheduler().runTask(this.plugin, new BukkitRunnable() {
+                        this.plugin.getServer().getScheduler().runTask(this.plugin, new Runnable() {
 
                             @Override
                             public void run() {
@@ -390,7 +389,7 @@ public class PlayerCommandHandler implements CommandExecutor, Listener {
                 } else {
                     this.plugin.sendMessage(player, MessageId.player_teleportingToYourHome);
                     dest.getChunk().load(true);
-                    this.plugin.getServer().getScheduler().runTask(this.plugin, new BukkitRunnable() {
+                    this.plugin.getServer().getScheduler().runTask(this.plugin, new Runnable() {
 
                         @Override
                         public void run() {

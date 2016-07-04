@@ -23,7 +23,6 @@ import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 
 public class SpyModeFeature extends Feature {
 
@@ -62,7 +61,7 @@ public class SpyModeFeature extends Feature {
         }
         Dynmap.hidePlayer(spy);
         if (spied != null) {
-            Bukkit.getScheduler().runTaskLater(this.getPlugin(), new BukkitRunnable() {
+            Bukkit.getScheduler().runTaskLater(this.getPlugin(), new Runnable() {
 
                 @Override
                 public void run() {
@@ -77,7 +76,7 @@ public class SpyModeFeature extends Feature {
         if (previousLocation != null) {
             spy.teleport(previousLocation.toBukkitLocation());
         }
-        Bukkit.getScheduler().runTaskLater(this.getPlugin(), new BukkitRunnable() {
+        Bukkit.getScheduler().runTaskLater(this.getPlugin(), new Runnable() {
 
             @Override
             public void run() {
