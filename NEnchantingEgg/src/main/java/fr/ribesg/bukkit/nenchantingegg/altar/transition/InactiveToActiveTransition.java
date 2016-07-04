@@ -48,7 +48,7 @@ public class InactiveToActiveTransition extends Transition {
         final Effect effectSound = Effect.BLAZE_SHOOT;
         final Effect effectGraphic = Effect.ENDER_SIGNAL;
 
-        steps.add(new SoundStep(0, new RelativeSound(-3, 4, 0, Sound.ENDERMAN_STARE, 1.5f, 0.75f)));
+        steps.add(new SoundStep(0, new RelativeSound(-3, 4, 0, Sound.ENTITY_ENDERMEN_STARE, 1.5f, 0.75f)));
 
         // ##########################################
 
@@ -143,10 +143,10 @@ public class InactiveToActiveTransition extends Transition {
         steps.add(new BlockStep(6 * t, new RelativeBlock(4, 0, 0, Material.LAVA)));
         steps.add(new BlockStep(6 * t, new RelativeBlock(0, 0, 4, Material.LAVA)));
 
-        steps.add(new SoundStep(6 * t, new RelativeSound(-4, 0, 0, Sound.LAVA, 1f, 1f)));
-        steps.add(new SoundStep(6 * t, new RelativeSound(0, 0, -4, Sound.LAVA, 1f, 1f)));
-        steps.add(new SoundStep(6 * t, new RelativeSound(4, 0, 0, Sound.LAVA, 1f, 1f)));
-        steps.add(new SoundStep(6 * t, new RelativeSound(0, 0, 4, Sound.LAVA, 1f, 1f)));
+        steps.add(new SoundStep(6 * t, new RelativeSound(-4, 0, 0, Sound.BLOCK_LAVA_AMBIENT, 1f, 1f)));
+        steps.add(new SoundStep(6 * t, new RelativeSound(0, 0, -4, Sound.BLOCK_LAVA_AMBIENT, 1f, 1f)));
+        steps.add(new SoundStep(6 * t, new RelativeSound(4, 0, 0, Sound.BLOCK_LAVA_AMBIENT, 1f, 1f)));
+        steps.add(new SoundStep(6 * t, new RelativeSound(0, 0, 4, Sound.BLOCK_LAVA_AMBIENT, 1f, 1f)));
 
         // L
         for (int i = -1; i <= 1; i += 2) { // -1 ; 1

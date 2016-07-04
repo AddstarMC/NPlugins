@@ -109,7 +109,7 @@ public class Arboricide extends NEnchantment {
                     while (it.hasNext()) {
                         loc = it.next();
                         if (this.random.nextFloat() > 0.75) {
-                            this.world.playSound(loc.toBukkitLocation(), Sound.DIG_WOOD, 1f, 1f);
+                            this.world.playSound(loc.toBukkitLocation(), Sound.ITEM_SHOVEL_FLATTEN, 1f, 1f);
                             this.world.getBlockAt(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()).breakNaturally();
                             it.remove();
                         }

@@ -81,7 +81,7 @@ public class EggProvidedToItemProvidedTransition extends Transition {
         // Egg
         steps.add(new BlockStep(0, new RelativeBlock(0, 1, 0, Material.AIR, (byte)0)));
         steps.add(new EffectStep(0, new RelativeEffect(0, 1, 0, Effect.MOBSPAWNER_FLAMES)));
-        steps.add(new SoundStep(0, new RelativeSound(0, 1, 0, Sound.EXPLODE, 0.5f, 0.5f)));
+        steps.add(new SoundStep(0, new RelativeSound(0, 1, 0, Sound.ENTITY_GENERIC_EXPLODE, 0.5f, 0.5f)));
 
         // ##########################################
 
@@ -212,7 +212,7 @@ public class EggProvidedToItemProvidedTransition extends Transition {
 
         // Item pop effect
         for (final Entry<Integer, Float> e : getZeldaSound().entrySet()) {
-            steps.add(new SoundStep(9 * t + e.getKey() * 4, new RelativeSound(-2, 2, 0, Sound.NOTE_PLING, 10.0f, e.getValue())));
+            steps.add(new SoundStep(9 * t + e.getKey() * 4, new RelativeSound(-2, 2, 0, Sound.BLOCK_NOTE_PLING, 10.0f, e.getValue())));
         }
         steps.add(new EffectStep(12 * t, new RelativeEffect(0, 3, 0, Effect.ENDER_SIGNAL)));
 

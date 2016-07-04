@@ -48,7 +48,7 @@ public class FallingBlockStep extends Step {
         final Location locBlock = altar.getCenterLocation().toBukkitLocation().add(this.block.getRelativeLocation());
         locBlock.getBlock().setType(Material.AIR);
         locBlock.getWorld().playEffect(locBlock, Effect.MOBSPAWNER_FLAMES, (byte)4);
-        locBlock.getWorld().playSound(locBlock, Sound.IRONGOLEM_THROW, 1.0f, 1.0f);
+        locBlock.getWorld().playSound(locBlock, Sound.ENTITY_IRONGOLEM_ATTACK, 1.0f, 1.0f);
 
         final Location locSpawn = locBlock.clone().add(0, this.fromHeight, 0);
         if (locSpawn.getY() >= locSpawn.getWorld().getMaxHeight()) {
