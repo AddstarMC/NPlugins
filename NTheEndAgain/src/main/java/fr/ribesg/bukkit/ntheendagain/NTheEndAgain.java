@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -47,6 +48,14 @@ public class NTheEndAgain extends NPlugin implements TheEndAgainNode {
 
     @Override
     protected void loadMessages() throws IOException {
+
+        this.entering(this.getClass(), "loadMessages");
+
+        // Uncomment to test different log levels
+        // this.getLogger().log(Level.SEVERE, "Log level severe");
+        // this.getLogger().log(Level.WARNING, "Log level warning");
+        // this.getLogger().log(Level.INFO, "Log level info");
+
         this.debug("Loading plugin Messages...");
         if (!this.getDataFolder().isDirectory()) {
             this.getDataFolder().mkdir();

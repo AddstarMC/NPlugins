@@ -27,6 +27,7 @@ import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -76,10 +77,18 @@ public class EnderDragonListener implements Listener {
      */
     @EventHandler(priority = EventPriority.NORMAL)
     public void onEnderDragonDeath(final EntityDeathEvent event) {
+
+        this.plugin.entering(this.getClass(), "onEnderDragonDeath");
+
     	if (event.getEntityType() == EntityType.ENDER_DRAGON) {
             final World endWorld = event.getEntity().getWorld();
             final EndWorldHandler handler = this.plugin.getHandler(StringUtil.toLowerCamelCase(endWorld.getName()));
-            if (handler != null) {
+            if (handler == null) {
+                this.plugin.log(Level.INFO, "No handler for EnderDragon death in world " + endWorld.getName());
+            } else {
+
+                this.plugin.log(Level.INFO, "Handling EnderDragon death in world " + endWorld.getName());
+
                 final Config config = handler.getConfig();
 
 				/* Compute damages */
@@ -116,10 +125,13 @@ public class EnderDragonListener implements Listener {
 
                 switch (config.getEdExpHandling()) {
                     case 0:
-                        event.setDroppedExp(config.getEdExpReward());
+                        int xpAmount = config.getEdExpReward();
+                        this.plugin.log(Level.INFO, "Explicitly setting XP drop from EnderDragon to" + xpAmount);
+                        event.setDroppedExp(xpAmount);
                         break;
                     case 1:
-                        event.setDroppedExp(0);
+                        this.plugin.log(Level.INFO, "Cancelling XP drop from EnderDragon, then manually distributing XP");
+                        event.setDroppedExp(1);
 
                         // Create map of XP to give
                         final Map<String, Integer> xpMap = new HashMap<>(dmgMap.size());
@@ -144,6 +156,11 @@ public class EnderDragonListener implements Listener {
                     default:
                         break;
                 }
+
+                // dropTableHandling:
+                // 0: Stock. Drops will just fall from the EnderDragon death Location
+                // 1: Distribution. Drops will be distributed exactly like the DragonEgg
+
                 if (config.getDropTableHandling() == 0) {
                     final Location loc = event.getEntity().getLocation();
                     for (final Pair<ItemStack, Float> pair : config.getDropTable()) {

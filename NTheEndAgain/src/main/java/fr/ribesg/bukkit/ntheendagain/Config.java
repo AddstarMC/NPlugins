@@ -102,6 +102,9 @@ public class Config extends AbstractConfig<NTheEndAgain> {
     private int respawnTimerMax;
 
     // Drop Table
+    // 0: Stock. Drops will just fall from the EnderDragon death Location
+    // 1: Distribution. Drops will be distributed exactly like the DragonEgg
+
     private static final int DEFAULT_dropTableHandling = 1;
     private int dropTableHandling;
 
