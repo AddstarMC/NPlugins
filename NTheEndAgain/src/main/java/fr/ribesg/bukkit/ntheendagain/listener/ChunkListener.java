@@ -16,7 +16,10 @@ import fr.ribesg.bukkit.ntheendagain.handler.EndWorldHandler;
 import fr.ribesg.bukkit.ntheendagain.world.EndChunk;
 import fr.ribesg.bukkit.ntheendagain.world.EndChunks;
 
+import java.text.DecimalFormat;
 import java.util.HashMap;
+import java.util.UUID;
+import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -37,7 +40,16 @@ import org.bukkit.event.world.ChunkUnloadEvent;
  */
 public class ChunkListener implements Listener {
 
+    private final int MESSAGE_INTERVAL_MILLIS = 10000;
+
     private final NTheEndAgain plugin;
+
+    private Boolean lastChunkCoordsValid = false;
+    private int lastChunkCoordX;
+    private int lastChunkCoordZ;
+    private long lastChunkRegenTime = System.currentTimeMillis() - 10000;
+
+    private long lastInfoTime = System.currentTimeMillis() - MESSAGE_INTERVAL_MILLIS * 2;
 
     public ChunkListener(final NTheEndAgain instance) {
         this.plugin = instance;
@@ -51,10 +63,22 @@ public class ChunkListener implements Listener {
      */
     @EventHandler(priority = EventPriority.NORMAL)
     public void onEndChunkLoad(final ChunkLoadEvent event) {
+
+        // Note: enable debug messages in game by having both NCore.jar and NTheEndAgain.jar
+        // in the plugins folder, then issue command /debug enable NTheEndAgain
+
         if (event.getWorld().getEnvironment() == Environment.THE_END) {
             final String worldName = event.getWorld().getName();
             final EndWorldHandler handler = this.plugin.getHandler(StringUtil.toLowerCamelCase(worldName));
             if (handler != null) {
+
+                long currentTime = System.currentTimeMillis();
+
+                if (currentTime > lastInfoTime + MESSAGE_INTERVAL_MILLIS) {
+                    this.plugin.debug("onEndChunkLoad: Examine chunks in world " + worldName);
+                    lastInfoTime = currentTime;
+                }
+
                 final EndChunks chunks = handler.getChunks();
                 final Chunk chunk = event.getChunk();
                 EndChunk endChunk = chunks.getChunk(worldName, chunk.getX(), chunk.getZ());
@@ -66,30 +90,70 @@ public class ChunkListener implements Listener {
                  *   - Schedule a refresh
                  */
                 if (endChunk != null && endChunk.hasToBeRegen()) {
+
+                    int chunkX = endChunk.getX();
+                    int chunkZ = endChunk.getZ();
+
+                    if (lastChunkCoordsValid) {
+                        if (chunkX == lastChunkCoordX && chunkZ == lastChunkCoordZ) {
+                            if (lastChunkRegenTime < currentTime + 5000) {
+                                // Regen of this chunk was initiated less than 5 seconds ago
+                                // Exit this function to avoid an endless loop and stack overflow
+                                // this.plugin.debug(" ... skip regen of chunk at " + chunkX + ", " + chunkZ);
+                                return;
+                            }
+                            this.plugin.debug(" ... repeating regen of chunk at " + chunkX + ", " + chunkZ);
+                        }
+                    }
+
+                    // Keep track of the last chunk regenerated
+                    lastChunkCoordsValid = true;
+                    lastChunkCoordX = chunkX;
+                    lastChunkCoordZ = chunkZ;
+                    lastChunkRegenTime = currentTime;
+
+                    this.plugin.debug(" ... regen chunk at " + chunkX + ", " + chunkZ + " (in progress)");
+
                     final ChunkRegenEvent regenEvent = new ChunkRegenEvent(chunk);
                     Bukkit.getPluginManager().callEvent(regenEvent);
                     if (!regenEvent.isCancelled()) {
+
+                        // this.plugin.debug(" ..... examine entities");
+
                         for (final Entity e : chunk.getEntities()) {
                             if (e.getType() == EntityType.ENDER_DRAGON) {
                                 final EnderDragon ed = (EnderDragon)e;
-                                if (handler.getDragons().containsKey(ed.getUniqueId())) {
-                                    handler.getDragons().remove(ed.getUniqueId());
-                                    handler.getLoadedDragons().remove(ed.getUniqueId());
+                                UUID dragonId = ed.getUniqueId();
+                                this.plugin.debug(" ... remove EnderDragon, UUID " + dragonId);
+
+                                if (handler.getDragons().containsKey(dragonId)) {
+                                    handler.getDragons().remove(dragonId);
+                                    handler.getLoadedDragons().remove(dragonId);
                                 }
                             }
                             e.remove();
                         }
+
+                        // this.plugin.debug(" ..... remove crystals");
                         endChunk.cleanCrystalLocations();
                         final int x = endChunk.getX(), z = endChunk.getZ();
+
+                        // this.plugin.debug(" ..... regenerate chunk now");
                         event.getWorld().regenerateChunk(x, z);
+
                         Bukkit.getScheduler().runTaskLater(this.plugin, new Runnable() {
 
                             @Override
                             public void run() {
+                                // Note that .refreshChunk() is deprecated with explanation
+                                // "This method is not guaranteed to work suitably across all client implementations"
                                 event.getWorld().refreshChunk(x, z);
                             }
                         }, 100L);
+
                     }
+
+                    // this.plugin.debug(" ..... setToBeRegen(false)");
                     endChunk.setToBeRegen(false);
                 }
 
@@ -103,20 +167,42 @@ public class ChunkListener implements Listener {
                     if (endChunk == null) {
                         endChunk = chunks.addChunk(chunk);
                     }
+
+                    // this.plugin.debug(" ... chunk regen not required at " + endChunk.getX() + ", " + endChunk.getZ());
+
                     for (final Entity e : chunk.getEntities()) {
+
+                        // this.plugin.debug(" ..... examine entities");
                         if (e.getType() == EntityType.ENDER_DRAGON && event.getWorld().getEnvironment() == Environment.THE_END) {
+
                             final EnderDragon ed = (EnderDragon)e;
-                            if (!handler.getDragons().containsKey(ed.getUniqueId())) {
-                                ed.setMaxHealth(handler.getConfig().getEdHealth());
+                            UUID dragonId = ed.getUniqueId();
+
+                            this.plugin.debug("onEndChunkLoad ... found EnderDragon, UUID " + dragonId);
+
+                            if (!handler.getDragons().containsKey(dragonId)) {
+
+                                int initialHealth = handler.getConfig().getEdHealth();
+                                this.plugin.debug("onEndChunkLoad ... add EnderDragon, UUID " + dragonId + ", health " + initialHealth);
+
+                                ed.setMaxHealth(initialHealth);
                                 ed.setHealth(ed.getMaxHealth());
-                                handler.getDragons().put(ed.getUniqueId(), new HashMap<String, Double>());
+
+                                // plugin.debug("onEndChunkLoad ... actual health is " + new DecimalFormat("#.##").format(ed.getHealth()));
+
+                                handler.getDragons().put(dragonId, new HashMap<String, Double>());
                             }
-                            handler.getLoadedDragons().add(ed.getUniqueId());
+                            handler.getLoadedDragons().add(dragonId);
+
                         } else if (e.getType() == EntityType.ENDER_CRYSTAL) {
+
+                            this.plugin.debug("onEndChunkLoad ... found crystal at " +
+                                    e.getLocation().getX() + ", " + e.getLocation().getY() + ", " + e.getLocation().getZ());
                             endChunk.addCrystalLocation(e);
                         }
                     }
                 }
+
                 endChunk.resetSavedDragons();
             }
         }
@@ -140,7 +226,10 @@ public class ChunkListener implements Listener {
                 for (final Entity e : event.getChunk().getEntities()) {
                     if (e.getType() == EntityType.ENDER_DRAGON) {
                         final EnderDragon ed = (EnderDragon)e;
-                        handler.getLoadedDragons().remove(ed.getUniqueId());
+                        UUID dragonId = ed.getUniqueId();
+                        this.plugin.debug("onEndChunkUnload ... remove EnderDragon, UUID " + dragonId);
+
+                        handler.getLoadedDragons().remove(dragonId);
                         chunk.incrementSavedDragons();
                     }
                 }
