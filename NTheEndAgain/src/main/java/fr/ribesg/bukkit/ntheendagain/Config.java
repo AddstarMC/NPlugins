@@ -555,7 +555,8 @@ public class Config extends AbstractConfig<NTheEndAgain> {
 
         // hardRegenOnStop
         content.append("# Activate hard regeneration on server stop. This will only slow down server stop.\n");
-        content.append("# This is nice to clean the End occasionnaly when using Soft or Crystal regen.\n");
+        content.append("# This is nice to clean the End occasionally when using Soft or Crystal regen.\n");
+        content.append("# However, a side effect is that the hard regen will fire if you reload the plugin (plugman reload NTheEndAgain).\n");
         content.append("#\n");
         content.append("#       0: Disabled.\n");
         content.append("#       1: Enabled.\n");
@@ -568,7 +569,7 @@ public class Config extends AbstractConfig<NTheEndAgain> {
         content.append("slowSoftRegenChunks: " + this.slowSoftRegenChunks + "\n\n");
 
         // slowSoftRegenTimer
-        content.append("# Select the at which rate slowSoftRegenChunks chunks will be regenerated after a\n");
+        content.append("# Select the rate at which slowSoftRegenChunks chunks will be regenerated after a\n");
         content.append("# Soft Regeneration has started. Default value: " + DEFAULT_slowSoftRegenTimer + '\n');
         content.append("slowSoftRegenTimer: " + this.slowSoftRegenTimer + "\n\n");
 

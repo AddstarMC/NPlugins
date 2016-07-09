@@ -20,6 +20,7 @@ import fr.ribesg.bukkit.ntheendagain.world.EndChunk;
 import fr.ribesg.bukkit.ntheendagain.world.EndChunks;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -119,7 +120,9 @@ public class EndWorldHandler {
 
         if (this.config.getRespawnType() == 3) {
             this.respawnHandler.respawnNoRegen();
-        } else if (this.config.getRespawnType() == 6) {
+        } /*
+           * Respawn Type 6 (deprecated)
+           else if (this.config.getRespawnType() == 6) {
             if (this.config.getNextRespawnTaskTime() > System.currentTimeMillis()) {
                 this.tasks.add(Bukkit.getScheduler().runTaskLater(this.plugin, new Runnable() {
 
@@ -132,6 +135,7 @@ public class EndWorldHandler {
                 this.respawnHandler.respawn();
             }
         }
+        */
 
         this.tasks.add(new UnexpectedDragonDeathHandlerTask(this).schedule(this.plugin));
 
@@ -202,11 +206,19 @@ public class EndWorldHandler {
                 for (final Entity e : chunk.getEntities()) {
                     if (e.getType() == EntityType.ENDER_DRAGON) {
                         final EnderDragon ed = (EnderDragon)e;
-                        if (!this.dragons.containsKey(ed.getUniqueId())) {
-                            ed.setMaxHealth(this.config.getEdHealth());
+                        UUID dragonId = ed.getUniqueId();
+
+                        if (!this.dragons.containsKey(dragonId)) {
+                            int initialHealth = this.config.getEdHealth();
+                            plugin.debug("EndWorldHandler.countEntities ... found EnderDragon, UUID " + dragonId + ", health " + initialHealth);
+
+                            ed.setMaxHealth(initialHealth);
                             ed.setHealth(ed.getMaxHealth());
-                            this.dragons.put(ed.getUniqueId(), new HashMap<String, Double>());
-                            this.loadedDragons.add(ed.getUniqueId());
+
+                            // plugin.debug("EndWorldHandler.countEntities ... actual health is " + new DecimalFormat("#.##").format(ed.getHealth()));
+
+                            this.dragons.put(dragonId, new HashMap<String, Double>());
+                            this.loadedDragons.add(dragonId);
                         }
                     } else if (e.getType() == EntityType.ENDER_CRYSTAL) {
                         c.addCrystalLocation(e);

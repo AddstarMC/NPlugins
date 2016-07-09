@@ -66,6 +66,10 @@ public abstract class NPlugin extends JavaPlugin implements Node {
 
             this.getPluginLoader().disablePlugin(this);
         } else /* Everything's ok */ {
+
+            // Enable debug messages in game by having both NCore.jar and NTheEndAgain.jar
+            // in the plugins folder, then issue command /debug enable NTheEndAgain
+
             this.debugEnabled = this.core.getPluginConfig().isDebugEnabled(this.getName());
             if (this.debugEnabled) {
                 this.info("DEBUG MODE ENABLED!");

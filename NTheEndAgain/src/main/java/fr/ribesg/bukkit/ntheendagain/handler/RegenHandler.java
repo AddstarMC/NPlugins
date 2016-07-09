@@ -24,6 +24,9 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
+import java.util.UUID;
+import java.util.logging.Level;
+
 /**
  * @author Ribesg
  */
@@ -128,7 +131,7 @@ public class RegenHandler {
         final EndChunks chunks = this.worldHandler.getChunks();
 
         final String prefix = "[REGEN " + endWorld.getName() + "] ";
-        plugin.info(prefix + "Regenerating End world...");
+        plugin.info(prefix + "Regenerating end world (hard regen) ...");
 
         plugin.debug("Kicking players out of the world/server...");
         this.kickPlayers();
@@ -151,8 +154,10 @@ public class RegenHandler {
                 c.resetSavedDragons();
                 for (final Entity e : endWorld.getChunkAt(c.getX(), c.getZ()).getEntities()) {
                     if (e.getType() == EntityType.ENDER_DRAGON) {
-                        this.worldHandler.getDragons().remove(e.getUniqueId());
-                        this.worldHandler.getLoadedDragons().remove(e.getUniqueId());
+                        UUID dragonId = e.getUniqueId();
+                        plugin.debug("remove EnderDragon, UUID " + dragonId);
+                        this.worldHandler.getDragons().remove(dragonId);
+                        this.worldHandler.getLoadedDragons().remove(dragonId);
                     }
                     e.remove();
                 }
@@ -169,6 +174,12 @@ public class RegenHandler {
 
     private void softRegen(final boolean pluginDisabled) {
         this.plugin.entering(this.getClass(), "softRegen");
+
+        World endWorld = this.worldHandler.getEndWorld();
+
+        final String worldName = endWorld.getName();
+        final String prefix = "[REGEN " + worldName + "] ";
+        plugin.info(prefix + "Regenerating end world (soft regen) ...");
 
         this.plugin.debug("Calling softRegen on chunks...");
         this.worldHandler.getChunks().softRegen();
@@ -192,6 +203,10 @@ public class RegenHandler {
 
     private void crystalRegen() {
         this.plugin.entering(this.getClass(), "crystalRegen");
+
+        World endWorld = this.worldHandler.getEndWorld();
+        final String prefix = "[REGEN " + endWorld.getName() + "] ";
+        plugin.info(prefix + "Regenerating crystals ...");
 
         this.worldHandler.getChunks().crystalRegen();
 

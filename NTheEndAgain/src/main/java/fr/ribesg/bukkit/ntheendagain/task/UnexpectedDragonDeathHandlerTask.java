@@ -10,11 +10,13 @@
 package fr.ribesg.bukkit.ntheendagain.task;
 
 import fr.ribesg.bukkit.ncore.util.FrameBuilder;
+import fr.ribesg.bukkit.ntheendagain.NTheEndAgain;
 import fr.ribesg.bukkit.ntheendagain.handler.EndWorldHandler;
 
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.UUID;
+import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.EnderDragon;
@@ -64,10 +66,14 @@ public class UnexpectedDragonDeathHandlerTask extends BukkitRunnable {
             }
             if (!found) {
                 // This EnderDragon was deleted some other way than after his death, forget about him
+                NTheEndAgain plugin = this.handler.getPlugin();
+
+                plugin.debug("UnexpectedDragonDeathHandlerTask.run ... remove EnderDragon, UUID " + id);
+
                 this.handler.getDragons().remove(id);
                 it.remove();
                 for (final String line : this.message) {
-                    this.handler.getPlugin().getLogger().warning(line);
+                    plugin.log(Level.WARNING, line);
                 }
             }
             found = false;

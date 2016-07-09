@@ -41,7 +41,7 @@ public class SlowSoftRegeneratorTaskHandler {
                         world.loadChunk(c.getX(), c.getZ());
                         regen++;
                     } else {
-                        // Something bad happen, stop there
+                        // Something bad happened, stop there
                         this.cancel();
                     }
                 }

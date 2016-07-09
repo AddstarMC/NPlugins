@@ -90,10 +90,17 @@ public class RespawnHandler {
             respawning++;
         }
         this.plugin.debug("Called respawnDragon " + respawning + " times");
+
+        String worldName;
+        if (this.worldHandler.getEndWorld().getName().equalsIgnoreCase("survival_the_end") )
+            worldName = "Survival";
+        else
+            worldName = this.worldHandler.getEndWorld().getName();
+
         if (respawning > 1) {
-            this.worldHandler.getPlugin().broadcastMessage(MessageId.theEndAgain_respawnedX, Integer.toString(respawning), this.worldHandler.getEndWorld().getName());
+            this.worldHandler.getPlugin().broadcastMessage(MessageId.theEndAgain_respawnedX, Integer.toString(respawning), worldName);
         } else if (respawning == 1) {
-            this.worldHandler.getPlugin().broadcastMessage(MessageId.theEndAgain_respawned1, this.worldHandler.getEndWorld().getName());
+            this.worldHandler.getPlugin().broadcastMessage(MessageId.theEndAgain_respawned1, worldName);
         }
 
         this.plugin.exiting(this.getClass(), "respawnDragons", Boolean.toString(result));
@@ -106,6 +113,7 @@ public class RespawnHandler {
 
         final World world = this.worldHandler.getEndWorld();
         final EndChunks chunks = this.worldHandler.getChunks();
+
         // Create a random location near the center
         final int x = RANDOM.nextInt(81) - 40; // [-40;40];
     	final int y = 100 + RANDOM.nextInt(21); // [100;120]
@@ -121,7 +129,7 @@ public class RespawnHandler {
                 final Chunk chunk = world.getChunkAt(a, b);
                 final EndChunk endChunk = chunks.getChunk(world.getName(), chunk.getX(), chunk.getZ());
                 if (endChunk != null && endChunk.hasToBeRegen()) {
-                    this.plugin.debug("Chunk at coords " + a + ';' + b + " needs to be regen first");
+                    this.plugin.debug("Chunk at coords " + a + ';' + b + " needs to be regen'd first");
                     world.regenerateChunk(chunk.getX(), chunk.getZ());
                     endChunk.setToBeRegen(false);
                     regenerated = true;
@@ -129,7 +137,7 @@ public class RespawnHandler {
             }
         }
         if (regenerated) {
-            this.plugin.debug("At least one chunk has been regen, respawn later");
+            this.plugin.debug("At least one chunk has been regen'd, respawn later");
             Bukkit.getScheduler().runTaskLater(this.worldHandler.getPlugin(), new Runnable() {
 
                 @Override
@@ -141,7 +149,7 @@ public class RespawnHandler {
                 }
             }, EndWorldHandler.REGEN_TO_RESPAWN_DELAY);
         } else {
-            this.plugin.debug("No chunk has been regen, respawn now");
+            this.plugin.debug("No chunk has been regen'd, respawn now");
             if (world.spawnEntity(loc, EntityType.ENDER_DRAGON) == null) {
                 this.retryRespawn(loc);
             }
