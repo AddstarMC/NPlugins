@@ -27,7 +27,7 @@ import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.logging.Level;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -36,6 +36,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.World.Environment;
 import org.bukkit.block.BlockState;
+import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -78,16 +79,20 @@ public class EnderDragonListener implements Listener {
     @EventHandler(priority = EventPriority.NORMAL)
     public void onEnderDragonDeath(final EntityDeathEvent event) {
 
-        this.plugin.entering(this.getClass(), "onEnderDragonDeath");
+        // Note: enable debug messages in game by having both NCore.jar and NTheEndAgain.jar
+        // in the plugins folder, then issue command /debug enable NTheEndAgain
 
-    	if (event.getEntityType() == EntityType.ENDER_DRAGON) {
+        if (event.getEntityType() == EntityType.ENDER_DRAGON) {
+
+            this.plugin.entering(this.getClass(), "onEnderDragonDeath");
+
             final World endWorld = event.getEntity().getWorld();
             final EndWorldHandler handler = this.plugin.getHandler(StringUtil.toLowerCamelCase(endWorld.getName()));
             if (handler == null) {
-                this.plugin.log(Level.INFO, "No handler for EnderDragon death in world " + endWorld.getName());
+                this.plugin.debug(" ... no handler for EnderDragon death in world " + endWorld.getName());
             } else {
 
-                this.plugin.log(Level.INFO, "Handling EnderDragon death in world " + endWorld.getName());
+                this.plugin.debug(" ... handling EnderDragon death in world " + endWorld.getName());
 
                 final Config config = handler.getConfig();
 
@@ -126,11 +131,11 @@ public class EnderDragonListener implements Listener {
                 switch (config.getEdExpHandling()) {
                     case 0:
                         int xpAmount = config.getEdExpReward();
-                        this.plugin.log(Level.INFO, "Explicitly setting XP drop from EnderDragon to" + xpAmount);
+                        this.plugin.debug(" ... explicitly setting XP drop from EnderDragon to " + xpAmount);
                         event.setDroppedExp(xpAmount);
                         break;
                     case 1:
-                        this.plugin.log(Level.INFO, "Cancelling XP drop from EnderDragon, then manually distributing XP");
+                        this.plugin.debug(" ... cancelling XP drop from EnderDragon, then manually distributing XP");
                         event.setDroppedExp(1);
 
                         // Create map of XP to give
@@ -150,6 +155,7 @@ public class EnderDragonListener implements Listener {
                                 final Player p = this.plugin.getServer().getPlayerExact(entry.getKey());
                                 p.giveExp(entry.getValue());
                                 this.plugin.sendMessage(p, MessageId.theEndAgain_receivedXP, Integer.toString(entry.getValue()));
+                                this.plugin.debug(" ... gave player " + p.getDisplayName() + " " + entry.getValue() + " XP");
                             }
                         }
                         break;
@@ -206,6 +212,38 @@ public class EnderDragonListener implements Listener {
                         }
                     }
                 }
+
+                // Forget about this dragon
+                UUID dragonId = event.getEntity().getUniqueId();
+
+                try {
+                    this.plugin.debug(" ... remove EnderDragon, UUID" + dragonId);
+                    handler.getDragons().remove(dragonId);
+                    handler.getLoadedDragons().remove(dragonId);
+                } catch (Exception ex) {
+                    this.plugin.debug(" ... exception removing EnderDragon, UUID" + dragonId + ": " + ex.getMessage());
+                }
+
+                // Handle on-ED-death regen/respawn
+                int respawnType = config.getRespawnType();
+
+                if (respawnType == 1) {
+                    this.plugin.debug(" ... respawnType is 1; call handler.getRespawnHandler().respawnLater");
+                    handler.getRespawnHandler().respawnLater();
+                } else {
+                    int dragonCountAlive = handler.getNumberOfAliveEnderDragons();
+                    if (dragonCountAlive == 0) {
+                        if (respawnType == 2) {
+                            this.plugin.debug(" ... respawnType is 2 and no dragons remain; call handler.getRespawnHandler().respawnLater");
+                            handler.getRespawnHandler().respawnLater();
+                        } else {
+                            this.plugin.debug(" ... respawnType is " + respawnType + "; take no action");
+                        }
+                    } else {
+                        this.plugin.debug(" ... live dragon count is " + dragonCountAlive + " (respawnType is " + respawnType + ")");
+                    }
+                }
+
             }
         }
     }
@@ -220,10 +258,23 @@ public class EnderDragonListener implements Listener {
      */
     @EventHandler(priority = EventPriority.NORMAL)
     public void onEnderDragonCreatePortal(final EntityCreatePortalEvent event) {
-        if (event.getEntityType() == EntityType.ENDER_DRAGON) {
+
+        EntityType entityType = event.getEntityType();
+        this.plugin.debug("EntityCreatePortalEvent fired for entityType " + entityType.toString());
+
+        if (entityType == EntityType.ENDER_DRAGON) {
+
+            // NOTE: This event is not firing for EnderDragons on Spigot 1.9 or Spigot 1.10
+            // See JIRA issue at https://hub.spigotmc.org/jira/browse/SPIGOT-1812
+
             final World endWorld = event.getEntity().getWorld();
+
+            this.plugin.info("Event EntityCreatePortalEvent was fired; this is unexpected for Spigot 1.9 or 1.10");
+
             final EndWorldHandler handler = this.plugin.getHandler(StringUtil.toLowerCamelCase(endWorld.getName()));
-            if (handler != null) {
+            if (handler == null) {
+                this.plugin.debug("No EndWorldHandler for world " + endWorld.getName() + "; custom portal handling disabled");
+            } else {
                 final Config config = handler.getConfig();
                 final int pH = config.getEdPortalSpawn();
                 final int eH = config.getEdEggHandling();
@@ -420,30 +471,54 @@ public class EnderDragonListener implements Listener {
                     event.setCancelled(cancelEvent);
                 }
 
+                /*
+                 * This code has been moved to onEnderDragonDeath
+                 * because event EntityCreatePortalEvent was not firing
+                 *
+
                 // Forget about this dragon
-                handler.getDragons().remove(event.getEntity().getUniqueId());
-                handler.getLoadedDragons().remove(event.getEntity().getUniqueId());
+                UUID dragonId = event.getEntity().getUniqueId();
+                this.plugin.debug(" ... remove EnderDragon, UUID " + dragonId);
+
+                handler.getDragons().remove(dragonId);
+                handler.getLoadedDragons().remove(dragonId);
 
                 // Handle on-ED-death regen/respawn
-                if (config.getRespawnType() == 1) {
-                    handler.getRespawnHandler().respawnLater();
-                } else if (handler.getNumberOfAliveEnderDragons() == 0) {
-                    if (config.getRespawnType() == 2) {
-                        handler.getRespawnHandler().respawnLater();
-                    }/* else if (config.getRespawnType() == 6) {
-                        // Type 6 (deprecated):
-                        // Respawn every X seconds after the last Dragon alive's death, persistent through reboots/reloads
-                        config.setNextRespawnTaskTime(System.currentTimeMillis() + config.getRandomRespawnTimer() * 1000);
-                        handler.getTasks().add(Bukkit.getScheduler().runTaskLater(this.plugin, new Runnable() {
+                int respawnType = config.getRespawnType();
 
-                            @Override
-                            public void run() {
-                                handler.getRespawnHandler().respawn();
-                            }
-                        }, config.getNextRespawnTaskTime() / 1000 * 20));
-                    }*/
+                if (respawnType == 1) {
+                    this.plugin.debug(" ... respawnType is 1; call handler.getRespawnHandler().respawnLater");
+                    handler.getRespawnHandler().respawnLater();
+                } else {
+                    int dragonCountAlive = handler.getNumberOfAliveEnderDragons();
+                    if (dragonCountAlive == 0) {
+                        if (respawnType == 2) {
+                            this.plugin.debug(" ... respawnType is 2 and no dragons remain; call handler.getRespawnHandler().respawnLater");
+                            handler.getRespawnHandler().respawnLater();
+                        } else {
+                            this.plugin.debug(" ... respawnType is " + respawnType + " and no dragons remain; take no action");
+
+                            // if (config.getRespawnType() == 6) {
+                            //    // Respawn Type 6 (deprecated):
+                            //    // Respawn every X seconds after the last Dragon alive's death, persistent through reboots/reloads
+                            //    config.setNextRespawnTaskTime(System.currentTimeMillis() + config.getRandomRespawnTimer() * 1000);
+                            //    handler.getTasks().add(Bukkit.getScheduler().runTaskLater(this.plugin, new Runnable() {
+                            //        @Override
+                            //        public void run() {
+                            //            handler.getRespawnHandler().respawn();
+                            //        }
+                            //    }, config.getNextRespawnTaskTime() / 1000 * 20));
+                            // }
+                        }
+                    } else {
+                        this.plugin.debug(" ... live dragon count is " + dragonCountAlive + " (respawnType is " + respawnType + ")");
+                    }
                 }
-            }
+
+                */
+
+
+}
         }
     }
 
@@ -456,17 +531,52 @@ public class EnderDragonListener implements Listener {
      */
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onEnderDragonSpawn(final CreatureSpawnEvent event) {
+
         if (event.getEntityType() == EntityType.ENDER_DRAGON) {
-        	if(event.getEntity().getWorld().getEnvironment() == Environment.THE_END) {
-                final EndWorldHandler handler = this.plugin.getHandler(StringUtil.toLowerCamelCase(event.getLocation().getWorld().getName()));
+
+            Environment currentEnvironment = event.getEntity().getWorld().getEnvironment();
+
+            if (currentEnvironment != Environment.THE_END) {
+                this.plugin.debug("An EnderDragon has spawned in " + currentEnvironment.toString() + "; will not track this dragon");
+            } else
+            {
+                this.plugin.debug("An EnderDragon has spawned in the End");
+
+                String worldName = event.getLocation().getWorld().getName();
+                final EndWorldHandler handler = this.plugin.getHandler(StringUtil.toLowerCamelCase(worldName));
+
                 if (handler != null) {
-                    if (event.getSpawnReason() != SpawnReason.CUSTOM && event.getSpawnReason() != SpawnReason.SPAWNER_EGG) {
-                        if (!handler.getDragons().containsKey(event.getEntity().getUniqueId()) && event.getLocation().getWorld().getEnvironment() == Environment.THE_END) {
-                            handler.getDragons().put(event.getEntity().getUniqueId(), new HashMap<String, Double>());
-                            event.getEntity().setMaxHealth(handler.getConfig().getEdHealth());
-                            event.getEntity().setHealth(event.getEntity().getMaxHealth());
+                    this.plugin.debug(" ... EndWorld handler found for " + worldName);
+
+                    SpawnReason spawnReason = event.getSpawnReason();
+                    if (spawnReason == SpawnReason.CUSTOM) {
+                        this.plugin.debug(" ... EnderDragon spawn reason: CUSTOM; will not track this dragon");
+                    } else if (spawnReason == SpawnReason.SPAWNER_EGG) {
+                        this.plugin.debug(" ... EnderDragon spawn reason: SPAWNER_EGG; will not track this dragon");
+                    } else {
+
+                        this.plugin.debug(" ... EnderDragon spawn reason: " + spawnReason.toString());
+
+                        final EnderDragon ed = (EnderDragon)event.getEntity();
+                        UUID dragonId = ed.getUniqueId();
+
+                        if (!handler.getDragons().containsKey(dragonId) && event.getLocation().getWorld().getEnvironment() == Environment.THE_END) {
+
+                            int initialHealth = handler.getConfig().getEdHealth();
+                            this.plugin.debug("onEnderDragonSpawn ... spawned EnderDragon, UUID " + dragonId + ", health " + initialHealth);
+
+                            handler.getDragons().put(dragonId, new HashMap<String, Double>());
+
+                            ed.setMaxHealth(initialHealth);
+                            ed.setHealth(ed.getMaxHealth());
+
+                            // plugin.debug("onEnderDragonSpawn ... actual health is " + new DecimalFormat("#.##").format(ed.getHealth()));
+
+                        } else {
+                            this.plugin.debug("onEnderDragonSpawn ... spawned EnderDragon, UUID " + dragonId +
+                                    "; default health of " + new DecimalFormat("#.##").format(ed.getHealth()));
                         }
-                        handler.getLoadedDragons().add(event.getEntity().getUniqueId());
+                        handler.getLoadedDragons().add(dragonId);
                     }
                 }
         	}
@@ -480,20 +590,39 @@ public class EnderDragonListener implements Listener {
      */
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onEnderDragonRegainHealth(final EntityRegainHealthEvent event) {
-    	if(event.getEntity().getWorld().getEnvironment() == Environment.THE_END){
-        if (event.getEntityType() == EntityType.ENDER_DRAGON && event.getRegainReason() == RegainReason.ENDER_CRYSTAL) {
-            final EndWorldHandler handler = this.plugin.getHandler(StringUtil.toLowerCamelCase(event.getEntity().getLocation().getWorld().getName()));
-            if (handler != null) {
-                final float rate = handler.getConfig().getEcHealthRegainRate();
-                if (rate < 1.0) {
-                    if (RANDOM.nextFloat() >= rate) {
-                        event.setCancelled(true);
+
+        this.plugin.entering(this.getClass(), "onEnderDragonRegainHealth");
+
+    	if(event.getEntity().getWorld().getEnvironment() == Environment.THE_END) {
+            if (event.getEntityType() == EntityType.ENDER_DRAGON && event.getRegainReason() == RegainReason.ENDER_CRYSTAL) {
+                String worldName = event.getEntity().getLocation().getWorld().getName();
+                final EndWorldHandler handler = this.plugin.getHandler(StringUtil.toLowerCamelCase(worldName));
+                if (handler == null) {
+                    this.plugin.debug("onEnderDragonRegainHealth: no handler for " + worldName);
+                } else {
+
+                    final EnderDragon ed = (EnderDragon)event.getEntity();
+                    UUID dragonId = ed.getUniqueId();
+
+                    final float rate = handler.getConfig().getEcHealthRegainRate();
+                    if (rate < 1.0) {
+                        float nextFloat = RANDOM.nextFloat();
+                        if (nextFloat >= rate) {
+                            this.plugin.debug("onEnderDragonRegainHealth: cancel health gain for EnderDragon, " +
+                                    "UUID " + dragonId + ": " + nextFloat + " >= " + rate);
+                            event.setCancelled(true);
+                        } else {
+                            this.plugin.debug("onEnderDragonRegainHealth: allow health gain for EnderDragon, " +
+                                    "UUID " + dragonId + ": " + event.getAmount());
+                        }
+                    } else if (rate > 1.0) {
+                        int healthAmount = (int)(rate * event.getAmount());
+                        this.plugin.debug("onEnderDragonRegainHealth: set health gain for EnderDragon, " +
+                                "UUID " + dragonId + ": " + healthAmount);
+                        event.setAmount(healthAmount);
                     }
-                } else if (rate > 1.0) {
-                    event.setAmount((int)(rate * event.getAmount()));
                 }
             }
-        }
     	}
     }
 }
