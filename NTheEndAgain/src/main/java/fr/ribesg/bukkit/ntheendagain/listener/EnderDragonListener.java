@@ -82,170 +82,171 @@ public class EnderDragonListener implements Listener {
         // Note: enable debug messages in game by having both NCore.jar and NTheEndAgain.jar
         // in the plugins folder, then issue command /debug enable NTheEndAgain
 
-        if (event.getEntityType() == EntityType.ENDER_DRAGON) {
+        if (event.getEntityType() != EntityType.ENDER_DRAGON) {
+            return;
+        }
 
-            this.plugin.entering(this.getClass(), "onEnderDragonDeath");
+        this.plugin.entering(this.getClass(), "onEnderDragonDeath");
 
-            final World endWorld = event.getEntity().getWorld();
-            final EndWorldHandler handler = this.plugin.getHandler(StringUtil.toLowerCamelCase(endWorld.getName()));
-            if (handler == null) {
-                this.plugin.debug(" ... no handler for EnderDragon death in world " + endWorld.getName());
-            } else {
+        final World endWorld = event.getEntity().getWorld();
+        final EndWorldHandler handler = this.plugin.getHandler(StringUtil.toLowerCamelCase(endWorld.getName()));
+        if (handler == null) {
+            this.plugin.debug(" ... no handler for EnderDragon death in world " + endWorld.getName());
+            return;
+        }
 
-                this.plugin.debug(" ... handling EnderDragon death in world " + endWorld.getName());
+        this.plugin.debug(" ... handling EnderDragon death in world " + endWorld.getName());
 
-                final Config config = handler.getConfig();
+        final Config config = handler.getConfig();
 
-				/* Compute damages */
+        /* Compute damages */
 
-                final HashMap<String, Double> dmgMap;
-                try {
-                    dmgMap = new HashMap<>(handler.getDragons().get(event.getEntity().getUniqueId()));
-                } catch (final NullPointerException e) {
-                    return;
-                }
+        final HashMap<String, Double> dmgMap;
+        try {
+            dmgMap = new HashMap<>(handler.getDragons().get(event.getEntity().getUniqueId()));
+        } catch (final NullPointerException e) {
+            return;
+        }
 
-                // We ignore offline players
-                final Iterator<Entry<String, Double>> it = dmgMap.entrySet().iterator();
-                while (it.hasNext()) {
-                    final Entry<String, Double> e = it.next();
-                    if (this.plugin.getServer().getPlayerExact(e.getKey()) == null) {
-                        it.remove();
-                    }
-                }
-
-                // Get total damages done to the ED by Online players
-                double totalDamages = 0;
-                for (final double v : dmgMap.values()) {
-                    totalDamages += v;
-                }
-
-                // Create map of damages percentages
-                final Map<String, Float> dmgPercentageMap = new HashMap<>();
-                for (final Entry<String, Double> entry : dmgMap.entrySet()) {
-                    dmgPercentageMap.put(entry.getKey(), (float)(entry.getValue() / totalDamages));
-                }
-
-				/* XP Handling */
-
-                switch (config.getEdExpHandling()) {
-                    case 0:
-                        int xpAmount = config.getEdExpReward();
-                        this.plugin.debug(" ... explicitly setting XP drop from EnderDragon to " + xpAmount);
-                        event.setDroppedExp(xpAmount);
-                        break;
-                    case 1:
-                        this.plugin.debug(" ... cancelling XP drop from EnderDragon, then manually distributing XP");
-                        event.setDroppedExp(1);
-
-                        // Create map of XP to give
-                        final Map<String, Integer> xpMap = new HashMap<>(dmgMap.size());
-                        for (final Entry<String, Float> entry : dmgPercentageMap.entrySet()) {
-                            final int reward = (int)(config.getEdExpReward() * dmgPercentageMap.get(entry.getKey()));
-                            xpMap.put(entry.getKey(), Math.min(reward, config.getEdExpReward()));
-                        }
-
-                        // Call event for external plugins to be able to play with this map
-                        final XPDistributionEvent xpDistributionEvent = new XPDistributionEvent(xpMap, config.getEdExpReward());
-                        Bukkit.getPluginManager().callEvent(xpDistributionEvent);
-
-                        if (!xpDistributionEvent.isCancelled()) {
-                            // Give exp to players
-                            for (final Entry<String, Integer> entry : xpDistributionEvent.getXpMap().entrySet()) {
-                                final Player p = this.plugin.getServer().getPlayerExact(entry.getKey());
-                                p.giveExp(entry.getValue());
-                                this.plugin.sendMessage(p, MessageId.theEndAgain_receivedXP, Integer.toString(entry.getValue()));
-                                this.plugin.debug(" ... gave player " + p.getDisplayName() + " " + entry.getValue() + " XP");
-                            }
-                        }
-                        break;
-                    default:
-                        break;
-                }
-
-                // dropTableHandling:
-                // 0: Stock. Drops will just fall from the EnderDragon death Location
-                // 1: Distribution. Drops will be distributed exactly like the DragonEgg
-
-                if (config.getDropTableHandling() == 0) {
-                    final Location loc = event.getEntity().getLocation();
-                    for (final Pair<ItemStack, Float> pair : config.getDropTable()) {
-                        final ItemStack is = pair.getKey().clone();
-                        is.setAmount(1);
-                        for (int i = 0; i < pair.getKey().getAmount(); i++) {
-                            if (RANDOM.nextFloat() <= pair.getValue()) {
-                                endWorld.dropItemNaturally(loc, is);
-                            }
-                        }
-                    }
-                }
-
-                final MessageId playerKilled, playersKilled, playersKilledLine;
-                if (config.getRespawnNumber() == 1) {
-                    playerKilled = MessageId.theEndAgain_playerKilledTheDragon;
-                    playersKilled = MessageId.theEndAgain_playersKilledTheDragon;
-                    playersKilledLine = MessageId.theEndAgain_playersKilledTheDragon_line;
-                } else {
-                    playerKilled = MessageId.theEndAgain_playerKilledADragon;
-                    playersKilled = MessageId.theEndAgain_playersKilledADragon;
-                    playersKilledLine = MessageId.theEndAgain_playersKilledADragon_line;
-                }
-                if (dmgPercentageMap.size() == 1) {
-                    this.plugin.broadcastMessage(playerKilled, dmgPercentageMap.entrySet().iterator().next().getKey());
-                } else {
-                    this.plugin.broadcastMessage(playersKilled);
-                    final Set<String> players = dmgPercentageMap.keySet();
-                    final String[] sortedPlayers = players.toArray(new String[players.size()]);
-                    Arrays.sort(sortedPlayers, new Comparator<String>() {
-
-                        @Override
-                        public int compare(final String a, final String b) {
-                            return -Float.compare(dmgPercentageMap.get(a), dmgPercentageMap.get(b));
-                        }
-                    });
-                    for (final String playerName : sortedPlayers) {
-                        final float percentage = dmgPercentageMap.get(playerName);
-                        if (percentage < THRESHOLD) {
-                            break;
-                        } else {
-                            this.plugin.broadcastMessage(playersKilledLine, playerName, FORMAT.format(percentage * 100f));
-                        }
-                    }
-                }
-
-                // Forget about this dragon
-                UUID dragonId = event.getEntity().getUniqueId();
-
-                try {
-                    this.plugin.debug(" ... remove EnderDragon, UUID" + dragonId);
-                    handler.getDragons().remove(dragonId);
-                    handler.getLoadedDragons().remove(dragonId);
-                } catch (Exception ex) {
-                    this.plugin.debug(" ... exception removing EnderDragon, UUID" + dragonId + ": " + ex.getMessage());
-                }
-
-                // Handle on-ED-death regen/respawn
-                int respawnType = config.getRespawnType();
-
-                if (respawnType == 1) {
-                    this.plugin.debug(" ... respawnType is 1; call handler.getRespawnHandler().respawnLater");
-                    handler.getRespawnHandler().respawnLater();
-                } else {
-                    int dragonCountAlive = handler.getNumberOfAliveEnderDragons();
-                    if (dragonCountAlive == 0) {
-                        if (respawnType == 2) {
-                            this.plugin.debug(" ... respawnType is 2 and no dragons remain; call handler.getRespawnHandler().respawnLater");
-                            handler.getRespawnHandler().respawnLater();
-                        } else {
-                            this.plugin.debug(" ... respawnType is " + respawnType + "; take no action");
-                        }
-                    } else {
-                        this.plugin.debug(" ... live dragon count is " + dragonCountAlive + " (respawnType is " + respawnType + ")");
-                    }
-                }
-
+        // We ignore offline players
+        final Iterator<Entry<String, Double>> it = dmgMap.entrySet().iterator();
+        while (it.hasNext()) {
+            final Entry<String, Double> e = it.next();
+            if (this.plugin.getServer().getPlayerExact(e.getKey()) == null) {
+                it.remove();
             }
         }
+
+        // Get total damages done to the ED by Online players
+        double totalDamages = 0;
+        for (final double v : dmgMap.values()) {
+            totalDamages += v;
+        }
+
+        // Create map of damages percentages
+        final Map<String, Float> dmgPercentageMap = new HashMap<>();
+        for (final Entry<String, Double> entry : dmgMap.entrySet()) {
+            dmgPercentageMap.put(entry.getKey(), (float)(entry.getValue() / totalDamages));
+        }
+
+        /* XP Handling */
+
+        switch (config.getEdExpHandling()) {
+            case 0:
+                int xpAmount = config.getEdExpReward();
+                this.plugin.debug(" ... explicitly setting XP drop from EnderDragon to " + xpAmount);
+                event.setDroppedExp(xpAmount);
+                break;
+            case 1:
+                this.plugin.debug(" ... cancelling XP drop from EnderDragon, then manually distributing XP");
+                event.setDroppedExp(1);
+
+                // Create map of XP to give
+                final Map<String, Integer> xpMap = new HashMap<>(dmgMap.size());
+                for (final Entry<String, Float> entry : dmgPercentageMap.entrySet()) {
+                    final int reward = (int)(config.getEdExpReward() * dmgPercentageMap.get(entry.getKey()));
+                    xpMap.put(entry.getKey(), Math.min(reward, config.getEdExpReward()));
+                }
+
+                // Call event for external plugins to be able to play with this map
+                final XPDistributionEvent xpDistributionEvent = new XPDistributionEvent(xpMap, config.getEdExpReward());
+                Bukkit.getPluginManager().callEvent(xpDistributionEvent);
+
+                if (!xpDistributionEvent.isCancelled()) {
+                    // Give exp to players
+                    for (final Entry<String, Integer> entry : xpDistributionEvent.getXpMap().entrySet()) {
+                        final Player p = this.plugin.getServer().getPlayerExact(entry.getKey());
+                        p.giveExp(entry.getValue());
+                        this.plugin.sendMessage(p, MessageId.theEndAgain_receivedXP, Integer.toString(entry.getValue()));
+                        this.plugin.debug(" ... gave player " + p.getDisplayName() + " " + entry.getValue() + " XP");
+                    }
+                }
+                break;
+            default:
+                break;
+        }
+
+        // dropTableHandling:
+        // 0: Stock. Drops will just fall from the EnderDragon death Location
+        // 1: Distribution. Drops will be distributed exactly like the DragonEgg
+
+        if (config.getDropTableHandling() == 0) {
+            final Location loc = event.getEntity().getLocation();
+            for (final Pair<ItemStack, Float> pair : config.getDropTable()) {
+                final ItemStack is = pair.getKey().clone();
+                is.setAmount(1);
+                for (int i = 0; i < pair.getKey().getAmount(); i++) {
+                    if (RANDOM.nextFloat() <= pair.getValue()) {
+                        endWorld.dropItemNaturally(loc, is);
+                    }
+                }
+            }
+        }
+
+        final MessageId playerKilled, playersKilled, playersKilledLine;
+        if (config.getRespawnNumber() == 1) {
+            playerKilled = MessageId.theEndAgain_playerKilledTheDragon;
+            playersKilled = MessageId.theEndAgain_playersKilledTheDragon;
+            playersKilledLine = MessageId.theEndAgain_playersKilledTheDragon_line;
+        } else {
+            playerKilled = MessageId.theEndAgain_playerKilledADragon;
+            playersKilled = MessageId.theEndAgain_playersKilledADragon;
+            playersKilledLine = MessageId.theEndAgain_playersKilledADragon_line;
+        }
+        if (dmgPercentageMap.size() == 1) {
+            this.plugin.broadcastMessage(playerKilled, dmgPercentageMap.entrySet().iterator().next().getKey());
+        } else {
+            this.plugin.broadcastMessage(playersKilled);
+            final Set<String> players = dmgPercentageMap.keySet();
+            final String[] sortedPlayers = players.toArray(new String[players.size()]);
+            Arrays.sort(sortedPlayers, new Comparator<String>() {
+
+                @Override
+                public int compare(final String a, final String b) {
+                    return -Float.compare(dmgPercentageMap.get(a), dmgPercentageMap.get(b));
+                }
+            });
+            for (final String playerName : sortedPlayers) {
+                final float percentage = dmgPercentageMap.get(playerName);
+                if (percentage < THRESHOLD) {
+                    break;
+                } else {
+                    this.plugin.broadcastMessage(playersKilledLine, playerName, FORMAT.format(percentage * 100f));
+                }
+            }
+        }
+
+        // Forget about this dragon
+        UUID dragonId = event.getEntity().getUniqueId();
+
+        try {
+            this.plugin.debug(" ... remove EnderDragon, UUID" + dragonId);
+            handler.getDragons().remove(dragonId);
+            handler.getLoadedDragons().remove(dragonId);
+        } catch (Exception ex) {
+            this.plugin.debug(" ... exception removing EnderDragon, UUID" + dragonId + ": " + ex.getMessage());
+        }
+
+        // Handle on-ED-death regen/respawn
+        int respawnType = config.getRespawnType();
+
+        if (respawnType == 1) {
+            this.plugin.debug(" ... respawnType is 1; call handler.getRespawnHandler().respawnLater");
+            handler.getRespawnHandler().respawnLater();
+        } else {
+            int dragonCountAlive = handler.getNumberOfAliveEnderDragons();
+            if (dragonCountAlive == 0) {
+                if (respawnType == 2) {
+                    this.plugin.debug(" ... respawnType is 2 and no dragons remain; call handler.getRespawnHandler().respawnLater");
+                    handler.getRespawnHandler().respawnLater();
+                } else {
+                    this.plugin.debug(" ... respawnType is " + respawnType + "; take no action");
+                }
+            } else {
+                this.plugin.debug(" ... live dragon count is " + dragonCountAlive + " (respawnType is " + respawnType + ")");
+            }
+        }
+
     }
 
     /**
@@ -262,264 +263,265 @@ public class EnderDragonListener implements Listener {
         EntityType entityType = event.getEntityType();
         this.plugin.debug("EntityCreatePortalEvent fired for entityType " + entityType.toString());
 
-        if (entityType == EntityType.ENDER_DRAGON) {
+        if (entityType != EntityType.ENDER_DRAGON) {
+            return;
+        }
 
-            // NOTE: This event is not firing for EnderDragons on Spigot 1.9 or Spigot 1.10
-            // See JIRA issue at https://hub.spigotmc.org/jira/browse/SPIGOT-1812
+        // NOTE: This event is not firing for EnderDragons on Spigot 1.9 or Spigot 1.10
+        // See JIRA issue at https://hub.spigotmc.org/jira/browse/SPIGOT-1812
 
-            final World endWorld = event.getEntity().getWorld();
+        final World endWorld = event.getEntity().getWorld();
 
-            this.plugin.info("Event EntityCreatePortalEvent was fired; this is unexpected for Spigot 1.9 or 1.10");
+        this.plugin.info("Event EntityCreatePortalEvent was fired; this is unexpected for Spigot 1.9 or 1.10");
 
-            final EndWorldHandler handler = this.plugin.getHandler(StringUtil.toLowerCamelCase(endWorld.getName()));
-            if (handler == null) {
-                this.plugin.debug("No EndWorldHandler for world " + endWorld.getName() + "; custom portal handling disabled");
-            } else {
-                final Config config = handler.getConfig();
-                final int pH = config.getEdPortalSpawn();
-                final int eH = config.getEdEggHandling();
-                final int dH = config.getDropTableHandling();
-                final Location deathLocation = event.getEntity().getLocation();
+        final EndWorldHandler handler = this.plugin.getHandler(StringUtil.toLowerCamelCase(endWorld.getName()));
+        if (handler == null) {
+            this.plugin.debug("No EndWorldHandler for world " + endWorld.getName() + "; custom portal handling disabled");
+            return;
+        }
 
-                /*
-                 * Explanation of algorithm:
-                 *
-                 * Variables:
-                 * - pH is the portalHandling configuration value
-                 * - eH is the eggHandling configuration value
-                 * - dH is the dropTableHandling configuration value
-                 *
-                 * "Things" to do:
-                 * - 1a = Cancel Egg spawn (on the portal)
-                 * - 1b = Cancel non-Egg portal blocks spawn
-                 * - 2a = Distribute Egg correctly, based on Damages done
-                 * - 2b = Distribute Drops correctly, based on Damages done
-                 * - 3  = Cancel the Event, it's better to use this when we just want
-                 *        no portal at all than setting everything to air later.
-                 *
-                 * Notes:
-                 * - 1a and 1b AND 2a and 2b are "things" that should be done at the same time
-                 *
-                 *         +--------+-------+-------+
-                 *         |  pH=0  |  pH=1 |  pH=2 |
-                 *  +------+--------+-------+-------+  2b = dH
-                 *  | eH=0 |    -   |   1b  |    3  |
-                 *  | eH=1 | 1a, 2a | 2a, 3 | 2a, 3 |
-                 *  +------+--------+-------+-------+
-                 */
+        final Config config = handler.getConfig();
+        final int pH = config.getEdPortalSpawn();
+        final int eH = config.getEdEggHandling();
+        final int dH = config.getDropTableHandling();
+        final Location deathLocation = event.getEntity().getLocation();
 
-                // (1a)
-                final boolean cancelEgg = pH == 0 && eH == 1 || event.isCancelled();
+        /*
+         * Explanation of algorithm:
+         *
+         * Variables:
+         * - pH is the portalHandling configuration value
+         * - eH is the eggHandling configuration value
+         * - dH is the dropTableHandling configuration value
+         *
+         * "Things" to do:
+         * - 1a = Cancel Egg spawn (on the portal)
+         * - 1b = Cancel non-Egg portal blocks spawn
+         * - 2a = Distribute Egg correctly, based on Damages done
+         * - 2b = Distribute Drops correctly, based on Damages done
+         * - 3  = Cancel the Event, it's better to use this when we just want
+         *        no portal at all than setting everything to air later.
+         *
+         * Notes:
+         * - 1a and 1b AND 2a and 2b are "things" that should be done at the same time
+         *
+         *         +--------+-------+-------+
+         *         |  pH=0  |  pH=1 |  pH=2 |
+         *  +------+--------+-------+-------+  2b = dH
+         *  | eH=0 |    -   |   1b  |    3  |
+         *  | eH=1 | 1a, 2a | 2a, 3 | 2a, 3 |
+         *  +------+--------+-------+-------+
+         */
 
-                // (1b)
-                final boolean cancelPortalBlocks = pH == 1 && eH == 0 || event.isCancelled();
+        // (1a)
+        final boolean cancelEgg = pH == 0 && eH == 1 || event.isCancelled();
 
-                // (2a)
-                final boolean customEggHandling = eH == 1;
+        // (1b)
+        final boolean cancelPortalBlocks = pH == 1 && eH == 0 || event.isCancelled();
 
-                // (2b)
-                final boolean customDropHandling = dH == 1;
+        // (2a)
+        final boolean customEggHandling = eH == 1;
 
-                // (3)
-                final boolean cancelEvent = pH == 1 && eH == 1 || pH == 2;
+        // (2b)
+        final boolean customDropHandling = dH == 1;
 
-                // 1a & 1b
-                if (cancelEgg || cancelPortalBlocks) {
-                    // Change block types accordingly
-                    BlockState eggBlock = null;
-                    for (final BlockState b : event.getBlocks()) {
-                        if (b.getType() == Material.DRAGON_EGG) {
-                            if (cancelEgg) {
-                                b.setType(Material.AIR);
-                            }
-                            eggBlock = b;
-                        } else if (cancelPortalBlocks) {
-                            b.setType(Material.AIR);
-                        }
+        // (3)
+        final boolean cancelEvent = pH == 1 && eH == 1 || pH == 2;
+
+        // 1a & 1b
+        if (cancelEgg || cancelPortalBlocks) {
+            // Change block types accordingly
+            BlockState eggBlock = null;
+            for (final BlockState b : event.getBlocks()) {
+                if (b.getType() == Material.DRAGON_EGG) {
+                    if (cancelEgg) {
+                        b.setType(Material.AIR);
                     }
+                    eggBlock = b;
+                } else if (cancelPortalBlocks) {
+                    b.setType(Material.AIR);
+                }
+            }
 
-                    // Refresh chunks to prevent client-side glitch
-                    if (eggBlock != null) {
-                        final Chunk c = eggBlock.getChunk();
-                        for (int x = c.getX() - 1; x <= c.getX() + 1; x++) {
-                            for (int z = c.getZ() - 1; z <= c.getZ() + 1; z++) {
-                                c.getWorld().refreshChunk(x, z);
-                            }
-                        }
+            // Refresh chunks to prevent client-side glitch
+            if (eggBlock != null) {
+                final Chunk c = eggBlock.getChunk();
+                for (int x = c.getX() - 1; x <= c.getX() + 1; x++) {
+                    for (int z = c.getZ() - 1; z <= c.getZ() + 1; z++) {
+                        c.getWorld().refreshChunk(x, z);
                     }
                 }
+            }
+        }
 
-                // 2a & 2b
-                if (customEggHandling || customDropHandling) {
-                    // Step 1: % of total damages done to the ED ; Player name
-                    TreeMap<Float, String> ratioMap = new TreeMap<>();
-                    long totalDamages = 0;
-                    for (final Entry<String, Double> e : handler.getDragons().get(event.getEntity().getUniqueId()).entrySet()) {
-                        totalDamages += e.getValue();
+        // 2a & 2b
+        if (customEggHandling || customDropHandling) {
+            // Step 1: % of total damages done to the ED ; Player name
+            TreeMap<Float, String> ratioMap = new TreeMap<>();
+            long totalDamages = 0;
+            for (final Entry<String, Double> e : handler.getDragons().get(event.getEntity().getUniqueId()).entrySet()) {
+                totalDamages += e.getValue();
+            }
+            for (final Entry<String, Double> e : handler.getDragons().get(event.getEntity().getUniqueId()).entrySet()) {
+                ratioMap.put((float)(e.getValue() / (double)totalDamages), e.getKey());
+            }
+
+            // Step 2: Remove entries for Players whom done less damages than threshold
+            final Iterator<Entry<Float, String>> it = ratioMap.entrySet().iterator();
+            while (it.hasNext()) {
+                final Entry<Float, String> e = it.next();
+                if (e.getKey() <= THRESHOLD) {
+                    it.remove();
+                }
+            }
+
+            // Step 3: Update ratio according to removed parts of total (was 1 obviously)
+            float remainingRatioTotal = 0f;
+            for (final float f : ratioMap.keySet()) {
+                // Computing new total (should be <=1)
+                remainingRatioTotal += f;
+            }
+
+            // Step 4: Now update what part of the new total damages each player did
+            if (remainingRatioTotal != 1) {
+                final TreeMap<Float, String> newRatioMap = new TreeMap<>();
+                for (final Entry<Float, String> e : ratioMap.entrySet()) {
+                    newRatioMap.put(e.getKey() * 1 / remainingRatioTotal, e.getValue());
+                }
+                ratioMap = newRatioMap;
+            }
+
+            if (customEggHandling) {
+                // Step 5: Now we will take a random player, the best fighter has the best chance to be chosen
+                float rand = new Random().nextFloat();
+                String playerName = null;
+                for (final Entry<Float, String> e : ratioMap.entrySet()) {
+                    if (rand < e.getKey()) {
+                        playerName = e.getValue();
+                        break;
                     }
-                    for (final Entry<String, Double> e : handler.getDragons().get(event.getEntity().getUniqueId()).entrySet()) {
-                        ratioMap.put((float)(e.getValue() / (double)totalDamages), e.getKey());
-                    }
+                    rand -= e.getKey();
+                }
 
-                    // Step 2: Remove entries for Players whom done less damages than threshold
-                    final Iterator<Entry<Float, String>> it = ratioMap.entrySet().iterator();
-                    while (it.hasNext()) {
-                        final Entry<Float, String> e = it.next();
-                        if (e.getKey() <= THRESHOLD) {
-                            it.remove();
-                        }
-                    }
-
-                    // Step 3: Update ratio according to removed parts of total (was 1 obviously)
-                    float remainingRatioTotal = 0f;
-                    for (final float f : ratioMap.keySet()) {
-                        // Computing new total (should be <=1)
-                        remainingRatioTotal += f;
-                    }
-
-                    // Step 4: Now update what part of the new total damages each player did
-                    if (remainingRatioTotal != 1) {
-                        final TreeMap<Float, String> newRatioMap = new TreeMap<>();
-                        for (final Entry<Float, String> e : ratioMap.entrySet()) {
-                            newRatioMap.put(e.getKey() * 1 / remainingRatioTotal, e.getValue());
-                        }
-                        ratioMap = newRatioMap;
-                    }
-
-                    if (customEggHandling) {
-                        // Step 5: Now we will take a random player, the best fighter has the best chance to be chosen
-                        float rand = new Random().nextFloat();
-                        String playerName = null;
-                        for (final Entry<Float, String> e : ratioMap.entrySet()) {
-                            if (rand < e.getKey()) {
-                                playerName = e.getValue();
-                                break;
-                            }
-                            rand -= e.getKey();
-                        }
-
-                        // Step 6: And now we give him a Dragon Egg
-                        if (playerName == null) {
-                            // Security
-                            endWorld.dropItem(deathLocation, new ItemStack(Material.DRAGON_EGG));
+                // Step 6: And now we give him a Dragon Egg
+                if (playerName == null) {
+                    // Security
+                    endWorld.dropItem(deathLocation, new ItemStack(Material.DRAGON_EGG));
+                } else {
+                    final Player p = Bukkit.getServer().getPlayerExact(playerName);
+                    if (p == null) {
+                        // Security
+                        endWorld.dropItem(deathLocation, new ItemStack(Material.DRAGON_EGG));
+                    } else {
+                        // Try to give the Egg
+                        final HashMap<Integer, ItemStack> notGiven = p.getInventory().addItem(new ItemStack(Material.DRAGON_EGG));
+                        if (!notGiven.isEmpty()) {
+                            // Inventory full, drop the egg at Player's foot
+                            p.getWorld().dropItem(p.getLocation(), new ItemStack(Material.DRAGON_EGG));
+                            this.plugin.sendMessage(p, MessageId.theEndAgain_droppedDragonEgg);
                         } else {
-                            final Player p = Bukkit.getServer().getPlayerExact(playerName);
-                            if (p == null) {
-                                // Security
-                                endWorld.dropItem(deathLocation, new ItemStack(Material.DRAGON_EGG));
-                            } else {
-                                // Try to give the Egg
-                                final HashMap<Integer, ItemStack> notGiven = p.getInventory().addItem(new ItemStack(Material.DRAGON_EGG));
-                                if (!notGiven.isEmpty()) {
-                                    // Inventory full, drop the egg at Player's foot
-                                    p.getWorld().dropItem(p.getLocation(), new ItemStack(Material.DRAGON_EGG));
-                                    this.plugin.sendMessage(p, MessageId.theEndAgain_droppedDragonEgg);
-                                } else {
-                                    this.plugin.sendMessage(p, MessageId.theEndAgain_receivedDragonEgg);
-                                }
-                            }
+                            this.plugin.sendMessage(p, MessageId.theEndAgain_receivedDragonEgg);
                         }
                     }
-
-                    // Step 7: And now we redo steps 5 and 6 for each Drop
-                    if (customDropHandling) {
-                        for (final Pair<ItemStack, Float> pair : config.getDropTable()) {
-                            final ItemStack is = pair.getKey().clone();
-                            is.setAmount(1);
-                            for (int i = 0; i < pair.getKey().getAmount(); i++) {
-                                if (RANDOM.nextFloat() <= pair.getValue()) {
-                                    // Step 5 again
-                                    float rand = new Random().nextFloat();
-                                    String playerName = null;
-                                    for (final Entry<Float, String> e : ratioMap.entrySet()) {
-                                        if (rand < e.getKey()) {
-                                            playerName = e.getValue();
-                                            break;
-                                        }
-                                        rand -= e.getKey();
-                                    }
-
-                                    // Step 6 again
-                                    if (playerName == null) {
-                                        // Security
-                                        endWorld.dropItem(deathLocation, is);
-                                    } else {
-                                        final Player p = Bukkit.getServer().getPlayerExact(playerName);
-                                        if (p == null) {
-                                            // Security
-                                            endWorld.dropItem(deathLocation, is);
-                                        } else {
-                                            // Try to give the Drop
-                                            final HashMap<Integer, ItemStack> notGiven = p.getInventory().addItem(is);
-                                            if (!notGiven.isEmpty()) {
-                                                // Inventory full, drop the drop at Player's foot
-                                                p.getWorld().dropItem(p.getLocation(), is);
-                                                this.plugin.sendMessage(p, MessageId.theEndAgain_droppedDrop);
-                                            } else {
-                                                this.plugin.sendMessage(p, MessageId.theEndAgain_receivedDrop);
-                                            } // Here starts the bracket waterfall!
-                                        }
-                                    } // Yay!
-                                }
-                            } // Again!
-                        }
-                    } // One more!
-                } // Woo!
-
-                // 3
-                if (!event.isCancelled()) {
-                    event.setCancelled(cancelEvent);
                 }
+            }
 
-                /*
-                 * This code has been moved to onEnderDragonDeath
-                 * because event EntityCreatePortalEvent was not firing
-                 *
+            // Step 7: And now we redo steps 5 and 6 for each Drop
+            if (customDropHandling) {
+                for (final Pair<ItemStack, Float> pair : config.getDropTable()) {
+                    final ItemStack is = pair.getKey().clone();
+                    is.setAmount(1);
+                    for (int i = 0; i < pair.getKey().getAmount(); i++) {
+                        if (RANDOM.nextFloat() <= pair.getValue()) {
+                            // Step 5 again
+                            float rand = new Random().nextFloat();
+                            String playerName = null;
+                            for (final Entry<Float, String> e : ratioMap.entrySet()) {
+                                if (rand < e.getKey()) {
+                                    playerName = e.getValue();
+                                    break;
+                                }
+                                rand -= e.getKey();
+                            }
 
-                // Forget about this dragon
-                UUID dragonId = event.getEntity().getUniqueId();
-                this.plugin.debug(" ... remove EnderDragon, UUID " + dragonId);
+                            // Step 6 again
+                            if (playerName == null) {
+                                // Security
+                                endWorld.dropItem(deathLocation, is);
+                            } else {
+                                final Player p = Bukkit.getServer().getPlayerExact(playerName);
+                                if (p == null) {
+                                    // Security
+                                    endWorld.dropItem(deathLocation, is);
+                                } else {
+                                    // Try to give the Drop
+                                    final HashMap<Integer, ItemStack> notGiven = p.getInventory().addItem(is);
+                                    if (!notGiven.isEmpty()) {
+                                        // Inventory full, drop the drop at Player's foot
+                                        p.getWorld().dropItem(p.getLocation(), is);
+                                        this.plugin.sendMessage(p, MessageId.theEndAgain_droppedDrop);
+                                    } else {
+                                        this.plugin.sendMessage(p, MessageId.theEndAgain_receivedDrop);
+                                    } // Here starts the bracket waterfall!
+                                }
+                            } // Yay!
+                        }
+                    } // Again!
+                }
+            } // One more!
+        } // Woo!
 
-                handler.getDragons().remove(dragonId);
-                handler.getLoadedDragons().remove(dragonId);
+        // 3
+        if (!event.isCancelled()) {
+            event.setCancelled(cancelEvent);
+        }
 
-                // Handle on-ED-death regen/respawn
-                int respawnType = config.getRespawnType();
+        /*
+         * This code has been moved to onEnderDragonDeath
+         * because event EntityCreatePortalEvent was not firing
+         *
 
-                if (respawnType == 1) {
-                    this.plugin.debug(" ... respawnType is 1; call handler.getRespawnHandler().respawnLater");
+        // Forget about this dragon
+        UUID dragonId = event.getEntity().getUniqueId();
+        this.plugin.debug(" ... remove EnderDragon, UUID " + dragonId);
+
+        handler.getDragons().remove(dragonId);
+        handler.getLoadedDragons().remove(dragonId);
+
+        // Handle on-ED-death regen/respawn
+        int respawnType = config.getRespawnType();
+
+        if (respawnType == 1) {
+            this.plugin.debug(" ... respawnType is 1; call handler.getRespawnHandler().respawnLater");
+            handler.getRespawnHandler().respawnLater();
+        } else {
+            int dragonCountAlive = handler.getNumberOfAliveEnderDragons();
+            if (dragonCountAlive == 0) {
+                if (respawnType == 2) {
+                    this.plugin.debug(" ... respawnType is 2 and no dragons remain; call handler.getRespawnHandler().respawnLater");
                     handler.getRespawnHandler().respawnLater();
                 } else {
-                    int dragonCountAlive = handler.getNumberOfAliveEnderDragons();
-                    if (dragonCountAlive == 0) {
-                        if (respawnType == 2) {
-                            this.plugin.debug(" ... respawnType is 2 and no dragons remain; call handler.getRespawnHandler().respawnLater");
-                            handler.getRespawnHandler().respawnLater();
-                        } else {
-                            this.plugin.debug(" ... respawnType is " + respawnType + " and no dragons remain; take no action");
+                    this.plugin.debug(" ... respawnType is " + respawnType + " and no dragons remain; take no action");
 
-                            // if (config.getRespawnType() == 6) {
-                            //    // Respawn Type 6 (deprecated):
-                            //    // Respawn every X seconds after the last Dragon alive's death, persistent through reboots/reloads
-                            //    config.setNextRespawnTaskTime(System.currentTimeMillis() + config.getRandomRespawnTimer() * 1000);
-                            //    handler.getTasks().add(Bukkit.getScheduler().runTaskLater(this.plugin, new Runnable() {
-                            //        @Override
-                            //        public void run() {
-                            //            handler.getRespawnHandler().respawn();
-                            //        }
-                            //    }, config.getNextRespawnTaskTime() / 1000 * 20));
-                            // }
-                        }
-                    } else {
-                        this.plugin.debug(" ... live dragon count is " + dragonCountAlive + " (respawnType is " + respawnType + ")");
-                    }
+                    // if (config.getRespawnType() == 6) {
+                    //    // Respawn Type 6 (deprecated):
+                    //    // Respawn every X seconds after the last Dragon alive's death, persistent through reboots/reloads
+                    //    config.setNextRespawnTaskTime(System.currentTimeMillis() + config.getRandomRespawnTimer() * 1000);
+                    //    handler.getTasks().add(Bukkit.getScheduler().runTaskLater(this.plugin, new Runnable() {
+                    //        @Override
+                    //        public void run() {
+                    //            handler.getRespawnHandler().respawn();
+                    //        }
+                    //    }, config.getNextRespawnTaskTime() / 1000 * 20));
+                    // }
                 }
-
-                */
-
-
-}
+            } else {
+                this.plugin.debug(" ... live dragon count is " + dragonCountAlive + " (respawnType is " + respawnType + ")");
+            }
         }
+
+        */
+
     }
 
     /**
