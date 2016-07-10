@@ -455,6 +455,7 @@ public class Config extends AbstractConfig<NTheEndAgain> {
 
         // edPortalSpawn
         content.append("# The way portal spawn will be handled. Default: " + DEFAULT_edPortalSpawn + '\n');
+        content.append("# Does not work properly on Spigot 1.9 or 1.10\n");
         content.append("#\n");
         content.append("#       0: Disabled. Portal will spawn normally.\n");
         content.append("#       1: Egg. Portal will be removed but not the DragonEgg\n");
