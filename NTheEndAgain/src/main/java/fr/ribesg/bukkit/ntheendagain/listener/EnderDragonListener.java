@@ -101,32 +101,37 @@ public class EnderDragonListener implements Listener {
 
         /* Compute damages */
 
+        final Map<UUID, Map<String, Double>> dragonInfo = handler.getDragons();
+
         final HashMap<String, Double> dmgMap;
         try {
-            dmgMap = new HashMap<>(handler.getDragons().get(event.getEntity().getUniqueId()));
+            dmgMap = new HashMap<>(dragonInfo.get(event.getEntity().getUniqueId()));
         } catch (final NullPointerException e) {
+            // Dragon not found
+            this.plugin.error("Dragon info not found for UUID " + event.getEntity().getUniqueId() + "; " +
+                    "cannot award XP or trigger regen / respawn tasks");
             return;
         }
 
         // We ignore offline players
-        final Iterator<Entry<String, Double>> it = dmgMap.entrySet().iterator();
-        while (it.hasNext()) {
-            final Entry<String, Double> e = it.next();
+        final Iterator<Entry<String, Double>> dmgMapIterator = dmgMap.entrySet().iterator();
+        while (dmgMapIterator.hasNext()) {
+            final Entry<String, Double> e = dmgMapIterator.next();
             if (this.plugin.getServer().getPlayerExact(e.getKey()) == null) {
-                it.remove();
+                dmgMapIterator.remove();
             }
         }
 
         // Get total damages done to the ED by Online players
-        double totalDamages = 0;
+        double totalDamagesXp = 0;
         for (final double v : dmgMap.values()) {
-            totalDamages += v;
+            totalDamagesXp += v;
         }
 
         // Create map of damages percentages
         final Map<String, Float> dmgPercentageMap = new HashMap<>();
         for (final Entry<String, Double> entry : dmgMap.entrySet()) {
-            dmgPercentageMap.put(entry.getKey(), (float)(entry.getValue() / totalDamages));
+            dmgPercentageMap.put(entry.getKey(), (float)(entry.getValue() / totalDamagesXp));
         }
 
         /* XP Handling */
@@ -178,6 +183,8 @@ public class EnderDragonListener implements Listener {
                 for (int i = 0; i < pair.getKey().getAmount(); i++) {
                     if (RANDOM.nextFloat() <= pair.getValue()) {
                         endWorld.dropItemNaturally(loc, is);
+                        this.plugin.debug(" ... Dropping item " + is.toString() +
+                                " at " + loc.getX() + ", " + loc.getY() + ", " + loc.getZ());
                     }
                 }
             }
@@ -216,12 +223,28 @@ public class EnderDragonListener implements Listener {
             }
         }
 
+        // Check for custom egg handling
+        final int eH = config.getEdEggHandling();
+        final Location deathLocation = event.getEntity().getLocation();
+        final String deathCoords = (int)deathLocation.getX() + ", " + (int)deathLocation.getY() + ", " + (int)deathLocation.getZ();
+
+        final boolean customEggHandling = (eH == 1);
+
+        // Award or drop a dragon egg
+
+        if (customEggHandling) {
+            AwardEnderDragonEgg(endWorld, deathLocation, deathCoords, dmgMap);
+        } else {
+            endWorld.dropItem(deathLocation, new ItemStack(Material.DRAGON_EGG));
+            this.plugin.debug(" ... dropped dragon egg at " + deathCoords);
+        }
+
         // Forget about this dragon
         UUID dragonId = event.getEntity().getUniqueId();
 
         try {
             this.plugin.debug(" ... remove EnderDragon, UUID" + dragonId);
-            handler.getDragons().remove(dragonId);
+            dragonInfo.remove(dragonId);
             handler.getLoadedDragons().remove(dragonId);
         } catch (Exception ex) {
             this.plugin.debug(" ... exception removing EnderDragon, UUID" + dragonId + ": " + ex.getMessage());
@@ -230,11 +253,12 @@ public class EnderDragonListener implements Listener {
         // Handle on-ED-death regen/respawn
         int respawnType = config.getRespawnType();
 
+        int dragonCountAlive = handler.getNumberOfAliveEnderDragons();
+
         if (respawnType == 1) {
             this.plugin.debug(" ... respawnType is 1; call handler.getRespawnHandler().respawnLater");
             handler.getRespawnHandler().respawnLater();
         } else {
-            int dragonCountAlive = handler.getNumberOfAliveEnderDragons();
             if (dragonCountAlive == 0) {
                 if (respawnType == 2) {
                     this.plugin.debug(" ... respawnType is 2 and no dragons remain; call handler.getRespawnHandler().respawnLater");
@@ -247,6 +271,165 @@ public class EnderDragonListener implements Listener {
             }
         }
 
+    }
+
+    private void AwardEnderDragonEgg(World endWorld, Location deathLocation, String deathCoords, HashMap<String, Double> dmgMapSource) {
+
+        this.plugin.debug("Awarding EnderDragon egg using custom logic");
+
+        // Copy values from dmgMapSource into a new HashMap
+        final HashMap<String, Double> dmgMap = new HashMap<>();
+        for (final Entry<String, Double> e : dmgMapSource.entrySet()) {
+            dmgMap.put(e.getKey(), e.getValue());
+        }
+
+        if (dmgMap.size() < 1) {
+            this.plugin.debug(" ... Bug: dmgMap is empty; cannot award an egg");
+            return;
+        }
+
+        // Step 1: % of total damages done to the ED ; Player name
+        TreeMap<Float, String> damageRatioMap = new TreeMap<>();
+
+        long totalDamages = 0;
+        for (final Entry<String, Double> e : dmgMap.entrySet()) {
+            totalDamages += e.getValue();
+        }
+
+        this.plugin.debug(" ... totalDamages: " + totalDamages);
+
+        for (final Entry<String, Double> e : dmgMap.entrySet()) {
+            float damageRatio = (float) (e.getValue() / (double) totalDamages);
+            damageRatioMap.put(damageRatio, e.getKey());
+
+            this.plugin.debug(" ... add to damageRatioMap: " + damageRatio + " for " + e.getKey());
+        }
+
+        // Step 2: Remove entries for Players whom done less damages than threshold
+        final Iterator<Entry<Float, String>> damageRatioMapIterator = damageRatioMap.entrySet().iterator();
+        while (damageRatioMapIterator.hasNext()) {
+            final Entry<Float, String> e = damageRatioMapIterator.next();
+            if (e.getKey() <= THRESHOLD) {
+                damageRatioMapIterator.remove();
+                this.plugin.debug(" ... remove from damageRatioMap: " + e.getKey() +
+                        " (inflicted less than " + (int) (THRESHOLD * 100) + "% of the damage)");
+            }
+        }
+
+        if (damageRatioMap.size() < 1) {
+            this.plugin.debug(" ... Bug: damageRatioMap is now empty; using all players");
+            dmgMap.clear();
+            damageRatioMap.clear();
+
+            for (final Entry<String, Double> e : dmgMapSource.entrySet()) {
+                dmgMap.put(e.getKey(), e.getValue());
+            }
+
+            for (final Entry<String, Double> e : dmgMap.entrySet()) {
+                float damageRatio = (float) (e.getValue() / (double) totalDamages);
+                damageRatioMap.put(damageRatio, e.getKey());
+            }
+        }
+
+        // Step 3: Update ratio according to removed parts of total (was 1 obviously)
+        float remainingRatioTotal = 0f;
+        for (final float f : damageRatioMap.keySet()) {
+            // Computing new total (should be <=1)
+            remainingRatioTotal += f;
+        }
+
+        // Step 4: Now update what part of the new total damages each player did
+        float highestScore = 0;
+        if (remainingRatioTotal != 1) {
+            final TreeMap<Float, String> newRatioMap = new TreeMap<>();
+            for (final Entry<Float, String> e : damageRatioMap.entrySet()) {
+                float newRatio = e.getKey() * 1 / remainingRatioTotal;
+                newRatioMap.put(newRatio, e.getValue());
+                this.plugin.debug(" ... add to newRatioMap: " + newRatio + " for " + e.getValue());
+
+                if (newRatio > highestScore)
+                    highestScore = newRatio;
+            }
+            damageRatioMap = newRatioMap;
+        }
+
+        String playerName = null;
+
+        if (damageRatioMap.size() == 1) {
+            // Only one person to consider
+            Entry<Float, String> e = damageRatioMap.firstEntry();
+            playerName = e.getValue();
+            this.plugin.debug(" ... will award egg to " + playerName + " (only possibility); damage ratio " + e.getKey());
+        } else {
+
+            // Step 5: Find all the players with a score of highestScore * .75 or higher
+            float scoreThreshold = highestScore * 0.75f;
+
+            final TreeMap<Float, String> highScoringPlayers = new TreeMap<>();
+            for (final Entry<Float, String> e : damageRatioMap.entrySet()) {
+                if (e.getKey() >= scoreThreshold) {
+                    highScoringPlayers.put(e.getKey(), e.getValue());
+                    this.plugin.debug(" ... " + e.getValue() + " has a chance to receive the egg; damage " + e.getKey() + " >= " + scoreThreshold);
+                }
+            }
+
+            if (highScoringPlayers.size() == 0) {
+                this.plugin.debug(" ... Bug: highScoringPlayers is empty; adding all players");
+                for (final Entry<Float, String> e : damageRatioMap.entrySet()) {
+                    highScoringPlayers.put(e.getKey(), e.getValue());
+                    this.plugin.debug(" ... " + e.getValue() + " has a chance to receive the egg; damage " + e.getKey());
+                }
+            }
+
+            // Step 6: Pick the winner
+            if (highScoringPlayers.size() == 1) {
+                Entry<Float, String> e = highScoringPlayers.firstEntry();
+                playerName = e.getValue();
+                this.plugin.debug(" ... highScoringPlayers has just 1 player; " +
+                        "will award egg to " + playerName + "; damage ratio " + e.getKey());
+            } else if (highScoringPlayers.size() > 1) {
+
+                // Pick a random player from the high scoring players
+                int rand = new Random().nextInt(highScoringPlayers.size());
+                int iterator = 0;
+                for (final Entry<Float, String> e : damageRatioMap.entrySet()) {
+                    if (iterator >= rand) {
+                        playerName = e.getValue();
+                        this.plugin.debug(" ... will award egg to " + playerName + " (randomly chosen, index " + rand + ")");
+                        break;
+                    }
+                    iterator++;
+                }
+
+            }
+        }
+
+        // Step 7: Give the Dragon Egg to playerName
+        if (playerName == null) {
+            // Security
+            endWorld.dropItem(deathLocation, new ItemStack(Material.DRAGON_EGG));
+            this.plugin.debug(" ... playerName is null; dropped dragon egg at " + deathCoords);
+        } else {
+            final Player p = Bukkit.getServer().getPlayerExact(playerName);
+            if (p == null) {
+                // Security
+                endWorld.dropItem(deathLocation, new ItemStack(Material.DRAGON_EGG));
+                this.plugin.debug(" ... player is null (name " + playerName + " not found); dropped dragon egg at " + deathCoords);
+            } else {
+                // Try to give the Egg
+                final HashMap<Integer, ItemStack> notGiven = p.getInventory().addItem(new ItemStack(Material.DRAGON_EGG));
+                if (!notGiven.isEmpty()) {
+                    // Inventory full, drop the egg at Player's foot
+                    p.getWorld().dropItem(p.getLocation(), new ItemStack(Material.DRAGON_EGG));
+                    this.plugin.sendMessage(p, MessageId.theEndAgain_droppedDragonEgg);
+                    this.plugin.info("Could not give dragon egg to " + playerName + " since inventory is full; " +
+                            "dropped dragon egg at " + deathCoords);
+                } else {
+                    this.plugin.sendMessage(p, MessageId.theEndAgain_receivedDragonEgg);
+                    this.plugin.info("Gave dragon egg to " + playerName + "");
+                }
+            }
+        }
     }
 
     /**
@@ -391,6 +574,10 @@ public class EnderDragonListener implements Listener {
                 ratioMap = newRatioMap;
             }
 
+            /*
+             * This code has been moved to onEnderDragonDeath
+             *
+
             if (customEggHandling) {
                 // Step 5: Now we will take a random player, the best fighter has the best chance to be chosen
                 float rand = new Random().nextFloat();
@@ -425,6 +612,7 @@ public class EnderDragonListener implements Listener {
                     }
                 }
             }
+            */
 
             // Step 7: And now we redo steps 5 and 6 for each Drop
             if (customDropHandling) {
@@ -593,38 +781,37 @@ public class EnderDragonListener implements Listener {
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onEnderDragonRegainHealth(final EntityRegainHealthEvent event) {
 
-        this.plugin.entering(this.getClass(), "onEnderDragonRegainHealth");
+    	if(event.getEntity().getWorld().getEnvironment() != Environment.THE_END ||
+           event.getEntityType() != EntityType.ENDER_DRAGON ||
+           event.getRegainReason() != RegainReason.ENDER_CRYSTAL) {
+            return;
+        }
 
-    	if(event.getEntity().getWorld().getEnvironment() == Environment.THE_END) {
-            if (event.getEntityType() == EntityType.ENDER_DRAGON && event.getRegainReason() == RegainReason.ENDER_CRYSTAL) {
-                String worldName = event.getEntity().getLocation().getWorld().getName();
-                final EndWorldHandler handler = this.plugin.getHandler(StringUtil.toLowerCamelCase(worldName));
-                if (handler == null) {
-                    this.plugin.debug("onEnderDragonRegainHealth: no handler for " + worldName);
-                } else {
+        String worldName = event.getEntity().getLocation().getWorld().getName();
+        final EndWorldHandler handler = this.plugin.getHandler(StringUtil.toLowerCamelCase(worldName));
+        if (handler == null) {
+            this.plugin.debug("onEnderDragonRegainHealth: no handler for " + worldName);
+            return;
+        }
 
-                    final EnderDragon ed = (EnderDragon)event.getEntity();
-                    UUID dragonId = ed.getUniqueId();
+        final EnderDragon ed = (EnderDragon)event.getEntity();
+        UUID dragonId = ed.getUniqueId();
 
-                    final float rate = handler.getConfig().getEcHealthRegainRate();
-                    if (rate < 1.0) {
-                        float nextFloat = RANDOM.nextFloat();
-                        if (nextFloat >= rate) {
-                            this.plugin.debug("onEnderDragonRegainHealth: cancel health gain for EnderDragon, " +
-                                    "UUID " + dragonId + ": " + nextFloat + " >= " + rate);
-                            event.setCancelled(true);
-                        } else {
-                            this.plugin.debug("onEnderDragonRegainHealth: allow health gain for EnderDragon, " +
-                                    "UUID " + dragonId + ": " + event.getAmount());
-                        }
-                    } else if (rate > 1.0) {
-                        int healthAmount = (int)(rate * event.getAmount());
-                        this.plugin.debug("onEnderDragonRegainHealth: set health gain for EnderDragon, " +
-                                "UUID " + dragonId + ": " + healthAmount);
-                        event.setAmount(healthAmount);
-                    }
-                }
+        final float rate = handler.getConfig().getEcHealthRegainRate();
+        if (rate < 1.0) {
+            float nextFloat = RANDOM.nextFloat();
+            if (nextFloat >= rate) {
+                this.plugin.debug("Cancel health gain for EnderDragon, " + "UUID " + dragonId + ": " + nextFloat + " >= " + rate);
+                event.setCancelled(true);
+            } else {
+                // this.plugin.debug("Allow health gain for EnderDragon, " + "UUID " + dragonId + ": " + event.getAmount());
             }
-    	}
+        } else if (rate > 1.0) {
+            int healthAmount = (int)(rate * event.getAmount());
+            this.plugin.debug("Set health gain for EnderDragon, " + "UUID " + dragonId + ": " + healthAmount);
+            event.setAmount(healthAmount);
+        } else {
+            // this.plugin.debug("Vanilla health gain for EnderDragon, " + "UUID " + dragonId + ": " + event.getAmount());
+        }
     }
 }
