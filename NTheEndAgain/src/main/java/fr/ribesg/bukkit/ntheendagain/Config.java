@@ -49,7 +49,7 @@ public class Config extends AbstractConfig<NTheEndAgain> {
     private static final float DEFAULT_edPushForce = 1.75f;
     private float edPushForce;
 
-    private static final int DEFAULT_edEggHandling = 0;
+    private static final int DEFAULT_edEggHandling = 1;
     private int edEggHandling;
 
     private static final int DEFAULT_edExpHandling = 0;
@@ -433,10 +433,11 @@ public class Config extends AbstractConfig<NTheEndAgain> {
         content.append("edPushForce: " + this.edPushForce + "\n\n");
 
         // edEggHandling
-        content.append("# The way the DragonEgg will spawn. Default: " + DEFAULT_edEggHandling + '\n');
+        content.append("# The way the DragonEgg will spawn (one per dragon). Default: " + DEFAULT_edEggHandling + '\n');
         content.append("#\n");
-        content.append("#       0: Disabled. The egg will spawn normally if portalHandling is set to 0 or 1.\n");
-        content.append("#       1: Enabled. The egg will be semi-randomly given to one of the best fighters.\n");
+        content.append("#       0: Disabled. The egg will spawn normally if portalHandling is set to 0 or 1 (does not work properly on Spigot 1.9 or 1.10)\n");
+        content.append("#       1: Award to player. The egg will be randomly given to one of the best fighters.\n");
+        content.append("#       2: Drop on ground. The egg will be dropped on the ground where the dragon dies.\n");
         content.append("#\n");
         content.append("edEggHandling: " + this.edEggHandling + "\n\n");
 

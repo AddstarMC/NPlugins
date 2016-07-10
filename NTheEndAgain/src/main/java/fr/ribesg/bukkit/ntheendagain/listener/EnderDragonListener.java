@@ -228,15 +228,16 @@ public class EnderDragonListener implements Listener {
         final Location deathLocation = event.getEntity().getLocation();
         final String deathCoords = (int)deathLocation.getX() + ", " + (int)deathLocation.getY() + ", " + (int)deathLocation.getZ();
 
-        final boolean customEggHandling = (eH == 1);
+        // Possibly award or drop a dragon egg
+        // 0: no special behavior; let the server handle the egg
+        // 1: award to best player
+        // 2: drop on the ground
 
-        // Award or drop a dragon egg
-
-        if (customEggHandling) {
+        if (eH == 1) {
             AwardEnderDragonEgg(endWorld, deathLocation, deathCoords, dmgMap);
-        } else {
+        } else if (eH == 2) {
             endWorld.dropItem(deathLocation, new ItemStack(Material.DRAGON_EGG));
-            this.plugin.debug(" ... dropped dragon egg at " + deathCoords);
+            this.plugin.info("Dropped Ender Dragon egg at " + deathCoords);
         }
 
         // Forget about this dragon
@@ -408,13 +409,13 @@ public class EnderDragonListener implements Listener {
         if (playerName == null) {
             // Security
             endWorld.dropItem(deathLocation, new ItemStack(Material.DRAGON_EGG));
-            this.plugin.debug(" ... playerName is null; dropped dragon egg at " + deathCoords);
+            this.plugin.info("PlayerName is null; dropped dragon egg at " + deathCoords);
         } else {
             final Player p = Bukkit.getServer().getPlayerExact(playerName);
             if (p == null) {
                 // Security
                 endWorld.dropItem(deathLocation, new ItemStack(Material.DRAGON_EGG));
-                this.plugin.debug(" ... player is null (name " + playerName + " not found); dropped dragon egg at " + deathCoords);
+                this.plugin.info("Player is null (name " + playerName + " not found); dropped dragon egg at " + deathCoords);
             } else {
                 // Try to give the Egg
                 final HashMap<Integer, ItemStack> notGiven = p.getInventory().addItem(new ItemStack(Material.DRAGON_EGG));
@@ -497,7 +498,7 @@ public class EnderDragonListener implements Listener {
          */
 
         // (1a)
-        final boolean cancelEgg = pH == 0 && eH == 1 || event.isCancelled();
+        final boolean cancelEgg = pH == 0 && eH >= 1 || event.isCancelled();
 
         // (1b)
         final boolean cancelPortalBlocks = pH == 1 && eH == 0 || event.isCancelled();
