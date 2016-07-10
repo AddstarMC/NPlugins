@@ -40,16 +40,21 @@ import org.bukkit.event.world.ChunkUnloadEvent;
  */
 public class ChunkListener implements Listener {
 
-    private final int MESSAGE_INTERVAL_MILLIS = 10000;
+    private final int MESSAGE_INTERVAL_MILLIS = 5000;
+    private final int STALE_CHUNK_INTERVAL_MILLIS = 10000;
 
     private final NTheEndAgain plugin;
 
     private Boolean lastChunkCoordsValid = false;
     private int lastChunkCoordX;
     private int lastChunkCoordZ;
-    private long lastChunkRegenTime = System.currentTimeMillis() - 10000;
+    private long lastChunkRegenTime = System.currentTimeMillis() - STALE_CHUNK_INTERVAL_MILLIS;
 
     private long lastInfoTime = System.currentTimeMillis() - MESSAGE_INTERVAL_MILLIS * 2;
+
+    // This is a count of the chunks regenerated during the current regen task
+	// It gets reset if a chunk regen event is more than 10 seconds since the previous event
+    private int chunksRegenerated = 0;
 
     public ChunkListener(final NTheEndAgain instance) {
         this.plugin = instance;
@@ -73,11 +78,6 @@ public class ChunkListener implements Listener {
             if (handler != null) {
 
                 long currentTime = System.currentTimeMillis();
-
-                if (currentTime > lastInfoTime + MESSAGE_INTERVAL_MILLIS) {
-                    this.plugin.debug("onEndChunkLoad: Examine chunks in world " + worldName);
-                    lastInfoTime = currentTime;
-                }
 
                 final EndChunks chunks = handler.getChunks();
                 final Chunk chunk = event.getChunk();
@@ -106,13 +106,23 @@ public class ChunkListener implements Listener {
                         }
                     }
 
+                    if (currentTime > lastChunkRegenTime + STALE_CHUNK_INTERVAL_MILLIS)
+                        chunksRegenerated = 0;
+                    else
+                        chunksRegenerated++;
+
                     // Keep track of the last chunk regenerated
                     lastChunkCoordsValid = true;
                     lastChunkCoordX = chunkX;
                     lastChunkCoordZ = chunkZ;
                     lastChunkRegenTime = currentTime;
 
-                    this.plugin.debug(" ... regen chunk at " + chunkX + ", " + chunkZ + " (in progress)");
+                    if (currentTime > lastInfoTime + MESSAGE_INTERVAL_MILLIS) {
+                        // Only show this message every 5 seconds
+                        this.plugin.debug(" ... regen chunk at " + chunkX + ", " + chunkZ +
+                                " (" + chunksRegenerated + " chunks regenerated)");
+                        lastInfoTime = currentTime;
+                    }
 
                     final ChunkRegenEvent regenEvent = new ChunkRegenEvent(chunk);
                     Bukkit.getPluginManager().callEvent(regenEvent);
