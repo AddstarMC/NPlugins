@@ -11,6 +11,7 @@ package fr.ribesg.bukkit.ntheendagain.listener;
 
 import fr.ribesg.bukkit.ncore.event.theendagain.ChunkRegenEvent;
 import fr.ribesg.bukkit.ncore.util.StringUtil;
+import fr.ribesg.bukkit.ntheendagain.Config;
 import fr.ribesg.bukkit.ntheendagain.NTheEndAgain;
 import fr.ribesg.bukkit.ntheendagain.handler.EndWorldHandler;
 import fr.ribesg.bukkit.ntheendagain.world.EndChunk;
@@ -85,7 +86,7 @@ public class ChunkListener implements Listener {
 
                 /*
                  * Chunk has to be regen
-                 *   - Forget every dragons in it
+                 *   - Forget every dragon in it
                  *   - Regenerate the chunk
                  *   - Schedule a refresh
                  */
@@ -117,10 +118,19 @@ public class ChunkListener implements Listener {
                     lastChunkCoordZ = chunkZ;
                     lastChunkRegenTime = currentTime;
 
-                    if (currentTime > lastInfoTime + MESSAGE_INTERVAL_MILLIS) {
+                    Config config = handler.getConfig();
+                    Boolean verboseLogging = config.getVerboseRegenLogging();
+                    String regenMessage = " ... regen chunk at " + chunkX + ", " + chunkZ +
+                            " (" + chunksRegenerated + " chunks regenerated)";
+
+                    if (verboseLogging) {
+                        if (this.plugin.isDebugEnabled())
+                            this.plugin.debug(regenMessage);
+                        else
+                            this.plugin.log(Level.INFO, regenMessage);
+                    } else if (currentTime > lastInfoTime + MESSAGE_INTERVAL_MILLIS) {
                         // Only show this message every 5 seconds
-                        this.plugin.debug(" ... regen chunk at " + chunkX + ", " + chunkZ +
-                                " (" + chunksRegenerated + " chunks regenerated)");
+                        this.plugin.debug(regenMessage);
                         lastInfoTime = currentTime;
                     }
 
