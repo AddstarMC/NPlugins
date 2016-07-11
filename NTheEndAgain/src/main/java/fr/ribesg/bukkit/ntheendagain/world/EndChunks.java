@@ -10,6 +10,7 @@
 package fr.ribesg.bukkit.ntheendagain.world;
 
 import fr.ribesg.bukkit.ncore.common.ChunkCoord;
+import fr.ribesg.bukkit.ntheendagain.NTheEndAgain;
 import fr.ribesg.bukkit.ntheendagain.handler.EndWorldHandler;
 
 import java.io.BufferedReader;
@@ -95,8 +96,16 @@ public class EndChunks implements Iterable<EndChunk> {
         }
     }
 
-    public void softRegen() {
+    public void softRegen(Boolean regenOuterEnd, Boolean verboseLogging, NTheEndAgain plugin) {
         for (final EndChunk ec : this) {
+            if (!regenOuterEnd) {
+                if (Math.abs(ec.getX()) >= 30 || Math.abs(ec.getZ()) >= 30 ) {
+                    // Skip this outer end chunk
+                    if (verboseLogging)
+                        plugin.debug(" ... skip outer island chunk at " + ec.getX() + ", " + ec.getZ());
+                    continue;
+                }
+            }
             ec.setToBeRegen(!ec.isProtected());
         }
     }

@@ -37,89 +37,160 @@ public class Config extends AbstractConfig<NTheEndAgain> {
     private int filterMovedTooQuicklySpam;
 
     // EnderDragon
+    // The health value EnderDragons will spawn with
     private static final int DEFAULT_edHealth = 200;
     private int edHealth;
 
+    // Scale damages done by EnderDragon
     private static final float DEFAULT_edDamageMultiplier = 1.0f;
     private float edDamageMultiplier;
 
+    // When 1, EnderDragons push players a random distance if the player is hit
     private static final int DEFAULT_edPushesPlayers = 1;
     private int edPushesPlayers;
 
+    // Simulated EnderDragon Push force
+    // Value between 0.01 and 10.0
     private static final float DEFAULT_edPushForce = 1.75f;
     private float edPushForce;
 
+    // The way the DragonEgg will spawn (one per dragon)
+    // 0: Disabled. The egg will spawn normally if portalHandling is set to 0 or 1 (does not work properly on Spigot 1.9 or 1.10)
+    // 1: Award to player. The egg will be randomly given to one of the best fighters.
+    // 2: Drop on ground. The egg will be dropped on the ground where the dragon dies.
     private static final int DEFAULT_edEggHandling = 1;
     private int edEggHandling;
 
+    // The way the reward XP will be given to player. Default: 0
+    // 0: Disabled. XP orbs will spawn normally.
+    // 1: Enabled. XP will be split between fighters, more XP for better fighters.
     private static final int DEFAULT_edExpHandling = 0;
     private int edExpHandling;
 
+    // The value of the XP drop, divided among players when edExpHandling is 1
     private static final int DEFAULT_edExpReward = 12_000;
     private int edExpReward;
 
+    // The way portal spawn will be handled. Default: 0
+    // Does not work properly on Spigot 1.9 or 1.10
+    // 0: Disabled. Portal will spawn normally.
+    // 1: Egg. Portal will be removed but not the DragonEgg
+    // 2: Enabled. Portal will not spawn. No more cut obsidian towers. /!\ No Egg if dragonEggHandling=0.
     private static final int DEFAULT_edPortalSpawn = 0;
     private int edPortalSpawn;
 
     // EnderCrystals
+    // Change EnderCrystals behaviour relative to the EnderDragon.
+    // < 1.0: Acts as a "chance that the Dragon will regain 1 HP" each tick
+    // = 1.0: Vanilla. EnderDragon gains 1 HP per tick.
+    // > 1.0: EnderDragon gains x HP per tick (use integer value of 2 or more)
     private static final float DEFAULT_ecHealthRegainRate = 1.0f;
     private float ecHealthRegainRate;
 
-    // Regeneration
+    // Regeneration type
+    // 0: Disabled
+    // 1: Before EnderDragon respawn (only if no EnderDragon alive)
+    // 2: Periodic - From load time
+    // 3: Periodic - Persistent
     private static final int DEFAULT_regenType = 0;
     private int regenType;
 
+    // Regen interval, in seconds
     private static final int DEFAULT_regenTimer = 86_400; // 24 hours
     private int regenTimer;
 
+    // Regeneration method
+    // 0: Hard Regen. Regen every chunks at once. Only recommended to run during server shutdown
+    // 1: Soft Regen. Regen chunks asynchronously
+    // 2: Crystals only. Does not modify any blocks, only respawn the EnderCrystals
     private static final int DEFAULT_regenMethod = 0;
     private int regenMethod;
 
+    // Control regeneration of the outer island chunks (Chunk x and z outside -30,30 and 30,30)
+    // Mode 2 is useful for regenerating the central island frequently (for example every 2 to 4 hours)
+    // while regenerating the outer islands less frequently (for example, every 30 days)
+    // 0: Do not regen the outer end
+    // 1: Regen the outer end every time the central island is regenerated
+    // 2: Regen the outer end every X hours (persisted across server restarts); minimum 1 hour
+    private static final int DEFAULT_regenOuterEnd = 0;
+    private int regenOuterEnd;
+
+    // How often to regenerate the outer end, in hours (triggered just after the central island is regenerated)
+    // The next appropriate outer end regen time is persisted across server restarts
+    private static final int DEFAULT_outerEndRegenHours = 720;
+    private int outerEndRegenHours;
+
+    // What do we do to players in the End when world regen starts
+    // 0: Kick them. This way they can rejoin immediately in the End at the same place.
+    // 1: Teleport them to the spawn point of the Main (= first) world.
+    // 2: Do nothing. Should only be used with regenMethod=2
     private static final int DEFAULT_regenAction = 0;
     private int regenAction;
 
+    // If 1, initiate hard regeneration on server stop
     private static final int DEFAULT_hardRegenOnStop = 0;
     private int hardRegenOnStop;
 
+    // Number of chunks to be regen every slowSoftRegenTimer after a Soft Regeneration has started
     private static final int DEFAULT_slowSoftRegenChunks = 5;
     private int slowSoftRegenChunks;
 
+    // Rate at which slowSoftRegenChunks chunks will be regenerated
     private static final int DEFAULT_slowSoftRegenTimer = 5;
     private int slowSoftRegenTimer;
 
-    private int maxDragons;
-    
+    // Number of EnderDragons to be spawned.
     private static final int DEFAULT_respawnNumber = 1;
     private int respawnNumber;
 
+    // When to respawn EnderDragons automatically
+    // 0: Disabled. No automatic respawn.
+    // 1: X seconds after each Dragon's death. Not really good with regenType=1.
+    // 2: X seconds after the last Dragon alive's death.
+    // 3: On server start.
+    // 4: Periodic - From load time. Respawn every X seconds after boot/load.
+    // 5: Periodic - Persistent. Respawn every X seconds, persistent through reboots/reloads
     private static final int DEFAULT_respawnType = 0;
     private int respawnType;
 
+    // Min time (in seconds) between respawns when respawnType is 1, 2, 4 or 5
+    // Randomly chosen for each iteration
     private static final int DEFAULT_respawnTimerMin = 7_200;
     private int respawnTimerMin;
 
+    // Max time (in seconds) between respawns when respawnType is 1, 2, 4 or 5
+    // Randomly chosen for each iteration
     private static final int DEFAULT_respawnTimerMax = 14_400;
     private int respawnTimerMax;
 
     // Drop Table
     // 0: Stock. Drops will just fall from the EnderDragon death Location
     // 1: Distribution. Drops will be distributed exactly like the DragonEgg
-
     private static final int DEFAULT_dropTableHandling = 1;
     private int dropTableHandling;
 
     private final PairList<ItemStack, Float> dropTable;
 
     // Chunk Protection
+    // Default state of newly first-generated chunks
     private static final boolean DEFAULT_defaultProtected = false;
     private boolean defaultProtected;
 
+    // Log settings
+    private boolean verboseRegenLogging;
+
     // Data
+    // Used for Regen task timer persistence, based on System.nanoTime()
     private static final long DEFAULT_nextRegenTaskTime = 0;
     private long nextRegenTaskTime;
 
+    // Used for Respawn task timer persistence, based on System.nanoTime()
     private static final long DEFAULT_nextRespawnTaskTime = 0;
     private long nextRespawnTaskTime;
+
+    // Used for outer end regen persistence, based on System.currentTimeMillis()
+    private static final long DEFAULT_nextOuterEndRegenTime = 0;
+    private long nextOuterEndRegenTime;
 
     public Config(final NTheEndAgain instance, final String world) {
         super(instance);
@@ -145,6 +216,8 @@ public class Config extends AbstractConfig<NTheEndAgain> {
         this.setRegenType(DEFAULT_regenType);
         this.setRegenTimer(DEFAULT_regenTimer);
         this.setRegenMethod(DEFAULT_regenMethod);
+        this.setRegenOuterEnd(DEFAULT_regenOuterEnd);
+        this.setOuterEndRegenHours(DEFAULT_outerEndRegenHours);
         this.setRegenAction(DEFAULT_regenAction);
         this.setHardRegenOnStop(DEFAULT_hardRegenOnStop);
         this.setSlowSoftRegenChunks(DEFAULT_slowSoftRegenChunks);
@@ -163,6 +236,7 @@ public class Config extends AbstractConfig<NTheEndAgain> {
         // Data
         this.setNextRegenTaskTime(DEFAULT_nextRegenTaskTime);
         this.setNextRespawnTaskTime(DEFAULT_nextRespawnTaskTime);
+        this.setNextOuterEndRegenTime(DEFAULT_nextOuterEndRegenTime);
     }
 
     @Override
@@ -258,6 +332,18 @@ public class Config extends AbstractConfig<NTheEndAgain> {
             this.setRegenMethod(DEFAULT_regenMethod);
         }
 
+        this.setRegenOuterEnd(config.getInt("regenOuterEnd", DEFAULT_regenOuterEnd));
+        if (!this.match(this.regenOuterEnd, 0, 2)) {
+            this.wrongValue(fileName, "regenOuterEnd", this.regenOuterEnd, DEFAULT_regenOuterEnd);
+            this.setRegenOuterEnd(DEFAULT_regenOuterEnd);
+        }
+
+        this.setOuterEndRegenHours(config.getInt("outerEndRegenHours", DEFAULT_outerEndRegenHours));
+        if (!this.match(this.outerEndRegenHours, 0, Integer.MAX_VALUE)) {
+            this.wrongValue(fileName, "outerEndRegenHours", this.outerEndRegenHours, DEFAULT_outerEndRegenHours);
+            this.setOuterEndRegenHours(DEFAULT_outerEndRegenHours);
+        }
+
         this.setRegenAction(config.getInt("regenAction", DEFAULT_regenAction));
         if (!this.match(this.regenAction, 0, 2)) {
             this.wrongValue(fileName, "regenAction", this.regenAction, DEFAULT_regenAction);
@@ -341,6 +427,9 @@ public class Config extends AbstractConfig<NTheEndAgain> {
         // Chunk Protection
         this.setDefaultProtected(config.getBoolean("defaultProtected", false));
 
+        // If true, log the location of every chunk that is regenerated
+        this.setVerboseRegenLogging(config.getBoolean("verboseRegenLogging", false));
+
         // Data
         this.setNextRegenTaskTime(config.getLong("nextRegenTaskTime", DEFAULT_nextRegenTaskTime));
         if (!this.match(this.nextRegenTaskTime, 0, Long.MAX_VALUE)) {
@@ -353,6 +442,13 @@ public class Config extends AbstractConfig<NTheEndAgain> {
             this.wrongValue(fileName, "nextRespawnTaskTime", this.nextRespawnTaskTime, DEFAULT_nextRespawnTaskTime);
             this.setNextRespawnTaskTime(DEFAULT_nextRespawnTaskTime);
         }
+
+        this.setNextOuterEndRegenTime(config.getLong("nextOuterEndRegenTime", DEFAULT_nextOuterEndRegenTime));
+        if (!this.match(this.nextOuterEndRegenTime, 0, Long.MAX_VALUE)) {
+            this.wrongValue(fileName, "nextOuterEndRegenTime", this.nextOuterEndRegenTime, DEFAULT_nextOuterEndRegenTime);
+            this.setNextOuterEndRegenTime(DEFAULT_nextOuterEndRegenTime);
+        }
+
     }
 
     @Override
@@ -445,7 +541,7 @@ public class Config extends AbstractConfig<NTheEndAgain> {
         content.append("# The way the reward XP will be given to player. Default: " + DEFAULT_edExpHandling + '\n');
         content.append("#\n");
         content.append("#       0: Disabled. XP orbs will spawn normally.\n");
-        content.append("#       1: Enabled. XP will be splitted between fighters, more XP for better fighters.\n");
+        content.append("#       1: Enabled. XP will be split between fighters, more XP for better fighters.\n");
         content.append("#\n");
         content.append("edExpHandling: " + this.edExpHandling + "\n\n");
 
@@ -480,8 +576,8 @@ public class Config extends AbstractConfig<NTheEndAgain> {
         content.append("# One important thing to understand is that Health is integer (for now).\n");
         content.append("#\n");
         content.append("#       < 1.0: Acts as a \"chance that the Dragon will regain 1 HP\" each tick\n");
-        content.append("#       = 1.0: Vanilla. EnderDragon gain 1 HP per tick.\n");
-        content.append("#       > 1.0: EnderDragon gain x HP per tick, so please set it to an integer value like 2 or more.\n");
+        content.append("#       = 1.0: Vanilla. EnderDragon gains 1 HP per tick.\n");
+        content.append("#       > 1.0: EnderDragon gains x HP per tick (use integer value of 2 or more).\n");
         content.append("#\n");
         content.append("ecHealthRegainRate: " + this.ecHealthRegainRate + "\n\n");
 
@@ -510,9 +606,9 @@ public class Config extends AbstractConfig<NTheEndAgain> {
         // regenMethod
         content.append("# Select your definition of \"regen\". Default: " + DEFAULT_regenMethod + '\n');
         content.append("#\n");
-        content.append("#       0: Hard Regen. Regen every chunks at once. Laggy. Not recommended.\n");
-        content.append("#       1: Soft Regen. Regen chunks when they are loaded. A lot less laggy.\n");
-        content.append("#       2: Crystals only. Does not modify any block, only respawn the EnderCrystals.\n");
+        content.append("#       0: Hard Regen. Regen every chunks at once. Laggy and can lock up the main thread.\n");
+        content.append("#       1: Soft Regen. Regen chunks asynchronously. A lot less laggy.\n");
+        content.append("#       2: Crystals only. Does not modify any blocks, only respawn the EnderCrystals.\n");
         content.append("#\n");
         content.append("# Note: Regeneration does not regenerate Protected chunks.\n");
         content.append("#\n");
@@ -524,7 +620,7 @@ public class Config extends AbstractConfig<NTheEndAgain> {
                        '\n');
         content.append("#\n");
         content.append("# Here are some example values:\n");
-        content.append("#   Value   --   Description\n");
+        content.append("#   Value --  Description\n");
         content.append("#       1800: 30 minutes\n");
         content.append("#       3600: 1 hour\n");
         content.append("#       7200: 2 hours\n");
@@ -551,7 +647,7 @@ public class Config extends AbstractConfig<NTheEndAgain> {
         content.append("#\n");
         content.append("#       1: Teleport them to the spawn point of the Main (= first) world.\n");
         content.append("#\n");
-        content.append("#       2: Do nothing. Can only be used with regenMethod=2\n");
+        content.append("#       2: Do nothing. Should only be used with regenMethod=2\n");
         content.append("#\n");
         content.append("regenAction: " + this.regenAction + "\n\n");
 
@@ -574,6 +670,35 @@ public class Config extends AbstractConfig<NTheEndAgain> {
         content.append("# Select the rate at which slowSoftRegenChunks chunks will be regenerated after a\n");
         content.append("# Soft Regeneration has started. Default value: " + DEFAULT_slowSoftRegenTimer + '\n');
         content.append("slowSoftRegenTimer: " + this.slowSoftRegenTimer + "\n\n");
+
+        // regenOuterEnd
+        content.append("# Control regeneration of the outer end chunks. Default: " + DEFAULT_regenOuterEnd + '\n');
+        content.append("# Outer islands are in chunks beyond the chunks at -30,-30 and 30,30\n");
+        content.append("#\n");
+        content.append("#       0: Do not regen the outer end.\n");
+        content.append("#       1: Regen the outer end every time the central island is regenerated.\n");
+        content.append("#       2: Regen the outer end every X hours (persisted across server restarts); minimum 1 hour.\n");
+        content.append("#\n");
+        content.append("# Mode 2 is useful for regenerating the central island frequently (for example every 2 to 4 hours)\n");
+        content.append("# while regenerating the outer end less frequently (for example, every 30 days).\n");
+        content.append("#\n");
+        content.append("regenOuterEnd: " + this.regenOuterEnd + "\n\n");
+
+        // outerEndRegenHours
+        content.append("# How often to regenerate the outer end, in hours. Default: " + DEFAULT_outerEndRegenHours + '\n');
+        content.append("# Outer end regeneration is triggered just after the central island is regenerated\n");
+        content.append("#\n");
+        content.append("# Here are some example values:\n");
+        content.append("#   Value --  Description\n");
+        content.append("#          1: 1 hour\n");
+        content.append("#          6: 6 hours\n");
+        content.append("#         24: 1 day\n");
+        content.append("#        168: 1 week\n");
+        content.append("#        336: 2 weeks\n");
+        content.append("#        672: 4 weeks\n");
+        content.append("#        720: 30 days\n");
+        content.append("#\n");
+        content.append("outerEndRegenHours: " + this.outerEndRegenHours + "\n\n");
 
         // ############# //
         // ## RESPAWN ## //
@@ -709,6 +834,14 @@ public class Config extends AbstractConfig<NTheEndAgain> {
         content.append("#\n");
         content.append("defaultProtected: " + this.defaultProtected + "\n\n");
 
+        // verboseRegenLogging
+        content.append("# Controls whether to log the location of every chunk that is regenerated.\n");
+        content.append("#\n");
+        content.append("#       true:  Verbose logging is enabled\n");
+        content.append("#       false: Logs chunk location every 5 seconds, but only if debugging is enabled (use /debug enable NTheEndAgain)\n");
+        content.append("#\n");
+        content.append("verboseRegenLogging: " + this.verboseRegenLogging + "\n\n");
+
         // ########## //
         // ## DATA ## //
         // ########## //
@@ -722,12 +855,16 @@ public class Config extends AbstractConfig<NTheEndAgain> {
         content.append('\n');
 
         // nextRegenTaskTime
-        content.append("# Used to allow Regen task timer persistence. /!\\ PLEASE DO NOT TOUCH THIS !\n");
+        content.append("# Used to allow Regen task timer persistence (based on System.nanoTime). /!\\ PLEASE DO NOT TOUCH THIS !\n");
         content.append("nextRegenTaskTime: " + (this.regenTimer == 0 ? "0" : this.nextRegenTaskTime) + "\n\n");
 
         // nextRespawnTaskTime
-        content.append("# Used to allow Respawn task timer persistence. /!\\ PLEASE DO NOT TOUCH THIS !\n");
+        content.append("# Used to allow Respawn task timer persistence (based on System.nanoTime). /!\\ PLEASE DO NOT TOUCH THIS !\n");
         content.append("nextRespawnTaskTime: " + (this.respawnTimerMax == 0 ? "0" : this.nextRespawnTaskTime) + "\n\n");
+
+        // nextOuterEndRegenTime
+        content.append("# Used to allow Outer End Regen persistence (based on System.currentTimeMillis). /!\\ PLEASE DO NOT TOUCH THIS !\n");
+        content.append("nextOuterEndRegenTime: " + (this.regenOuterEnd == 0 ? "0" : this.nextOuterEndRegenTime) + "\n\n");
 
         return content.toString();
     }
@@ -844,6 +981,22 @@ public class Config extends AbstractConfig<NTheEndAgain> {
         this.regenMethod = regenMethod;
     }
 
+    public int getRegenOuterEnd() {
+        return this.regenOuterEnd;
+    }
+
+    private void setRegenOuterEnd(final int regenOuterEnd) {
+        this.regenOuterEnd = regenOuterEnd;
+    }
+
+    public int getOuterEndRegenHours() {
+        return this.outerEndRegenHours;
+    }
+
+    public void setOuterEndRegenHours(final int outerEndRegenHours) {
+        this.outerEndRegenHours = outerEndRegenHours;
+    }
+
     public int getRegenTimer() {
         return this.regenTimer;
     }
@@ -878,10 +1031,6 @@ public class Config extends AbstractConfig<NTheEndAgain> {
 
     // Respawn
 
-    public int getMaxDragons() {
-    	return this.maxDragons;
-    }
-    
     public int getRespawnNumber() {
         return this.respawnNumber;
     }
@@ -906,9 +1055,23 @@ public class Config extends AbstractConfig<NTheEndAgain> {
         this.respawnTimerMin = respawnTimerMin;
     }
 
-    public int getRandomRespawnTimer() {
-        final int respawnTimerDiff = this.respawnTimerMax - this.respawnTimerMin;
-        return respawnTimerDiff == 0 ? 0 : RANDOM.nextInt(respawnTimerDiff) + this.respawnTimerMin;
+    /*
+     * Compute a new respawn wait time, in seconds
+     */
+    public int getRandomRespawnTimeSeconds() {
+        int minValue;
+        int maxValue;
+        if (this.respawnTimerMax < this.respawnTimerMin) {
+            minValue = Math.min(this.respawnTimerMin, this.respawnTimerMax);
+            maxValue = Math.max(this.respawnTimerMin, this.respawnTimerMax);
+            this.plugin.error("respawnTimerMin and respawnTimerMax need to be swapped; " +
+                              "auto-swapping in-memory to compute the new randomRespawnTimer value");
+        } else {
+            minValue = this.respawnTimerMin;
+            maxValue = this.respawnTimerMax;
+        }
+        final int respawnTimerDiff = maxValue - minValue;
+        return respawnTimerDiff <= 0 ? 0 : RANDOM.nextInt(respawnTimerDiff) + minValue;
     }
 
     public int getRespawnType() {
@@ -943,6 +1106,16 @@ public class Config extends AbstractConfig<NTheEndAgain> {
         this.defaultProtected = defaultProtected;
     }
 
+    // Verbose Logging
+    
+    public boolean getVerboseRegenLogging() {
+        return this.verboseRegenLogging;
+    }
+
+    public void setVerboseRegenLogging(final boolean verboseRegenLogging) {
+        this.verboseRegenLogging = verboseRegenLogging;
+    }
+
     // Data
 
     public long getNextRegenTaskTime() {
@@ -961,9 +1134,44 @@ public class Config extends AbstractConfig<NTheEndAgain> {
         this.nextRespawnTaskTime = nextRespawnTaskTime;
     }
 
+    public long getNextOuterEndRegenTime() {
+        return this.nextOuterEndRegenTime;
+    }
+
+    public void setNextOuterEndRegenTime(final long nextOuterEndRegenTime) {
+        this.nextOuterEndRegenTime = nextOuterEndRegenTime;
+    }
+
     // Others
 
     public String getWorldName() {
         return this.worldName;
+    }
+
+
+    private long nextExpectedRespawnTime = 0;
+
+    /**
+     * Number of seconds until the next EnderDragon is expected to be spawned
+     * Not guaranteed to happen based on the various ways in which an EnderDragon can spawn
+     * @return Seconds remaining
+     */
+    public long getSecondsUntilNextExpectedRespawn() {
+        if (this.nextExpectedRespawnTime <= 0)
+            return 0;
+
+        long timeRemainingSec = (this.nextExpectedRespawnTime - System.currentTimeMillis()) / 1000L;
+        if (timeRemainingSec <= 0)
+            return 0;
+        else
+            return timeRemainingSec;
+    }
+
+    /**
+     * Update the next expected time that an EnderDragon will be spawned
+     * @param respawnDelaySeconds Seconds from the current time at which the respawn should occur
+     */
+    public void updateNextExpectedRespawnTime(long respawnDelaySeconds) {
+        this.nextExpectedRespawnTime = System.currentTimeMillis() + respawnDelaySeconds * 1000L;
     }
 }

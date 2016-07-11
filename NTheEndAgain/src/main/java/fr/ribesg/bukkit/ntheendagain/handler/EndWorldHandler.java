@@ -20,7 +20,6 @@ import fr.ribesg.bukkit.ntheendagain.world.EndChunk;
 import fr.ribesg.bukkit.ntheendagain.world.EndChunks;
 
 import java.io.IOException;
-import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -39,8 +38,11 @@ import org.bukkit.scheduler.BukkitTask;
 
 public class EndWorldHandler {
 
-    static final long KICK_TO_REGEN_DELAY    = 2L;
-    static final long REGEN_TO_RESPAWN_DELAY = KICK_TO_REGEN_DELAY + 8L;
+    // 20 ticks (1 second)
+    static final long KICK_TO_REGEN_DELAY    = 20L;
+
+    // 100 ticks (5 seconds)
+    static final long REGEN_TO_RESPAWN_DELAY = KICK_TO_REGEN_DELAY + 100L;
 
     private final String camelCaseWorldName;
 
@@ -115,37 +117,31 @@ public class EndWorldHandler {
      */
     public void init() {
         // Config is now loaded
-    	if(this.endWorld.getEnvironment() == Environment.THE_END){
-        this.countEntities();
+    	if(this.endWorld.getEnvironment() == Environment.THE_END) {
+            this.countEntities();
 
-        if (this.config.getRespawnType() == 3) {
-            this.respawnHandler.respawnNoRegen();
-        } /*
-           * Respawn Type 6 (deprecated)
-           else if (this.config.getRespawnType() == 6) {
-            if (this.config.getNextRespawnTaskTime() > System.currentTimeMillis()) {
-                this.tasks.add(Bukkit.getScheduler().runTaskLater(this.plugin, new Runnable() {
+            if (this.config.getRespawnType() == 3) {
+                // Respawn the dragons now, but do not regenerate the chunks
+                this.respawnHandler.respawnNoRegen();
+            } /*
+               * Respawn Type 6 (deprecated)
+               else if (this.config.getRespawnType() == 6) {
+                if (this.config.getNextRespawnTaskTime() > System.currentTimeMillis()) {
+                    this.tasks.add(Bukkit.getScheduler().runTaskLater(this.plugin, new Runnable() {
 
-                    @Override
-                    public void run() {
-                        fr.ribesg.bukkit.ntheendagain.handler.EndWorldHandler.this.respawnHandler.respawn();
-                    }
-                }, this.config.getNextRespawnTaskTime() / 1000 * 20));
-            } else {
-                this.respawnHandler.respawn();
+                        @Override
+                        public void run() {
+                            fr.ribesg.bukkit.ntheendagain.handler.EndWorldHandler.this.respawnHandler.respawn();
+                        }
+                    }, this.config.getNextRespawnTaskTime() / 1000 * 20));
+                } else {
+                    this.respawnHandler.respawn();
+                }
             }
-        }
-        */
+            */
 
-        this.tasks.add(new UnexpectedDragonDeathHandlerTask(this).schedule(this.plugin));
-
-        if (this.config.getRespawnTimerMax() != 0 && (this.config.getRespawnType() == 4 || this.config.getRespawnType() == 5)) {
-            this.tasks.add(new RespawnTask(this).schedule(this.plugin));
-        }
-
-        if (this.config.getRegenTimer() != 0 && (this.config.getRegenType() == 2 || this.config.getRegenType() == 3)) {
-            this.tasks.add(new RegenTask(this).schedule(this.plugin));
-        }
+            // Create the background tasks used by this handler
+            createTasks();
     	}
     }
 
@@ -167,8 +163,33 @@ public class EndWorldHandler {
             final long nextRegenExecTime = this.config.getNextRegenTaskTime();
             final long nextRespawnExecTime = this.config.getNextRespawnTaskTime();
             this.loadConfig();
+
             this.config.setNextRegenTaskTime(this.config.getRegenTimer() == 0 ? 0 : nextRegenExecTime);
             this.config.setNextRespawnTaskTime(this.config.getRespawnTimerMax() == 0 ? 0 : nextRespawnExecTime);
+
+            int regenOuterEnd = this.config.getRegenOuterEnd();
+            switch (regenOuterEnd) {
+                case 0:
+                case 1:
+                    this.config.setNextOuterEndRegenTime(0);
+                    break;
+                case 2:
+                    if (this.config.getNextOuterEndRegenTime() <= 0) {
+                        int outerEndRegenHours = this.config.getOuterEndRegenHours();
+                        if (outerEndRegenHours < 1) {
+                            outerEndRegenHours = 1;
+                            this.plugin.debug("outerEndRegenHours cannot be 0 when regenOuterEnd is 2; setting to 1");
+                            config.setOuterEndRegenHours(outerEndRegenHours);
+                        }
+                        this.config.setNextOuterEndRegenTime(System.currentTimeMillis() + outerEndRegenHours * 60L * 60L * 1000L);
+                    }
+                    break;
+                default:
+                    // Unknown mode
+                    this.plugin.error("Unknown value for regenOuterEnd: " + regenOuterEnd);
+                    break;
+            }
+
             this.saveConfig();
         } catch (final IOException e) {
             this.plugin.getLogger().severe("An error occured, stacktrace follows:");
@@ -190,6 +211,63 @@ public class EndWorldHandler {
             t.cancel();
         }
         this.tasks.clear();
+    }
+
+	/**
+     * This method will remove any existing tasks then create new ones
+     */
+    public void recreateTasksLater() {
+
+        Bukkit.getScheduler().runTaskLater(this.plugin, new Runnable() {
+
+            @Override
+            public void run() {
+                fr.ribesg.bukkit.ntheendagain.handler.EndWorldHandler.this.recreateTasks();
+            }
+        }, 10L);
+
+    }
+
+    private void recreateTasks() {
+
+        int existingTaskCount = this.tasks.size();
+        if (this.tasks.size() > 0) {
+            if (existingTaskCount == 1)
+                plugin.debug("Cancelling 1 existing task");
+            else
+                plugin.debug("Cancelling " + existingTaskCount + " existing tasks");
+            cancelTasks();
+        }
+
+        createTasks();
+    }
+
+    /**
+     * Create the background tasks used by this handler
+     */
+    private void createTasks() {
+        int respawnType = this.config.getRespawnType();
+        int respawnTimerMin = this.config.getRespawnTimerMin();
+        int respawnTimerMax = this.config.getRespawnTimerMax();
+
+        int regenTimer = this.config.getRegenTimer();
+        int regenType = this.config.getRegenType();
+
+        this.tasks.add(new UnexpectedDragonDeathHandlerTask(this).schedule(this.plugin));
+
+        if (respawnTimerMax != 0 && (respawnType == 4 || respawnType == 5)) {
+            // Create a persistent respawn task
+            // 4: persistent after boot/load
+            // 5: persistent through reboots/reloads
+            plugin.debug("Creating RespawnTask, type " + respawnType + ", TimerRange " + respawnTimerMin + " to " + respawnTimerMax);
+            this.tasks.add(new RespawnTask(this).schedule(this.plugin));
+        }
+
+        if (regenTimer != 0 && (regenType == 2 || regenType == 3)) {
+            plugin.debug("Creating RegenTask, type " + regenType + ", Timer " + regenTimer);
+            this.tasks.add(new RegenTask(this).schedule(this.plugin));
+        }
+
     }
 
     /**

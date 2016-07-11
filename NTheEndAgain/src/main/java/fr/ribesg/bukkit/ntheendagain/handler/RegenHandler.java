@@ -51,14 +51,24 @@ public class RegenHandler {
 
     public void regen() {
         this.plugin.entering(this.getClass(), "regen");
+        Config config = this.worldHandler.getConfig();
 
-        this.regen(this.worldHandler.getConfig().getRegenMethod());
+        int regenMethod = config.getRegenMethod();
+        Boolean regenOuterEndNow = checkRegenOuterEndNow(config);
+
+        this.regen(regenMethod, regenOuterEndNow);
 
         this.plugin.exiting(this.getClass(), "regen");
     }
 
-    public void regen(final int type) {
-        this.plugin.entering(this.getClass(), "regen(int)");
+    public void regen(final int regenMethod) {
+        Config config = this.worldHandler.getConfig();
+        Boolean regenOuterEndNow = checkRegenOuterEndNow(config);
+        this.regen(regenMethod, regenOuterEndNow);
+    }
+
+    public void regen(final int regenMethod, final Boolean regenOuterEndNow) {
+        this.plugin.entering(this.getClass(), "regen(int, int)");
 
         this.plugin.debug("Kicking players out of the world/server...");
         this.kickPlayers();
@@ -70,14 +80,14 @@ public class RegenHandler {
             public void run() {
                 fr.ribesg.bukkit.ntheendagain.handler.RegenHandler.this.plugin.entering(this.getClass(), "run", "task from regen(int)");
 
-                switch (type) {
+                switch (regenMethod) {
                     case 0:
                         fr.ribesg.bukkit.ntheendagain.handler.RegenHandler.this.plugin.debug("Hard regen...");
-                        fr.ribesg.bukkit.ntheendagain.handler.RegenHandler.this.hardRegen(false);
+                        fr.ribesg.bukkit.ntheendagain.handler.RegenHandler.this.hardRegen(regenOuterEndNow, false);
                         break;
                     case 1:
                         fr.ribesg.bukkit.ntheendagain.handler.RegenHandler.this.plugin.debug("Soft regen...");
-                        fr.ribesg.bukkit.ntheendagain.handler.RegenHandler.this.softRegen(false);
+                        fr.ribesg.bukkit.ntheendagain.handler.RegenHandler.this.softRegen(regenOuterEndNow, false, false);
                         break;
                     case 2:
                         fr.ribesg.bukkit.ntheendagain.handler.RegenHandler.this.plugin.debug("Crystal regen...");
@@ -91,18 +101,23 @@ public class RegenHandler {
             }
         }, EndWorldHandler.KICK_TO_REGEN_DELAY);
 
-        this.plugin.exiting(this.getClass(), "regen(int)");
+        this.plugin.exiting(this.getClass(), "regen(int, int)");
     }
 
     public void hardRegenOnStop() {
         this.plugin.entering(this.getClass(), "hardRegenOnStop");
 
-        this.hardRegen(true);
+        Config config = this.worldHandler.getConfig();
+
+        Boolean regenOuterEndNow = checkRegenOuterEndNow(config);
+
+        this.hardRegen(regenOuterEndNow, true);
 
         this.plugin.exiting(this.getClass(), "hardRegenOnStop");
     }
 
-    /*package*/ void regenThenRespawn() {
+    /*package*/
+    void regenThenRespawn() {
         this.plugin.entering(this.getClass(), "regenThenRespawn");
 
         this.regen();
@@ -123,7 +138,46 @@ public class RegenHandler {
         this.plugin.exiting(this.getClass(), "regenThenRespawn");
     }
 
-    private void hardRegen(final boolean pluginDisabled) {
+    /**
+      * Determine whether the outer end should be regenerated now
+      */
+    private Boolean checkRegenOuterEndNow(Config config) {
+
+        int regenOuterEnd = config.getRegenOuterEnd();
+
+        switch (regenOuterEnd) {
+            case 0:
+                config.setNextOuterEndRegenTime(0);
+                return false;
+            case 1:
+                config.setNextOuterEndRegenTime(0);
+                return true;
+            case 2:
+                long nextRegenTaskTime = config.getNextOuterEndRegenTime();
+
+                if (nextRegenTaskTime == 0 || nextRegenTaskTime < System.currentTimeMillis()) {
+                    int outerEndRegenHours = config.getOuterEndRegenHours();
+
+                    if (outerEndRegenHours < 1) {
+                        outerEndRegenHours = 1;
+                        this.plugin.debug("outerEndRegenHours cannot be 0 when regenOuterEnd is 2; setting to 1");
+                        config.setOuterEndRegenHours(outerEndRegenHours);
+                    }
+                    config.setNextOuterEndRegenTime(System.currentTimeMillis() + outerEndRegenHours * 60L * 60L * 1000L);
+
+                    return true;
+                }
+                break;
+            default:
+                // Unknown mode
+                this.plugin.error("Unknown value for regenOuterEnd: " + regenOuterEnd);
+                break;
+        }
+
+        return false;
+    }
+
+    private void hardRegen(final Boolean regenOuterEndNow, final boolean pluginDisabled) {
         this.plugin.entering(this.getClass(), "hardRegen");
 
         final NTheEndAgain plugin = this.worldHandler.getPlugin();
@@ -131,13 +185,18 @@ public class RegenHandler {
         final EndChunks chunks = this.worldHandler.getChunks();
 
         final String prefix = "[REGEN " + endWorld.getName() + "] ";
-        plugin.info(prefix + "Regenerating end world (hard regen) ...");
+
+
+        if (regenOuterEndNow)
+            plugin.info(prefix + "Regenerating end world, including outer islands (hard regen) ...");
+        else
+            plugin.info(prefix + "Regenerating end world, central island only (soft hard) ...");
 
         plugin.debug("Kicking players out of the world/server...");
         this.kickPlayers();
 
         plugin.debug("Calling softRegen to set all chunks to toBeRegen...");
-        this.softRegen(pluginDisabled);
+        this.softRegen(regenOuterEndNow, pluginDisabled, true);
 
         final long totalChunks = chunks.size();
         long i = 0, regen = 0;
@@ -172,17 +231,30 @@ public class RegenHandler {
         plugin.exiting(this.getClass(), "hardRegen");
     }
 
-    private void softRegen(final boolean pluginDisabled) {
+    private void softRegen(
+            final boolean regenOuterEndNow,
+            final boolean pluginDisabled,
+            final boolean hardRegenInProgress) {
+
         this.plugin.entering(this.getClass(), "softRegen");
 
         World endWorld = this.worldHandler.getEndWorld();
 
-        final String worldName = endWorld.getName();
-        final String prefix = "[REGEN " + worldName + "] ";
-        plugin.info(prefix + "Regenerating end world (soft regen) ...");
+        Config config = this.worldHandler.getConfig();
+        Boolean verboseLogging = config.getVerboseRegenLogging();
+
+        if (!hardRegenInProgress) {
+            final String worldName = endWorld.getName();
+            final String prefix = "[REGEN " + worldName + "] ";
+
+            if (regenOuterEndNow)
+                plugin.info(prefix + "Regenerating end world, including outer islands (soft regen) ...");
+            else
+                plugin.info(prefix + "Regenerating end world, central island only (soft regen) ...");
+        }
 
         this.plugin.debug("Calling softRegen on chunks...");
-        this.worldHandler.getChunks().softRegen();
+        this.worldHandler.getChunks().softRegen(regenOuterEndNow, verboseLogging, this.plugin);
 
 		/*
          * Instantly regen the spawn chunk to prevent NPE when an Entity
