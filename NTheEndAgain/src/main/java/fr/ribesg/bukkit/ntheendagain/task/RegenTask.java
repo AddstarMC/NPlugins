@@ -21,6 +21,10 @@ public class RegenTask extends RandomRepeatingTask {
     }
 
     @Override
+    /**
+     * Execute the task.
+     * This is equivalent to the run() task of a standard repeating task
+     */
     public boolean exec() {
         this.worldHandler.getPlugin().entering(this.getClass(), "exec");
 
@@ -31,6 +35,11 @@ public class RegenTask extends RandomRepeatingTask {
     }
 
     @Override
+    /**
+     * Get the initial delay for this task
+     *
+     * @return the initial delay, in seconds
+     */
     protected long getInitialDelay() {
         long nextRegenTaskTime = this.worldHandler.getConfig().getNextRegenTaskTime();
         if (this.worldHandler.getConfig().getRegenType() == 2) {
@@ -40,12 +49,20 @@ public class RegenTask extends RandomRepeatingTask {
     }
 
     @Override
+    /**
+     * @return a Random value between the minimum and maximum delay set in config
+     */
     protected long getDelay() {
         return this.worldHandler.getConfig().getRegenTimer();
     }
 
     @Override
-    protected void setNextConfigTime(final long date) {
-        this.worldHandler.getConfig().setNextRegenTaskTime(date);
+    /**
+     * Sets the next execution time for this task.
+     *
+     * @param nextTaskTime the next execution time for this task, based on System.nanoTime
+     */
+    protected void setNextConfigTime(final long nextTaskTime) {
+        this.worldHandler.getConfig().setNextRegenTaskTime(nextTaskTime);
     }
 }

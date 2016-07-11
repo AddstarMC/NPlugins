@@ -37,6 +37,10 @@ public abstract class RandomRepeatingTask implements Runnable {
     }
 
     @Override
+    /**
+     * Execute the task, then schedule a future task to run on a delay
+     * Also store the next task time using setNextConfigTime
+     */
     public void run() {
         final boolean success = this.exec();
         final long delay = this.getDelay();
@@ -60,14 +64,14 @@ public abstract class RandomRepeatingTask implements Runnable {
     /**
      * Sets the next execution time for this task.
      *
-     * @param date the next execution time for this task
+     * @param nextTaskTime the next execution time for this task, based on System.nanoTime
      */
-    protected abstract void setNextConfigTime(final long date);
+    protected abstract void setNextConfigTime(final long nextTaskTime);
 
     /**
      * Build an initial delay according to the nextTaskTime
      *
-     * @param nextTaskTime the next Task Time
+     * @param nextTaskTime the next Task Time, based on System.nanoTime
      *
      * @return the initial delay, in seconds
      */
@@ -76,6 +80,8 @@ public abstract class RandomRepeatingTask implements Runnable {
         if (initialDelay < 0) {
             initialDelay = 0;
         }
+
+        // Convert to seconds
         return initialDelay / 1_000_000_000;
     }
 
