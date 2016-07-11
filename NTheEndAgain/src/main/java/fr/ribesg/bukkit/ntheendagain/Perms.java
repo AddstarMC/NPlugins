@@ -22,6 +22,7 @@ public class Perms {
     private static final String CMD_RELOAD         = "ntheendagain.cmd.reload";
     private static final String CMD_REGEN          = "ntheendagain.cmd.regen";
     private static final String CMD_RESPAWN        = "ntheendagain.cmd.respawn";
+    private static final String CMD_STATUS         = "ntheendagain.cmd.status";
     private static final String CMD_NB             = "ntheendagain.cmd.nb";
     private static final String CMD_CHUNKINFO      = "ntheendagain.cmd.chunkinfo";
     private static final String CMD_CHUNKPROTECT   = "ntheendagain.cmd.chunkprotect";
@@ -49,6 +50,10 @@ public class Perms {
 
     public static boolean hasRespawn(final CommandSender permissible) {
         return has(permissible, CMD_RESPAWN);
+    }
+
+    public static boolean hasStatus(final CommandSender permissible) {
+        return has(permissible, CMD_STATUS);
     }
 
     public static boolean hasNb(final CommandSender permissible) {

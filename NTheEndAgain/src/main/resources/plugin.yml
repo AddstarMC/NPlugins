@@ -29,6 +29,8 @@ permissions:
         default: op
       ntheendagain.cmd.respawn:
         default: op
+      ntheendagain.cmd.status:
+        default: op
       ntheendagain.cmd.chunkprotect:
         default: op
       ntheendagain.cmd.chunkunprotect:

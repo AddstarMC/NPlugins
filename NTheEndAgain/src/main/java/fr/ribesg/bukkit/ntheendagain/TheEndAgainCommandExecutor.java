@@ -108,8 +108,18 @@ public class TheEndAgainCommandExecutor implements CommandExecutor {
                         }
                     case "reload":
                     case "rld":
+                        // reload config
+                        // reload messages
                         if (Perms.hasReload(sender)) {
                             return this.cmdReload(sender, Arrays.copyOfRange(args, 1, args.length));
+                        } else {
+                            this.plugin.sendMessage(sender, MessageId.noPermissionForCommand);
+                            return true;
+                        }
+                    case "status":
+                        // status
+                        if (Perms.hasStatus(sender)) {
+                            return this.cmdStatus(sender);
                         } else {
                             this.plugin.sendMessage(sender, MessageId.noPermissionForCommand);
                             return true;
@@ -127,7 +137,9 @@ public class TheEndAgainCommandExecutor implements CommandExecutor {
     private boolean cmdHelp(final CommandSender sender) {
         // TODO We will create some kind of great Help thing later for the whole NPlugins suite
         //      Or maybe we will just use the Bukkit /help command...
-        sender.sendMessage("Available subcommands: help, regen, respawn, nb, chunk info, chunk protect, chunk unprotect, reload messages");
+        sender.sendMessage("Available subcommands: help, regen, respawn, nb, " +
+                "chunk info, chunk protect, chunk unprotect, " +
+                "reload config, reload messages, status");
         return true;
     }
 
@@ -350,10 +362,30 @@ public class TheEndAgainCommandExecutor implements CommandExecutor {
                         this.plugin.sendMessage(sender, MessageId.cmdReloadError, "messages.yml");
                     }
                     return true;
+                case "config":
+                case "conf":
+                    try {
+                        this.plugin.reloadConfig(sender);
+                        this.plugin.sendMessage(sender, MessageId.cmdReloadConfig);
+                    } catch (final IOException e) {
+                        this.plugin.error("An error occured when NTheEndAgain tried to reload config.yml", e);
+                        this.plugin.sendMessage(sender, MessageId.cmdReloadError, "config.yml");
+                    }
+                    return true;
                 default:
                     return false;
             }
         }
+    }
+
+	/**
+     * Show status information both in game and at the console
+     * @param sender
+     * @return
+     */
+    private boolean cmdStatus(final CommandSender sender) {
+        this.plugin.showStatus(sender);
+        return true;
     }
 
     /**

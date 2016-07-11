@@ -40,6 +40,7 @@ public class Messages extends AbstractMessages {
 
         // Command - RELOAD
         newMessages.add(new Message(MessageId.cmdReloadMessages, "&aMessages reloaded!", true));
+        newMessages.add(new Message(MessageId.cmdReloadConfig, "&aConfig reloaded!", true));
         newMessages.add(new Message(MessageId.cmdReloadError, "&An error occured while loading %file%!", true, "%file%"));
 
         // Command - END
