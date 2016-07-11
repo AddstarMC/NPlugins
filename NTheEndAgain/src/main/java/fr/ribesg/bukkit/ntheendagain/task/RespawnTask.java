@@ -9,6 +9,7 @@
 
 package fr.ribesg.bukkit.ntheendagain.task;
 
+import fr.ribesg.bukkit.ntheendagain.Config;
 import fr.ribesg.bukkit.ntheendagain.handler.EndWorldHandler;
 
 /**
@@ -21,6 +22,10 @@ public class RespawnTask extends RandomRepeatingTask {
     }
 
     @Override
+    /**
+     * Execute the task.
+     * This is equivalent to the run() task of a standard repeating task
+     */
     public boolean exec() {
         this.worldHandler.getPlugin().entering(this.getClass(), "exec");
 
@@ -31,21 +36,45 @@ public class RespawnTask extends RandomRepeatingTask {
     }
 
     @Override
+    /**
+     * Get the initial delay for this task
+     *
+     * @return the initial delay, in seconds
+     */
     protected long getInitialDelay() {
-        long nextRespawnTaskTime = this.worldHandler.getConfig().getNextRespawnTaskTime();
+        Config config = this.worldHandler.getConfig();
+
+        // This is a nanoTime value
+        long nextRespawnTaskTime = config.getNextRespawnTaskTime();
         if (this.worldHandler.getConfig().getRespawnType() == 4) {
             nextRespawnTaskTime = 0;
         }
-        return this.buildInitialDelay(nextRespawnTaskTime);
+
+        long initialDelaySeconds = this.buildInitialDelay(nextRespawnTaskTime);
+        config.updateNextExpectedRespawnTime(initialDelaySeconds);
+
+        return initialDelaySeconds;
     }
 
     @Override
+    /**
+     * @return a Random value between the minimum and maximum delay set in config
+     */
     protected long getDelay() {
-        return this.worldHandler.getConfig().getRandomRespawnTimer();
+        return this.worldHandler.getConfig().getRandomRespawnTimeSeconds();
     }
 
     @Override
-    protected void setNextConfigTime(final long date) {
-        this.worldHandler.getConfig().setNextRespawnTaskTime(date);
+    /**
+     * Sets the next execution time for this task.
+     *
+     * @param nextTaskTime the next execution time for this task, based on System.nanoTime
+     */
+    protected void setNextConfigTime(final long nextTaskTime) {
+        Config config = this.worldHandler.getConfig();
+        config.setNextRespawnTaskTime(nextTaskTime);
+
+        int respawnDelaySeconds = (int)((nextTaskTime - System.nanoTime()) / 1_000_000_000);
+        config.updateNextExpectedRespawnTime(respawnDelaySeconds);
     }
 }

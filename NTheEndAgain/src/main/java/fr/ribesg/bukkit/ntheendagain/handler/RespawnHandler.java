@@ -11,6 +11,7 @@ package fr.ribesg.bukkit.ntheendagain.handler;
 
 import fr.ribesg.bukkit.ncore.common.NLocation;
 import fr.ribesg.bukkit.ncore.lang.MessageId;
+import fr.ribesg.bukkit.ntheendagain.Config;
 import fr.ribesg.bukkit.ntheendagain.NTheEndAgain;
 import fr.ribesg.bukkit.ntheendagain.world.EndChunk;
 import fr.ribesg.bukkit.ntheendagain.world.EndChunks;
@@ -59,13 +60,18 @@ public class RespawnHandler {
     public void respawnLater() {
         this.plugin.entering(this.getClass(), "respawnLater");
 
+        Config config = this.worldHandler.getConfig();
+        int randomRespawnTimeSec = config.getRandomRespawnTimeSeconds();
+
         Bukkit.getScheduler().runTaskLater(this.worldHandler.getPlugin(), new Runnable() {
 
             @Override
             public void run() {
                 fr.ribesg.bukkit.ntheendagain.handler.RespawnHandler.this.respawn();
             }
-        }, this.worldHandler.getConfig().getRandomRespawnTimer() * 20L);
+        }, randomRespawnTimeSec * 20L);
+
+        config.updateNextExpectedRespawnTime(randomRespawnTimeSec);
 
         this.plugin.entering(this.getClass(), "respawnLater");
     }
@@ -145,7 +151,14 @@ public class RespawnHandler {
                     if (world.spawnEntity(loc, EntityType.ENDER_DRAGON) == null) {
                         fr.ribesg.bukkit.ntheendagain.handler.RespawnHandler.this.retryRespawn(loc);
                     }
-                    fr.ribesg.bukkit.ntheendagain.handler.RespawnHandler.this.worldHandler.getConfig().setNextRespawnTaskTime(System.nanoTime() + fr.ribesg.bukkit.ntheendagain.handler.RespawnHandler.this.worldHandler.getConfig().getRandomRespawnTimer() * 1_000_000_000);
+                    Config config = fr.ribesg.bukkit.ntheendagain.handler.RespawnHandler.this.worldHandler.getConfig();
+
+                    long randomRespawnTimeSec = config.getRandomRespawnTimeSeconds();
+                    long nextRespawnNanoTime = System.nanoTime() + randomRespawnTimeSec * 1_000_000_000;
+                    config.setNextRespawnTaskTime(nextRespawnNanoTime);
+
+                    config.updateNextExpectedRespawnTime(randomRespawnTimeSec);
+
                 }
             }, EndWorldHandler.REGEN_TO_RESPAWN_DELAY);
         } else {
