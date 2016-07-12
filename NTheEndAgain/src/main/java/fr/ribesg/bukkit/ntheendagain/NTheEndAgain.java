@@ -24,11 +24,14 @@ import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.util.HashMap;
 
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.InvalidConfigurationException;
+
+import org.mcstats.Metrics;
 
 public class NTheEndAgain extends NPlugin implements TheEndAgainNode {
 
@@ -48,8 +51,8 @@ public class NTheEndAgain extends NPlugin implements TheEndAgainNode {
 
 	/**
      * Reload the config
-     * @param sender The Sender
-     * @throws IOException if the config cant be loaded
+     * @param sender
+     * @throws IOException
      */
     protected void reloadConfig(final CommandSender sender) throws IOException {
         // this.entering(this.getClass(), "reLoadConfig");
@@ -77,7 +80,7 @@ public class NTheEndAgain extends NPlugin implements TheEndAgainNode {
                 try {
                     handler.loadConfig();
                 } catch (final IOException e) {
-                    this.error("This error occured when NTheEndAgain.reloadConfig tried to load " + e.getMessage() + ".yml", e);
+                    this.error("This error occurred when NTheEndAgain.reloadConfig tried to load " + e.getMessage() + ".yml", e);
                     break;
                 }
 
@@ -106,24 +109,27 @@ public class NTheEndAgain extends NPlugin implements TheEndAgainNode {
                     this.info("Re-creating tasks because regenType has changed from " + savedRegenType + " to " + updatedRegenType);
                     handler.recreateTasksLater();
                     showDetails = true;
-                } else if (savedRespawnTimerMin != updatedRespawnTimerMin ||
-                           savedRespawnTimerMax != updatedRespawnTimerMax) {
-                    if (config.getSecondsUntilNextExpectedRespawn() > 0) {
-                        msg = "Note: the new respawn timer values will not take effect until after the next respawn event " +
-                                "(changed from " + savedRespawnTimerMin + "-" + savedRespawnTimerMax +
-                                " seconds to " + updatedRespawnTimerMin + "-" + updatedRespawnTimerMax + " seconds)";
-                        this.debug(msg);
-                        msgAddon.append('\n').append(msg);
+                } else {
+                    if (savedRespawnTimerMin != updatedRespawnTimerMin || savedRespawnTimerMax != updatedRespawnTimerMax) {
+                        if (config.getSecondsUntilNextExpectedRespawn() > 0) {
+                            msg = "Note: the new respawn timer values will not take effect until after the next respawn event " +
+                                    "(changed from " + savedRespawnTimerMin + "-" + savedRespawnTimerMax +
+                                    " seconds to " + updatedRespawnTimerMin + "-" + updatedRespawnTimerMax + " seconds)";
+                            this.debug(msg);
+                            msgAddon.append('\n' + msg);
+                        }
+                        showDetails = true;
                     }
-                    showDetails = true;
-                } else if (savedRegenTimer != updatedRegenTimer) {
-                    if (updatedRegenType == 2 || updatedRegenType == 3) {
-                        msg = "Note: the new regen timer value will not take effect until after the next regen " +
-                                "(changed from " + savedRegenTimer + " to " + updatedRegenTimer + ")";
-                        this.debug(msg);
-                        msgAddon.append('\n').append(msg);
+
+                    if (savedRegenTimer != updatedRegenTimer) {
+                        if (updatedRegenType == 2 || updatedRegenType == 3) {
+                            msg = "Note: the new regen timer value will not take effect until after the next regen " +
+                                    "(changed from " + savedRegenTimer + " to " + updatedRegenTimer + ")";
+                            this.debug(msg);
+                            msgAddon.append('\n' + msg);
+                        }
+                        showDetails = true;
                     }
-                    showDetails = true;
                 }
 
                 if (savedRegenOuterEnd != updatedRegenOuterEnd)
@@ -144,7 +150,7 @@ public class NTheEndAgain extends NPlugin implements TheEndAgainNode {
                         // Unknown mode
                         msg = "Unknown value for regenOuterEnd: " + updatedRegenOuterEnd;
                         this.error(msg);
-                        msgAddon.append('\n').append(msg);
+                        msgAddon.append('\n' + msg);
                         break;
                 }
 
@@ -153,7 +159,7 @@ public class NTheEndAgain extends NPlugin implements TheEndAgainNode {
                 }
 
             } catch (final InvalidConfigurationException e) {
-                this.error("An error occured when NTheEndAgain tried to load \"" + handler.getCamelCaseWorldName() + "\"'s config file.", e);
+                this.error("An error occurred when NTheEndAgain tried to load \"" + handler.getCamelCaseWorldName() + "\"'s config file.", e);
                 break;
             }
         }
@@ -162,7 +168,7 @@ public class NTheEndAgain extends NPlugin implements TheEndAgainNode {
 
 	/**
      * Show NTheEndAgain config values for each world of type THE_END
-     * @param sender the Commandsender
+     * @param sender
      */
     public void showStatus(final CommandSender sender) {
 
@@ -180,7 +186,7 @@ public class NTheEndAgain extends NPlugin implements TheEndAgainNode {
 
     /**
      * Show NTheEndAgain config values for each world of type THE_END
-     * @param sender the Commandsender
+     * @param sender
      * @param handler End world handler
      * @param msgAddon Additional text to append (assumed to start with \n)
      */
@@ -192,14 +198,14 @@ public class NTheEndAgain extends NPlugin implements TheEndAgainNode {
         this.debug("Config details for world " + config.getWorldName() + " (" + currentWorld.getEnvironment().toString() + ")");
 
         StringBuilder multiLineMsg = new StringBuilder();
-        multiLineMsg.append("Config for ").append(currentWorld.getName());
+        multiLineMsg.append("Config for " + currentWorld.getName());
 
         String msg;
 
         int respawnType = config.getRespawnType();
         int respawnTimerMin = config.getRespawnTimerMin();
         int respawnTimerMax = config.getRespawnTimerMax();
-        String respawnInterval = "between " + respawnTimerMin + " and " + respawnTimerMax + " seconds";
+        String respawnInterval = "between " + secondsToDescription(respawnTimerMin, respawnTimerMax);
 
         String dragonSpawnDesc;
         int dragonRespawnCount = config.getRespawnNumber();
@@ -238,9 +244,12 @@ public class NTheEndAgain extends NPlugin implements TheEndAgainNode {
         }
 
         this.debug(msg);
-        multiLineMsg.append('\n').append(msg);
+        multiLineMsg.append('\n' + msg);
 
         int regenType = config.getRegenType();
+
+        int regenIntervalSeconds = config.getRegenTimer();
+        String regenInterval = secondsToDescription(regenIntervalSeconds);
 
         switch (regenType) {
             case 0:
@@ -250,10 +259,10 @@ public class NTheEndAgain extends NPlugin implements TheEndAgainNode {
                 msg = "End island chunks will regenerate just before a new EnderDragon is spawned (regenType=1)";
                 break;
             case 2:
-                msg = "End island chunks will regenerate " + config.getRegenTimer() + " seconds after boot/load (regenType=2)";
+                msg = "End island chunks will regenerate " + regenInterval + " after boot/load (regenType=2)";
                 break;
             case 3:
-                msg = "End island chunks will regenerate every " + config.getRegenTimer() + " seconds (regenType=3)";
+                msg = "End island chunks will regenerate every " + regenInterval + " (regenType=3)";
                 break;
             default:
                 msg = "Unknown value for regenType: " + regenType;
@@ -261,7 +270,7 @@ public class NTheEndAgain extends NPlugin implements TheEndAgainNode {
         }
 
         this.debug(msg);
-        multiLineMsg.append('\n').append(msg);
+        multiLineMsg.append('\n' + msg);
 
         int regenOuterEnd = config.getRegenOuterEnd();
         int outerEndRegenHours = config.getOuterEndRegenHours();
@@ -270,16 +279,14 @@ public class NTheEndAgain extends NPlugin implements TheEndAgainNode {
         long currentTime = System.currentTimeMillis();
         long lastOuterEndRegenTimeMillis = config.getLastOuterEndRegenTime();
 
-        // Compute the number of hours ago that the outer end was last regen'd
-        double outerEndRegenElapsedTimeHours = (currentTime - lastOuterEndRegenTimeMillis) / 1000.0 / 60 / 60;
+        // Compute the number of seconds ago that the outer end was last regen'd
+        long outerEndRegenElapsedTimeSeconds = (currentTime - lastOuterEndRegenTimeMillis) / 1000;
+        float outerEndRegenElapsedTimeHours = outerEndRegenElapsedTimeSeconds / 3600F;
 
         String lastOuterEndRegenTime;
 
-        if (outerEndRegenCount > 0) {
-            if (outerEndRegenElapsedTimeHours < 24)
-                lastOuterEndRegenTime = "last regenerated " + new DecimalFormat("#.#").format(outerEndRegenElapsedTimeHours) + " hours ago";
-            else
-                lastOuterEndRegenTime = "last regenerated " + new DecimalFormat("#.#").format(outerEndRegenElapsedTimeHours / 24) + " days ago";
+        if (outerEndRegenCount > 0 && outerEndRegenElapsedTimeSeconds < Integer.MAX_VALUE) {
+            lastOuterEndRegenTime = "last regenerated " + secondsToDescription((int)outerEndRegenElapsedTimeSeconds) + " ago";
         } else {
             lastOuterEndRegenTime = "never regenerated";
         }
@@ -291,34 +298,29 @@ public class NTheEndAgain extends NPlugin implements TheEndAgainNode {
             case 0:
                 msg = "Outer end islands will not auto-regen";
                 this.debug(msg);
-                multiLineMsg.append('\n').append(msg);
+                multiLineMsg.append('\n' + msg);
             case 1:
                 msg = "Outer end islands will regenerate every time the central island is regenerated";
                 if (outerEndRegenCount > 0)
                     msg += "; " + lastOuterEndRegenTime;
 
                 this.debug(msg);
-                multiLineMsg.append('\n').append(msg);
+                multiLineMsg.append('\n' + msg);
                 break;
             case 2:
 
                 if (outerEndRegenElapsedTimeHours > outerEndRegenHours) {
                     msg = "Outer end islands will regen the next time an auto-regen occurs";
                 } else {
-                    double hoursRemaining = outerEndRegenHours - outerEndRegenElapsedTimeHours;
-                    if (hoursRemaining < 24) {
-                        msg = "Outer end islands will regen in " + new DecimalFormat("#.#").format(hoursRemaining) + " hours";
-                    } else {
-                        msg = "Outer end islands will regen in " + new DecimalFormat("#.##").format(hoursRemaining / 24.0) + " days";
-                    }
-
+                    float minutesRemaining = (outerEndRegenHours - outerEndRegenElapsedTimeHours) * 60F;
+                    msg = "Outer end islands will regen in " + secondsToDescription((int)(minutesRemaining * 60));
                 }
 
                 if (outerEndRegenCount > 0)
                     msg += "; " + lastOuterEndRegenTime;
 
                 this.debug(msg);
-                multiLineMsg.append('\n').append(msg);
+                multiLineMsg.append('\n' + msg);
 
                 break;
             default:
@@ -333,11 +335,11 @@ public class NTheEndAgain extends NPlugin implements TheEndAgainNode {
         final Integer nb = handler.getNumberOfAliveEnderDragons();
 
         if (nb == 0) {
-            multiLineMsg.append('\n' + "There is no EnderDragon alive");
+            multiLineMsg.append('\n' + "There are no EnderDragons alive");
         } else if (nb == 1) {
             multiLineMsg.append('\n' + "There is 1 EnderDragon alive");
         } else {
-            multiLineMsg.append('\n' + "There are ").append(nb).append(" EnderDragons alive");
+            multiLineMsg.append('\n' + "There are " + nb + " EnderDragons alive");
         }
 
         // Look for a scheduled respawn event
@@ -345,15 +347,15 @@ public class NTheEndAgain extends NPlugin implements TheEndAgainNode {
         if (secondsUntilNextExpectedRespawn <= 0) {
             msg = "At present, no EnderDragons are actively scheduled to be respawned";
         } else {
-            if (secondsUntilNextExpectedRespawn < 3600)
-                msg = "An EnderDragon is expected to respawn in " + secondsUntilNextExpectedRespawn + " seconds";
+            if (handler.getNumberOfAliveEnderDragons() < dragonRespawnCount)
+                msg = "An EnderDragon is expected to respawn in " + secondsToDescription(secondsUntilNextExpectedRespawn);
             else
-                msg = "An EnderDragon is expected to respawn in " +
-                        new DecimalFormat("#.#").format(secondsUntilNextExpectedRespawn / 3600F) + " hours";
+                msg = "An EnderDragon will respawn in " + secondsToDescription(secondsUntilNextExpectedRespawn) +
+                        " only if an existing dragon is killed";
         }
 
         this.debug(msg);
-        multiLineMsg.append('\n').append(msg);
+        multiLineMsg.append('\n' + msg);
 
         // Append any extra text
         if (msgAddon.length() > 0)
@@ -361,6 +363,67 @@ public class NTheEndAgain extends NPlugin implements TheEndAgainNode {
 
         ShowMessage(sender, multiLineMsg.toString());
 
+    }
+
+    /**
+     * Format a number with a fixed number of digits after the decimal place
+     * @param value
+     * @param digitsAfterDecimal
+     * @return
+     */
+    private String formatNumber(double value, int digitsAfterDecimal) {
+        String formatString;
+
+        if (digitsAfterDecimal <= 0) {
+            formatString = "#";
+        } else {
+            // Construct a format string of the form #.##
+            formatString = "#." + StringUtils.repeat("#", digitsAfterDecimal);
+        }
+
+        return new DecimalFormat(formatString).format(value);
+    }
+
+    /**
+     * Convert the number of seconds to a description, like 45 seconds or 10.5 minutes or 5.3 hours or 9.3 days
+     * @param timeLengthSeconds
+     * @return
+	 */
+    private String secondsToDescription(long timeLengthSeconds) {
+        if (timeLengthSeconds < 60)
+            return timeLengthSeconds + " seconds";
+        else if (timeLengthSeconds < 3600)
+            return formatNumber(timeLengthSeconds / 60F, 1) + " minutes";
+        else if (timeLengthSeconds < 86400)
+            return formatNumber(timeLengthSeconds / 3600F, 1) + " hours";
+        else
+            return formatNumber(timeLengthSeconds / 86400F, 1) + " days";
+    }
+
+    /**
+     * Convert a range of seconds to a description, like 45 seconds and 90 seconds or 10 minutes and 30 minutes
+     * @param minTimeLengthSeconds
+     * @param maxTimeLengthSeconds
+     * @return
+     */
+    private String secondsToDescription(long minTimeLengthSeconds, long maxTimeLengthSeconds) {
+        String minTimeDesc = secondsToDescription(minTimeLengthSeconds);
+        String maxTimeDesc = secondsToDescription(maxTimeLengthSeconds);
+
+        if (minTimeDesc.endsWith("seconds") && maxTimeDesc.endsWith("seconds"))
+            return minTimeLengthSeconds + " and " + maxTimeDesc;
+
+        if (minTimeDesc.endsWith("minutes") && maxTimeDesc.endsWith("minutes"))
+            return formatNumber(minTimeLengthSeconds / 60F, 1) + " and " + maxTimeDesc;
+
+        if (minTimeDesc.endsWith("hours") && maxTimeDesc.endsWith("hours"))
+            return formatNumber(minTimeLengthSeconds / 3600F, 1) + " and " + maxTimeDesc;
+
+        if (minTimeDesc.endsWith("days") && maxTimeDesc.endsWith("days"))
+            return formatNumber(minTimeLengthSeconds / 86400F, 1) + " and " + maxTimeDesc;
+
+        // Min and Max do not have the same units
+        return minTimeDesc + " and " + maxTimeDesc;
     }
 
     @Override
@@ -403,7 +466,7 @@ public class NTheEndAgain extends NPlugin implements TheEndAgainNode {
                     break;
                 }
             } catch (final InvalidConfigurationException e) {
-                this.error("An error occured when NTheEndAgain tried to load \"" + w.getName() + "\"'s config file.", e);
+                this.error("An error occurred when NTheEndAgain tried to load \"" + w.getName() + "\"'s config file.", e);
                 break;
             }
         }
@@ -427,6 +490,100 @@ public class NTheEndAgain extends NPlugin implements TheEndAgainNode {
 
         this.debug("Registering command...");
         this.setCommandExecutor("nend", new TheEndAgainCommandExecutor(this));
+
+        this.debug("Handling Metrics...");
+        final Metrics.Graph g1 = this.getMetrics().createGraph("Amount of End Worlds handled");
+        g1.addPlotter(new Metrics.Plotter() {
+
+            @Override
+            public int getValue() {
+                return fr.ribesg.bukkit.ntheendagain.NTheEndAgain.this.getWorldHandlers().size();
+            }
+        });
+
+        // Metrics - Type of regeneration
+        int disabled = 0;
+        int hard = 0;
+        int soft = 0;
+        int crystal = 0;
+        for (final EndWorldHandler h : this.worldHandlers.values()) {
+            if (h.getConfig().getRegenType() == 0) {
+                disabled++;
+            } else {
+                switch (h.getConfig().getRegenMethod()) {
+                    case 0:
+                        hard++;
+                        break;
+                    case 1:
+                        soft++;
+                        break;
+                    case 2:
+                        crystal++;
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+        final int finalDisabled = disabled;
+        final int finalHard = hard;
+        final int finalSoft = soft;
+        final int finalCrystal = crystal;
+
+        final Metrics.Graph g2 = this.getMetrics().createGraph("Regeneration Method");
+        g2.addPlotter(new Metrics.Plotter("Disabled") {
+
+            @Override
+            public int getValue() {
+                return finalDisabled;
+            }
+        });
+        g2.addPlotter(new Metrics.Plotter("Hard Regen") {
+
+            @Override
+            public int getValue() {
+                return finalHard;
+            }
+        });
+        g2.addPlotter(new Metrics.Plotter("Soft Regen") {
+
+            @Override
+            public int getValue() {
+                return finalSoft;
+            }
+        });
+        g2.addPlotter(new Metrics.Plotter("Crystals Only") {
+
+            @Override
+            public int getValue() {
+                return finalCrystal;
+            }
+        });
+
+        // Metrics - Regeneration on Stop
+        int regenOnStop = 0;
+        for (final EndWorldHandler h : this.worldHandlers.values()) {
+            if (h.getConfig().getHardRegenOnStop() == 1) {
+                regenOnStop++;
+            }
+        }
+        final int finalRegenOnStop = regenOnStop;
+
+        final Metrics.Graph g3 = this.getMetrics().createGraph("Hard Regeneration on Stop");
+        g3.addPlotter(new Metrics.Plotter("Enabled") {
+
+            @Override
+            public int getValue() {
+                return finalRegenOnStop;
+            }
+        });
+        g3.addPlotter(new Metrics.Plotter("Disabled") {
+
+            @Override
+            public int getValue() {
+                return fr.ribesg.bukkit.ntheendagain.NTheEndAgain.this.getWorldHandlers().size() - finalRegenOnStop;
+            }
+        });
 
         this.exiting(this.getClass(), "onNodeEnable");
         return true;
@@ -466,7 +623,7 @@ public class NTheEndAgain extends NPlugin implements TheEndAgainNode {
             handler.initLater();
             return true;
         } catch (final IOException e) {
-            this.error("This error occured when NTheEndAgain.loadWorld tried to load " + e.getMessage() + ".yml", e);
+            this.error("This error occurred when NTheEndAgain.loadWorld tried to load " + e.getMessage() + ".yml", e);
             return false;
         }
     }
