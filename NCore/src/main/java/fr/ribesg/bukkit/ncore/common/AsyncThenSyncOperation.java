@@ -61,7 +61,7 @@ public abstract class AsyncThenSyncOperation {
         this.ran = true;
         Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> {
             AsyncThenSyncOperation.this.execAsyncFirst();
-            Bukkit.getScheduler().runTask(AsyncThenSyncOperation.this.plugin, () -> AsyncThenSyncOperation.this.execSyncThen());
+            Bukkit.getScheduler().runTask(AsyncThenSyncOperation.this.plugin, AsyncThenSyncOperation.this::execSyncThen);
         });
     }
 

@@ -78,7 +78,7 @@ public class NCore extends JavaPlugin {
 
         this.nodes = new HashMap<>();
 
-        Bukkit.getScheduler().runTaskLaterAsynchronously(this, () -> NCore.this.afterNodesLoad(), 5 * 20L /* ~5 seconds */);
+        Bukkit.getScheduler().runTaskLaterAsynchronously(this, NCore.this::afterNodesLoad, 5 * 20L /* ~5 seconds */);
 
         Bukkit.getPluginManager().registerEvents(new NEventsListener(this), this);
         Bukkit.getPluginManager().registerEvents(new UpdaterListener(this), this);

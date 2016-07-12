@@ -21,7 +21,6 @@ import fr.ribesg.bukkit.ntalk.filter.bean.ReplaceFilter;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.concurrent.Callable;
 import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;

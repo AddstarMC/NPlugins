@@ -19,7 +19,6 @@ import fr.ribesg.bukkit.ntheendagain.handler.EndWorldHandler;
 
 import java.text.DecimalFormat;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;

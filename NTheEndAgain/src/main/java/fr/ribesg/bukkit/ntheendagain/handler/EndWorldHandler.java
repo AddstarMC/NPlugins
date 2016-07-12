@@ -100,7 +100,7 @@ public class EndWorldHandler {
     }
 
     public void initLater() {
-        Bukkit.getScheduler().runTaskLater(this.plugin, () -> EndWorldHandler.this.init(), 1L);
+        Bukkit.getScheduler().runTaskLater(this.plugin, EndWorldHandler.this::init, 1L);
     }
 
     /**

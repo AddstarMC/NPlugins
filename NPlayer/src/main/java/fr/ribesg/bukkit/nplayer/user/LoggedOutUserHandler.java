@@ -50,7 +50,7 @@ public class LoggedOutUserHandler implements Listener {
         this.plugin = plugin;
         this.loggedOutPlayers = new HashMap<>();
 
-        Bukkit.getScheduler().runTaskTimer(plugin, () -> LoggedOutUserHandler.this.poisonLoggedOutPlayers(), 20 * 5, 20 * 5);
+        Bukkit.getScheduler().runTaskTimer(plugin, LoggedOutUserHandler.this::poisonLoggedOutPlayers, 20 * 5, 20 * 5);
     }
 
     public void notifyConnect(final Player player) {

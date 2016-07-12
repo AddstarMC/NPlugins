@@ -19,15 +19,11 @@ import fr.ribesg.bukkit.npermissions.config.WorldGroups;
 import fr.ribesg.bukkit.npermissions.config.WorldPlayers;
 import fr.ribesg.bukkit.npermissions.lang.Messages;
 import fr.ribesg.bukkit.npermissions.permission.PermissionsManager;
-import fr.ribesg.bukkit.npermissions.permission.WorldGroupPermissions;
-import fr.ribesg.bukkit.npermissions.permission.WorldLegacyPlayerPermissions;
-import fr.ribesg.bukkit.npermissions.permission.WorldPlayerPermissions;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;

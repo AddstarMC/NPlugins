@@ -49,7 +49,7 @@ public class NTheEndAgain extends NPlugin implements TheEndAgainNode {
 
 	/**
      * Reload the config
-     * @param sender
+     * @param sender the commandsender
      * @throws IOException
      */
     protected void reloadConfig(final CommandSender sender) throws IOException {
@@ -114,7 +114,7 @@ public class NTheEndAgain extends NPlugin implements TheEndAgainNode {
                                     "(changed from " + savedRespawnTimerMin + "-" + savedRespawnTimerMax +
                                     " seconds to " + updatedRespawnTimerMin + "-" + updatedRespawnTimerMax + " seconds)";
                             this.debug(msg);
-                            msgAddon.append('\n' + msg);
+                            msgAddon.append('\n').append(msg);
                         }
                         showDetails = true;
                     }
@@ -124,7 +124,7 @@ public class NTheEndAgain extends NPlugin implements TheEndAgainNode {
                             msg = "Note: the new regen timer value will not take effect until after the next regen " +
                                     "(changed from " + savedRegenTimer + " to " + updatedRegenTimer + ")";
                             this.debug(msg);
-                            msgAddon.append('\n' + msg);
+                            msgAddon.append('\n').append(msg);
                         }
                         showDetails = true;
                     }
@@ -148,7 +148,7 @@ public class NTheEndAgain extends NPlugin implements TheEndAgainNode {
                         // Unknown mode
                         msg = "Unknown value for regenOuterEnd: " + updatedRegenOuterEnd;
                         this.error(msg);
-                        msgAddon.append('\n' + msg);
+                        msgAddon.append('\n').append(msg);
                         break;
                 }
 
@@ -166,7 +166,7 @@ public class NTheEndAgain extends NPlugin implements TheEndAgainNode {
 
 	/**
      * Show NTheEndAgain config values for each world of type THE_END
-     * @param sender
+     * @param sender the command sender
      */
     public void showStatus(final CommandSender sender) {
 
@@ -184,7 +184,7 @@ public class NTheEndAgain extends NPlugin implements TheEndAgainNode {
 
     /**
      * Show NTheEndAgain config values for each world of type THE_END
-     * @param sender
+     * @param sender command sender
      * @param handler End world handler
      * @param msgAddon Additional text to append (assumed to start with \n)
      */
@@ -196,7 +196,7 @@ public class NTheEndAgain extends NPlugin implements TheEndAgainNode {
         this.debug("Config details for world " + config.getWorldName() + " (" + currentWorld.getEnvironment().toString() + ")");
 
         StringBuilder multiLineMsg = new StringBuilder();
-        multiLineMsg.append("Config for " + currentWorld.getName());
+        multiLineMsg.append("Config for ").append(currentWorld.getName());
 
         String msg;
 
@@ -242,7 +242,7 @@ public class NTheEndAgain extends NPlugin implements TheEndAgainNode {
         }
 
         this.debug(msg);
-        multiLineMsg.append('\n' + msg);
+        multiLineMsg.append('\n').append(msg);
 
         int regenType = config.getRegenType();
 
@@ -268,7 +268,7 @@ public class NTheEndAgain extends NPlugin implements TheEndAgainNode {
         }
 
         this.debug(msg);
-        multiLineMsg.append('\n' + msg);
+        multiLineMsg.append('\n').append(msg);
 
         int regenOuterEnd = config.getRegenOuterEnd();
         int outerEndRegenHours = config.getOuterEndRegenHours();
@@ -296,14 +296,14 @@ public class NTheEndAgain extends NPlugin implements TheEndAgainNode {
             case 0:
                 msg = "Outer end islands will not auto-regen";
                 this.debug(msg);
-                multiLineMsg.append('\n' + msg);
+                multiLineMsg.append('\n').append(msg);
             case 1:
                 msg = "Outer end islands will regenerate every time the central island is regenerated";
                 if (outerEndRegenCount > 0)
                     msg += "; " + lastOuterEndRegenTime;
 
                 this.debug(msg);
-                multiLineMsg.append('\n' + msg);
+                multiLineMsg.append('\n').append(msg);
                 break;
             case 2:
 
@@ -318,7 +318,7 @@ public class NTheEndAgain extends NPlugin implements TheEndAgainNode {
                     msg += "; " + lastOuterEndRegenTime;
 
                 this.debug(msg);
-                multiLineMsg.append('\n' + msg);
+                multiLineMsg.append('\n').append(msg);
 
                 break;
             default:
@@ -337,7 +337,7 @@ public class NTheEndAgain extends NPlugin implements TheEndAgainNode {
         } else if (nb == 1) {
             multiLineMsg.append('\n' + "There is 1 EnderDragon alive");
         } else {
-            multiLineMsg.append('\n' + "There are " + nb + " EnderDragons alive");
+            multiLineMsg.append('\n' + "There are ").append(nb).append(" EnderDragons alive");
         }
 
         // Look for a scheduled respawn event
@@ -353,7 +353,7 @@ public class NTheEndAgain extends NPlugin implements TheEndAgainNode {
         }
 
         this.debug(msg);
-        multiLineMsg.append('\n' + msg);
+        multiLineMsg.append('\n').append(msg);
 
         // Append any extra text
         if (msgAddon.length() > 0)
@@ -365,9 +365,9 @@ public class NTheEndAgain extends NPlugin implements TheEndAgainNode {
 
     /**
      * Format a number with a fixed number of digits after the decimal place
-     * @param value
-     * @param digitsAfterDecimal
-     * @return
+     * @param value the value to format
+     * @param digitsAfterDecimal decimal places
+     * @return a String formatted
      */
     private String formatNumber(double value, int digitsAfterDecimal) {
         String formatString;
@@ -384,8 +384,8 @@ public class NTheEndAgain extends NPlugin implements TheEndAgainNode {
 
     /**
      * Convert the number of seconds to a description, like 45 seconds or 10.5 minutes or 5.3 hours or 9.3 days
-     * @param timeLengthSeconds
-     * @return
+     * @param timeLengthSeconds time in seconds
+     * @return a string
 	 */
     private String secondsToDescription(long timeLengthSeconds) {
         if (timeLengthSeconds < 60)
@@ -400,9 +400,9 @@ public class NTheEndAgain extends NPlugin implements TheEndAgainNode {
 
     /**
      * Convert a range of seconds to a description, like 45 seconds and 90 seconds or 10 minutes and 30 minutes
-     * @param minTimeLengthSeconds
-     * @param maxTimeLengthSeconds
-     * @return
+     * @param minTimeLengthSeconds min time
+     * @param maxTimeLengthSeconds max time
+     * @return a string
      */
     private String secondsToDescription(long minTimeLengthSeconds, long maxTimeLengthSeconds) {
         String minTimeDesc = secondsToDescription(minTimeLengthSeconds);

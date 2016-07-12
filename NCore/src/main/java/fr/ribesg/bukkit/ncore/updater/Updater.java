@@ -33,7 +33,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.concurrent.Callable;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
