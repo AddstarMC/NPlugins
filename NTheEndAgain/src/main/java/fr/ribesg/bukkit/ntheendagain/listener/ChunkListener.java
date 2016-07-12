@@ -126,10 +126,10 @@ public class ChunkListener implements Listener {
                         if (this.plugin.isDebugEnabled())
                             this.plugin.debug(regenMessage);
                         else
-                            this.plugin.log(Level.INFO, regenMessage);
+                            this.plugin.info(regenMessage);
                     } else if (currentTime > lastInfoTime + MESSAGE_INTERVAL_MILLIS) {
-                        // Only show this message every 5 seconds
-                        this.plugin.debug(regenMessage);
+                        // Report the progress every 5 seconds (whether or not debug is enabled)
+                        this.plugin.info(regenMessage);
                         lastInfoTime = currentTime;
                     }
 

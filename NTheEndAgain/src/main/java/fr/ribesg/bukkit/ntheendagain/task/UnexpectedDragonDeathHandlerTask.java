@@ -35,8 +35,9 @@ public class UnexpectedDragonDeathHandlerTask extends BukkitRunnable {
         final FrameBuilder frame = new FrameBuilder();
         frame.addLine("An EnderDragon has been lost!", FrameBuilder.Option.CENTER);
         frame.addLine("Maybe it was removed by another plugin/command?");
+        frame.addLine("This can also occur after a server restart when spigot decides that there is one dragon too many.");
         frame.addLine("If you had respawnType set to \"after death\", you will");
-        frame.addLine("need to manually respawn the Dragon(s) with /end respawn!");
+        frame.addLine("need to manually respawn the Dragon(s) with /nend respawn!");
         frame.addLine("Remember: EnderDragons should DIE to be handled correctly.");
         this.message = frame.build();
     }
