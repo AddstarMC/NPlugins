@@ -17,8 +17,6 @@ import fr.ribesg.bukkit.ncuboid.beans.Flag;
 import fr.ribesg.bukkit.ncuboid.beans.GeneralRegion;
 import fr.ribesg.bukkit.ncuboid.commands.AbstractSubcmdExecutor;
 
-import java.util.regex.Pattern;
-
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;

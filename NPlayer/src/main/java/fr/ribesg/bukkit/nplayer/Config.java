@@ -76,7 +76,7 @@ public class Config extends AbstractConfig<NPlayer> {
         frame.addLine("If you don't understand something, please ask on dev.bukkit.org");
         frame.addLine("Ribesg", FrameBuilder.Option.RIGHT);
         for (final String line : frame.build()) {
-            content.append(line + '\n');
+            content.append(line).append('\n');
         }
 
         // Enable authentication
@@ -88,12 +88,12 @@ public class Config extends AbstractConfig<NPlayer> {
         content.append("#       1 : Disabled\n");
         content.append("#       2 : Optional\n");
         content.append("#\n");
-        content.append("authenticationMode: " + this.authenticationMode + "\n\n");
+        content.append("authenticationMode: ").append(this.authenticationMode).append("\n\n");
 
         // Maximum Login attempts
         content.append("# Maximum login attempts before punishment. Possible values: Positive integers\n");
         content.append("# Default : 3\n");
-        content.append("maximumLoginAttempts: " + this.maximumLoginAttempts + "\n\n");
+        content.append("maximumLoginAttempts: ").append(this.maximumLoginAttempts).append("\n\n");
 
         // Too Many Attempts Punishment
         content.append("# How do we punish people after too many attempts? Possible values: 0, 1, 2\n");
@@ -104,7 +104,7 @@ public class Config extends AbstractConfig<NPlayer> {
         content.append("#       1 : Tempban\n");
         content.append("#       2 : Ban\n");
         content.append("#\n");
-        content.append("tooManyAttemptsPunishment: " + this.tooManyAttemptsPunishment + "\n\n");
+        content.append("tooManyAttemptsPunishment: ").append(this.tooManyAttemptsPunishment).append("\n\n");
 
         // Too Many Attempts Punishment Duration
         content.append("# The duration of the punishment, if applicable. Possible values: Positive integers\n");
@@ -133,7 +133,7 @@ public class Config extends AbstractConfig<NPlayer> {
         content.append("# You can use *any* strictly positive value you want, just be sure to convert it to seconds.\n");
         content.append("# Note: only applies to TempBan punishment for now.\n");
         content.append("#\n");
-        content.append("tooManyAttemptsPunishmentDuration: " + this.tooManyAttemptsPunishmentDuration + "\n\n");
+        content.append("tooManyAttemptsPunishmentDuration: ").append(this.tooManyAttemptsPunishmentDuration).append("\n\n");
 
         return content.toString();
     }

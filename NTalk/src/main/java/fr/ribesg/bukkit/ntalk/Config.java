@@ -63,16 +63,16 @@ public class Config extends AbstractConfig<NTalk> {
         this.setDefaultFormat(new Format(FormatType.GROUP, "default", "", ""));
         this.setOpGroup("admin");
 
-        this.setPlayerFormats(new HashMap<UUID, Format>());
+        this.setPlayerFormats(new HashMap<>());
         final UUID ribesgId = UuidDb.getId(Node.TALK, "Ribesg", true);
         final UUID notchId = UuidDb.getId(Node.TALK, "Notch", true);
         this.playerFormats.put(ribesgId, new Format(FormatType.PLAYER, ribesgId.toString(), "&c[Dev]&f", ""));
         this.playerFormats.put(notchId, new Format(FormatType.PLAYER, notchId.toString(), "&c[God]&f", ""));
 
-        this.setPlayerNicknames(new HashMap<UUID, String>());
+        this.setPlayerNicknames(new HashMap<>());
         this.playerNicknames.put(notchId, "TheNotch");
 
-        this.setGroupFormats(new HashMap<String, Format>());
+        this.setGroupFormats(new HashMap<>());
         this.groupFormats.put("admin", new Format(FormatType.GROUP, "admin", "&c[Admin]&f", ""));
         this.groupFormats.put("user", new Format(FormatType.GROUP, "user", "&c[User]&f", ""));
 
@@ -85,9 +85,9 @@ public class Config extends AbstractConfig<NTalk> {
     @Override
     protected void handleValues(final YamlConfiguration config) throws InvalidConfigurationException {
 
-        this.setPlayerFormats(new HashMap<UUID, Format>());
-        this.setPlayerNicknames(new HashMap<UUID, String>());
-        this.setGroupFormats(new HashMap<String, Format>());
+        this.setPlayerFormats(new HashMap<>());
+        this.setPlayerNicknames(new HashMap<>());
+        this.setGroupFormats(new HashMap<>());
 
         // template. Default: "&f<[prefix][name]%%([realName])%%[suffix]&f> [message]".
         // Possible values: Any String containing at least "[name]" and "[message]""
@@ -206,29 +206,29 @@ public class Config extends AbstractConfig<NTalk> {
         frame.addLine("If you don't understand something, please ask on dev.bukkit.org");
         frame.addLine("Ribesg", FrameBuilder.Option.RIGHT);
         for (final String line : frame.build()) {
-            content.append(line + '\n');
+            content.append(line).append('\n');
         }
 
         // template for chat messages
         content.append("# The template used to parse chat messages\n");
         content.append("# Default : " + defaultTemplate + '\n');
-        content.append("template: \"" + this.template + "\"\n\n");
+        content.append("template: \"").append(this.template).append("\"\n\n");
 
         // template for private messages
         content.append("# The template used to parse private messages\n");
         content.append("# Default : " + defaultPmTemplate + '\n');
-        content.append("pmTemplate: \"" + this.pmTemplate + "\"\n\n");
+        content.append("pmTemplate: \"").append(this.pmTemplate).append("\"\n\n");
 
         // the group used for Op players
         content.append("# The group used for Op players\n");
-        content.append("opGroup: \"" + this.opGroup + "\"\n\n");
+        content.append("opGroup: \"").append(this.opGroup).append("\"\n\n");
 
         // default prefix & suffix for player without any group permission or custom prefix and suffix
         content.append("# Default prefix and suffix used for player without custom prefix/suffix or group\n");
         content.append("# Default : both empty\n");
         content.append("defaultFormat: \n");
-        content.append("  prefix: \"" + this.defaultFormat.getPrefix() + "\"\n");
-        content.append("  suffix: \"" + this.defaultFormat.getSuffix() + "\"\n\n");
+        content.append("  prefix: \"").append(this.defaultFormat.getPrefix()).append("\"\n");
+        content.append("  suffix: \"").append(this.defaultFormat.getSuffix()).append("\"\n\n");
 
         // group prefixes and suffixes
         content.append("# Group prefixes and suffixes. Use exact group names as written in your permissions files\n");
@@ -236,9 +236,9 @@ public class Config extends AbstractConfig<NTalk> {
         content.append("# with permission 'maingroup.test'\n");
         content.append("groupFormats:\n");
         for (final Entry<String, Format> e : this.groupFormats.entrySet()) {
-            content.append("  " + e.getKey() + ": \n");
-            content.append("    prefix: \"" + e.getValue().getPrefix() + "\"\n");
-            content.append("    suffix: \"" + e.getValue().getSuffix() + "\"\n");
+            content.append("  ").append(e.getKey()).append(": \n");
+            content.append("    prefix: \"").append(e.getValue().getPrefix()).append("\"\n");
+            content.append("    suffix: \"").append(e.getValue().getSuffix()).append("\"\n");
         }
         content.append('\n');
 
@@ -260,15 +260,15 @@ public class Config extends AbstractConfig<NTalk> {
                 if (this.playerNicknames.containsKey(playerId)) {
                     nickName = this.playerNicknames.get(playerId);
                 }
-                content.append("  " + playerId + ": # " + UuidDb.getName(playerId) + '\n');
+                content.append("  ").append(playerId).append(": # ").append(UuidDb.getName(playerId)).append('\n');
                 if (!prefix.isEmpty()) {
-                    content.append("    prefix: \"" + prefix + "\"\n");
+                    content.append("    prefix: \"").append(prefix).append("\"\n");
                 }
                 if (!nickName.isEmpty()) {
-                    content.append("    nick: \"" + nickName + "\"\n");
+                    content.append("    nick: \"").append(nickName).append("\"\n");
                 }
                 if (!suffix.isEmpty()) {
-                    content.append("    suffix: \"" + suffix + "\"\n");
+                    content.append("    suffix: \"").append(suffix).append("\"\n");
                 }
             }
         }
@@ -276,21 +276,21 @@ public class Config extends AbstractConfig<NTalk> {
 
         // Chat filter
         content.append("# Globally toggle the Chat Filter system.\n");
-        content.append("enableChatFilter: " + this.chatFiltersEnabled + "\n\n");
+        content.append("enableChatFilter: ").append(this.chatFiltersEnabled).append("\n\n");
 
         content.append("# The tempmute command that will be used to mute people\n");
         content.append("# It should contain:\n");
         content.append("# - %player% : will be replaced by the player's name\n");
         content.append("# - %duration% : will be replaced by the duration, in seconds\n");
         content.append("# - %reason% : will be replaced by the reason\n");
-        content.append("tempMuteCommand: " + this.tempMuteCommand + "\n\n");
+        content.append("tempMuteCommand: ").append(this.tempMuteCommand).append("\n\n");
 
         content.append("# The tempban command that will be used to ban people\n");
         content.append("# It should contain:\n");
         content.append("# - %player% : will be replaced by the player's name\n");
         content.append("# - %duration% : will be replaced by the duration, in seconds\n");
         content.append("# - %reason% : will be replaced by the reason\n");
-        content.append("tempBanCommand: " + this.tempBanCommand + "\n\n");
+        content.append("tempBanCommand: ").append(this.tempBanCommand).append("\n\n");
 
         content.append("# The tempjail command that will be used to jail people\n");
         content.append("# It should contain:\n");
@@ -298,7 +298,7 @@ public class Config extends AbstractConfig<NTalk> {
         content.append("# - %duration% : will be replaced by the duration, in seconds\n");
         content.append("# - %jailName% : will be replaced by the jail name\n");
         content.append("# - %reason% : will be replaced by the reason\n");
-        content.append("tempJailCommand: " + this.tempJailCommand + "\n\n");
+        content.append("tempJailCommand: ").append(this.tempJailCommand).append("\n\n");
 
         return content.toString();
     }

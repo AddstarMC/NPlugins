@@ -323,7 +323,7 @@ public final class Message implements Iterable<Part>, ConfigurationSerializable 
      * static constructors.
      */
     private Message() {
-        this.parts = new ArrayList<Part>();
+        this.parts = new ArrayList<>();
     }
 
     /**
@@ -1064,6 +1064,7 @@ public final class Message implements Iterable<Part>, ConfigurationSerializable 
      * @param map the map to convert to a chat Message
      *
      * @see ConfigurationSerializable
+     * @return the Message deserialized
      */
     public static Message deserialize(final Map<String, Object> map) {
         final Object parts = map.get("parts");

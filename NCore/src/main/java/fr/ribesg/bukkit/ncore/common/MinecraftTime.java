@@ -105,7 +105,7 @@ public enum MinecraftTime {
     private final long start;
     private final long end;
 
-    private MinecraftTime(final long start, final long end) {
+    MinecraftTime(final long start, final long end) {
         this.start = start;
         this.end = end;
     }

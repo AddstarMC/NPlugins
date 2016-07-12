@@ -126,7 +126,7 @@ public class UuidDb extends AbstractConfig<NCore> implements Listener {
         final long now = System.currentTimeMillis();
         PlayerInfo info = instance.byUuid.get(id);
         if (info == null) {
-            info = new PlayerInfo(id, name, new TreeMap<Long, String>(), now, now);
+            info = new PlayerInfo(id, name, new TreeMap<>(), now, now);
             instance.byUuid.put(id, info);
             instance.byName.put(name.toLowerCase(), info);
         } else if (!name.equals(info.lastKnownName)) {
@@ -171,17 +171,13 @@ public class UuidDb extends AbstractConfig<NCore> implements Listener {
         this.byName = new LinkedHashMap<>();
         this.updated = false;
         Bukkit.getPluginManager().registerEvents(this, instance);
-        Bukkit.getScheduler().runTaskTimerAsynchronously(instance, new Runnable() {
-
-            @Override
-            public void run() {
-                if (UuidDb.this.updated) {
-                    try {
-                        UuidDb.this.updated = false;
-                        UuidDb.this.writeConfig();
-                    } catch (final IOException e) {
-                        UuidDb.LOGGER.error("[NCore] An error occured when NCore tried to save uuidDb.yml", e);
-                    }
+        Bukkit.getScheduler().runTaskTimerAsynchronously(instance, () -> {
+            if (UuidDb.this.updated) {
+                try {
+                    UuidDb.this.updated = false;
+                    UuidDb.this.writeConfig();
+                } catch (final IOException e) {
+                    UuidDb.LOGGER.error("[NCore] An error occured when NCore tried to save uuidDb.yml", e);
                 }
             }
         }, 5 * 60 * 20L, 30 * 20L);
@@ -236,23 +232,23 @@ public class UuidDb extends AbstractConfig<NCore> implements Listener {
         frame.addLine("If you don't understand something, please ask on dev.bukkit.org");
         frame.addLine("Ribesg", FrameBuilder.Option.RIGHT);
         for (final String line : frame.build()) {
-            content.append(line + '\n');
+            content.append(line).append('\n');
         }
         content.append('\n');
 
         // Actual content
         content.append("# Please don't modify this file, you could break everything.\n\n");
         for (final PlayerInfo info : this.byUuid.values()) {
-            content.append("# Player '" + info.lastKnownName + "'\n");
-            content.append("# Offline-mode UUID: " + PlayerIdsUtil.getOfflineUuid(info.lastKnownName) + '\n');
-            content.append(info.uuid + ":\n");
-            content.append("  lastKnownName: " + info.lastKnownName + '\n');
-            content.append("  firstSeen: " + info.firstSeen + " # " + DateUtil.formatDate(info.firstSeen) + '\n');
-            content.append("  lastSeen: " + info.lastSeen + " # " + DateUtil.formatDate(info.lastSeen) + '\n');
+            content.append("# Player '").append(info.lastKnownName).append("'\n");
+            content.append("# Offline-mode UUID: ").append(PlayerIdsUtil.getOfflineUuid(info.lastKnownName)).append('\n');
+            content.append(info.uuid).append(":\n");
+            content.append("  lastKnownName: ").append(info.lastKnownName).append('\n');
+            content.append("  firstSeen: ").append(info.firstSeen).append(" # ").append(DateUtil.formatDate(info.firstSeen)).append('\n');
+            content.append("  lastSeen: ").append(info.lastSeen).append(" # ").append(DateUtil.formatDate(info.lastSeen)).append('\n');
             if (!info.previousNames.isEmpty()) {
                 content.append("  previousNames:\n");
                 for (final Map.Entry<Long, String> e : info.previousNames.entrySet()) {
-                    content.append("    " + e.getValue() + ": " + e.getKey() + " # Changed on " + DateUtil.formatDate(e.getKey()) + '\n');
+                    content.append("    ").append(e.getValue()).append(": ").append(e.getKey()).append(" # Changed on ").append(DateUtil.formatDate(e.getKey())).append('\n');
                 }
             }
             content.append('\n');

@@ -380,8 +380,8 @@ public class TheEndAgainCommandExecutor implements CommandExecutor {
 
 	/**
      * Show status information both in game and at the console
-     * @param sender
-     * @return
+     * @param sender the Commandsender
+     * @return true if the status of the sender is true
      */
     private boolean cmdStatus(final CommandSender sender) {
         this.plugin.showStatus(sender);

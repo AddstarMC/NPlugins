@@ -124,7 +124,7 @@ public class DbConfig extends AbstractConfig<NGeneral> {
         frame.addLine("unless you know what you are doing");
         frame.addLine("Ribesg", FrameBuilder.Option.RIGHT);
         for (final String line : frame.build()) {
-            content.append(line + '\n');
+            content.append(line).append('\n');
         }
         content.append('\n');
 
@@ -135,7 +135,7 @@ public class DbConfig extends AbstractConfig<NGeneral> {
         if (this.plugin.getPluginConfig().hasFlyModeFeature()) {
             content.append("flyModePlayers:\n");
             for (final UUID playerId : this.plugin.getFeatures().get(FlyModeFeature.class).getFlyPlayers()) {
-                content.append("- " + playerId + " # " + UuidDb.getName(playerId) + '\n');
+                content.append("- ").append(playerId).append(" # ").append(UuidDb.getName(playerId)).append('\n');
             }
             content.append('\n');
         }
@@ -147,7 +147,7 @@ public class DbConfig extends AbstractConfig<NGeneral> {
         if (this.plugin.getPluginConfig().hasGodModeFeature()) {
             content.append("godModePlayers:\n");
             for (final UUID playerId : this.plugin.getFeatures().get(GodModeFeature.class).getGodPlayers()) {
-                content.append("- " + playerId + " # " + UuidDb.getName(playerId) + '\n');
+                content.append("- ").append(playerId).append(" # ").append(UuidDb.getName(playerId)).append('\n');
             }
             content.append('\n');
         }
@@ -159,14 +159,14 @@ public class DbConfig extends AbstractConfig<NGeneral> {
         if (this.plugin.getPluginConfig().hasItemNetworkFeature()) {
             content.append("itemnetworks:\n");
             for (final ItemNetwork network : this.plugin.getFeatures().get(ItemNetworkFeature.class).getNetworks().values()) {
-                content.append("  " + network.getName() + ":\n");
-                content.append("    creator: " + network.getCreator() + '\n');
+                content.append("  ").append(network.getName()).append(":\n");
+                content.append("    creator: ").append(network.getCreator()).append('\n');
                 content.append("    receivers:\n");
                 int i = 1;
                 for (final ReceiverSign receiver : network.getReceivers()) {
-                    content.append("      receiver" + i++ + ":\n");
-                    content.append("        location: " + receiver.getLocation() + '\n');
-                    content.append("        accepts: \"" + receiver.getAcceptsString() + "\"\n");
+                    content.append("      receiver").append(i++).append(":\n");
+                    content.append("        location: ").append(receiver.getLocation()).append('\n');
+                    content.append("        accepts: \"").append(receiver.getAcceptsString()).append("\"\n");
                 }
             }
             content.append('\n');

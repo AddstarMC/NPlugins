@@ -32,8 +32,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.plugin.PluginManager;
 
-import org.mcstats.Metrics;
-
 public class NEnchantingEgg extends NPlugin implements EnchantingEggNode {
 
     // Configs
@@ -123,16 +121,6 @@ public class NEnchantingEgg extends NPlugin implements EnchantingEggNode {
 
         this.debug("Starting TimeListenerTask...");
         Bukkit.getScheduler().runTaskTimer(this, new TimeListenerTask(this), 100L, 50);
-
-        this.debug("Handling Metrics...");
-        final Metrics.Graph g = this.getMetrics().createGraph("Amount of Altars");
-        g.addPlotter(new Metrics.Plotter() {
-
-            @Override
-            public int getValue() {
-                return fr.ribesg.bukkit.nenchantingegg.NEnchantingEgg.this.getAltars().getAltars().size();
-            }
-        });
 
         this.exiting(this.getClass(), "onNodeEnable");
         return true;

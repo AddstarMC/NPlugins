@@ -21,7 +21,7 @@ import org.bukkit.entity.Player;
 
 public abstract class PlayerRegion extends GeneralRegion {
 
-    public static enum RegionState {
+    public enum RegionState {
         /**
          * Normal Region
          */

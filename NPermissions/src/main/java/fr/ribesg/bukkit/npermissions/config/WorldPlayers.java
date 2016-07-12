@@ -184,9 +184,9 @@ public class WorldPlayers extends AbstractConfig<NPermissions> {
         // TODO print some (commented) example before
 
         for (final WorldPlayerPermissions worldPlayer : this.manager.getWorldPlayers().get(this.worldName).values()) {
-            content.append("# The player '" + worldPlayer.getPlayerName() + "' also has all permissions defined at the plugin folder's root\n");
+            content.append("# The player '").append(worldPlayer.getPlayerName()).append("' also has all permissions defined at the plugin folder's root\n");
             for (final String groupPerm : worldPlayer.getAllGroupPerms()) {
-                content.append("# - " + groupPerm + '\n');
+                content.append("# - ").append(groupPerm).append('\n');
             }
             final YamlConfiguration dummySection = new YamlConfiguration();
             worldPlayer.save(dummySection);
@@ -195,9 +195,9 @@ public class WorldPlayers extends AbstractConfig<NPermissions> {
 
         content.append("_legacy:\n");
         for (final WorldLegacyPlayerPermissions worldLegacyPlayer : this.manager.getWorldLegacyPlayers().get(this.worldName).values()) {
-            content.append("  # The player '" + worldLegacyPlayer.getPlayerName() + "' will also have all permissions defined at the plugin folder's root\n");
+            content.append("  # The player '").append(worldLegacyPlayer.getPlayerName()).append("' will also have all permissions defined at the plugin folder's root\n");
             for (final String groupPerm : worldLegacyPlayer.getAllGroupPerms()) {
-                content.append("  # - " + groupPerm + '\n');
+                content.append("  # - ").append(groupPerm).append('\n');
             }
             final YamlConfiguration dummySection = new YamlConfiguration();
             worldLegacyPlayer.save(dummySection);

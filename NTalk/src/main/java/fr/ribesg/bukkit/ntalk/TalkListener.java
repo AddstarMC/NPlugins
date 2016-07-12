@@ -102,13 +102,9 @@ public class TalkListener implements Listener {
                             final long muteDuration = muteFilter.getDuration();
                             final String muteReason = this.plugin.getMessages().get(MessageId.talk_filterMutedReason, muteFilter.getOutputString())[0];
                             final String muteCommand = this.plugin.getPluginConfig().getTempMuteCommand(mutePlayerName, muteDuration, muteReason);
-                            Bukkit.getScheduler().callSyncMethod(this.plugin, new Callable<Object>() {
-
-                                @Override
-                                public Object call() throws Exception {
-                                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), muteCommand);
-                                    return null;
-                                }
+                            Bukkit.getScheduler().callSyncMethod(this.plugin, () -> {
+                                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), muteCommand);
+                                return null;
                             });
                             break;
                         case TEMPORARY_BAN:
@@ -117,13 +113,9 @@ public class TalkListener implements Listener {
                             final long banDuration = banFilter.getDuration();
                             final String banReason = this.plugin.getMessages().get(MessageId.talk_filterBannedReason, banFilter.getOutputString())[0];
                             final String banCommand = this.plugin.getPluginConfig().getTempBanCommand(banPlayerName, banDuration, banReason);
-                            Bukkit.getScheduler().callSyncMethod(this.plugin, new Callable<Object>() {
-
-                                @Override
-                                public Object call() throws Exception {
-                                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), banCommand);
-                                    return null;
-                                }
+                            Bukkit.getScheduler().callSyncMethod(this.plugin, () -> {
+                                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), banCommand);
+                                return null;
                             });
                             break;
                         case TEMPORARY_JAIL:
@@ -133,13 +125,9 @@ public class TalkListener implements Listener {
                             final String jailName = jailFilter.getJailName();
                             final String jailReason = this.plugin.getMessages().get(MessageId.talk_filterJailedReason, jailFilter.getOutputString())[0];
                             final String jailCommand = this.plugin.getPluginConfig().getTempJailCommand(jailPlayerName, jailDuration, jailName, jailReason);
-                            Bukkit.getScheduler().callSyncMethod(this.plugin, new Callable<Object>() {
-
-                                @Override
-                                public Object call() throws Exception {
-                                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), jailCommand);
-                                    return null;
-                                }
+                            Bukkit.getScheduler().callSyncMethod(this.plugin, () -> {
+                                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), jailCommand);
+                                return null;
                             });
                             break;
                         case DIVINE_PUNISHMENT:
@@ -178,13 +166,9 @@ public class TalkListener implements Listener {
         }
 
         final String normalMessage = String.format(formats[1], event.getPlayer().getDisplayName(), message);
-        Bukkit.getScheduler().runTask(this.plugin, new Runnable() {
-
-            @Override
-            public void run() {
-                for (final Player p : players) {
-                    p.sendMessage(normalMessage);
-                }
+        Bukkit.getScheduler().runTask(this.plugin, () -> {
+            for (final Player p : players) {
+                p.sendMessage(normalMessage);
             }
         });
     }

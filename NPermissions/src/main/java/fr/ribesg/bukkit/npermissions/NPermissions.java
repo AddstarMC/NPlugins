@@ -108,7 +108,7 @@ public class NPermissions extends NPlugin implements PermissionsNode {
             for (final World world : Bukkit.getWorlds()) {
                 // Groups
                 try {
-                    this.manager.getWorldGroups().put(world.getName(), new LinkedHashMap<String, WorldGroupPermissions>());
+                    this.manager.getWorldGroups().put(world.getName(), new LinkedHashMap<>());
                     final WorldGroups worldGroupsConfig = new WorldGroups(this, world.getName());
                     worldGroupsConfig.loadConfig(world.getName() + File.separator + "groups.yml");
                     this.worldGroupsConfigs.put(world.getName(), worldGroupsConfig);
@@ -119,8 +119,8 @@ public class NPermissions extends NPlugin implements PermissionsNode {
 
                 // Players
                 try {
-                    this.manager.getWorldPlayers().put(world.getName(), new LinkedHashMap<UUID, WorldPlayerPermissions>());
-                    this.manager.getWorldLegacyPlayers().put(world.getName(), new LinkedHashMap<String, WorldLegacyPlayerPermissions>());
+                    this.manager.getWorldPlayers().put(world.getName(), new LinkedHashMap<>());
+                    this.manager.getWorldLegacyPlayers().put(world.getName(), new LinkedHashMap<>());
                     final WorldPlayers worldPlayersConfig = new WorldPlayers(this, world.getName());
                     worldPlayersConfig.loadConfig(world.getName() + File.separator + "players.yml");
                     this.worldPlayersConfigs.put(world.getName(), worldPlayersConfig);

@@ -106,13 +106,9 @@ public class ItemNetworkHandlerTask extends BukkitRunnable {
             } while (!this.network.getBuffer().isEmpty());
 
             // Send everything
-            Bukkit.getScheduler().callSyncMethod(this.network.getFeature().getPlugin(), new Callable() {
-
-                @Override
-                public Object call() throws Exception {
-                    ItemNetworkHandlerTask.this.network.send(toBeSent, notSendable);
-                    return null;
-                }
+            Bukkit.getScheduler().callSyncMethod(this.network.getFeature().getPlugin(), (Callable) () -> {
+                ItemNetworkHandlerTask.this.network.send(toBeSent, notSendable);
+                return null;
             });
         }
     }

@@ -55,7 +55,7 @@ public class GodFlagListener extends AbstractListener {
     public void onEntityDamage(final ExtendedEntityDamageEvent ext) {
         final EntityDamageEvent event = (EntityDamageEvent)ext.getBaseEvent();
         if (event.getEntityType() == EntityType.PLAYER) {
-            if (this.godPlayers.contains(((Player)event.getEntity()).getName())) {
+            if (this.godPlayers.contains(event.getEntity().getName())) {
                 event.setCancelled(true);
             }
         }

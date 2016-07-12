@@ -122,19 +122,19 @@ public class WorldGroups extends AbstractConfig<NPermissions> {
         }
         content.append('\n');
 
-        content.append("# This file contains permissions for world '" + this.worldName + "'\n\n");
+        content.append("# This file contains permissions for world '").append(this.worldName).append("'\n\n");
 
         // TODO print some (commented) example before
 
         for (final WorldGroupPermissions worldGroup : this.manager.getWorldGroups().get(this.worldName).values()) {
             final String groupPermission = "group." + worldGroup.getGroupName().toLowerCase();
-            content.append("# The group '" + worldGroup.getGroupName() + "', also has all permissions defined at the plugin folder's root\n");
+            content.append("# The group '").append(worldGroup.getGroupName()).append("', also has all permissions defined at the plugin folder's root\n");
             final SortedSet<String> groupPerms = worldGroup.getAllGroupPerms();
             if (!groupPerms.isEmpty()) {
                 content.append("# Members of this group also have the following permissions:\n");
                 for (final String groupPerm : groupPerms) {
                     if (!groupPermission.equals(groupPerm) && !this.manager.getGroups().get(worldGroup.getGroupName()).getAllGroupPerms().contains(groupPerm)) {
-                        content.append("# - " + groupPerm + '\n');
+                        content.append("# - ").append(groupPerm).append('\n');
                     }
                 }
             }

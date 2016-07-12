@@ -186,10 +186,10 @@ public class Players extends AbstractConfig<NPermissions> {
         // TODO print some (commented) example before
 
         for (final PlayerPermissions player : this.manager.getPlayers().values()) {
-            content.append("# The player '" + player.getPlayerName() + "' also has the following permissions:\n");
-            content.append("# - maingroup." + player.getMainGroup().toLowerCase() + '\n');
+            content.append("# The player '").append(player.getPlayerName()).append("' also has the following permissions:\n");
+            content.append("# - maingroup.").append(player.getMainGroup().toLowerCase()).append('\n');
             for (final String groupPerm : player.getAllGroupPerms()) {
-                content.append("# - " + groupPerm + '\n');
+                content.append("# - ").append(groupPerm).append('\n');
             }
             final YamlConfiguration dummySection = new YamlConfiguration();
             player.save(dummySection);
@@ -198,10 +198,10 @@ public class Players extends AbstractConfig<NPermissions> {
 
         content.append("_legacy:\n");
         for (final LegacyPlayerPermissions legacyPlayer : this.manager.getLegacyPlayers().values()) {
-            content.append("  # The player '" + legacyPlayer.getPlayerName() + "' will also have the following permissions:\n");
-            content.append("  # - maingroup." + legacyPlayer.getMainGroup().toLowerCase() + '\n');
+            content.append("  # The player '").append(legacyPlayer.getPlayerName()).append("' will also have the following permissions:\n");
+            content.append("  # - maingroup.").append(legacyPlayer.getMainGroup().toLowerCase()).append('\n');
             for (final String groupPerm : legacyPlayer.getAllGroupPerms()) {
-                content.append("  # - " + groupPerm + '\n');
+                content.append("  # - ").append(groupPerm).append('\n');
             }
             final YamlConfiguration dummySection = new YamlConfiguration();
             legacyPlayer.save(dummySection);

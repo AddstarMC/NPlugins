@@ -62,7 +62,7 @@ public class ArgumentParser {
     /**
      * Different states encountered while iterating over the args array
      */
-    private static enum QuoteState {
+    private enum QuoteState {
 
         /**
          * Not inside a quoted String

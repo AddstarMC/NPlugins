@@ -621,6 +621,7 @@ public final class Part implements ConfigurationSerializable {
      * @param map the map to convert to a chat message Part
      *
      * @see ConfigurationSerializable
+     * @return Part deserializer
      */
     public static Part deserialize(final Map<String, Object> map) {
         final Part part = new Part();

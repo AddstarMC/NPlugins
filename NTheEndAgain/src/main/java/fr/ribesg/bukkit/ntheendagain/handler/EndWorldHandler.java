@@ -100,13 +100,7 @@ public class EndWorldHandler {
     }
 
     public void initLater() {
-        Bukkit.getScheduler().runTaskLater(this.plugin, new Runnable() {
-
-            @Override
-            public void run() {
-                fr.ribesg.bukkit.ntheendagain.handler.EndWorldHandler.this.init();
-            }
-        }, 1L);
+        Bukkit.getScheduler().runTaskLater(this.plugin, () -> EndWorldHandler.this.init(), 1L);
     }
 
     /**
@@ -218,13 +212,7 @@ public class EndWorldHandler {
      */
     public void recreateTasksLater() {
 
-        Bukkit.getScheduler().runTaskLater(this.plugin, new Runnable() {
-
-            @Override
-            public void run() {
-                fr.ribesg.bukkit.ntheendagain.handler.EndWorldHandler.this.recreateTasks();
-            }
-        }, 10L);
+        Bukkit.getScheduler().runTaskLater(this.plugin, () -> EndWorldHandler.this.recreateTasks(), 10L);
 
     }
 
@@ -295,7 +283,7 @@ public class EndWorldHandler {
 
                             // plugin.debug("EndWorldHandler.countEntities ... actual health is " + new DecimalFormat("#.##").format(ed.getHealth()));
 
-                            this.dragons.put(dragonId, new HashMap<String, Double>());
+                            this.dragons.put(dragonId, new HashMap<>());
                             this.loadedDragons.add(dragonId);
                         }
                     } else if (e.getType() == EntityType.ENDER_CRYSTAL) {

@@ -59,17 +59,9 @@ public abstract class AsyncThenSyncOperation {
             throw new IllegalStateException("Can only run once.");
         }
         this.ran = true;
-        Bukkit.getScheduler().runTaskAsynchronously(this.plugin, new Runnable() {
-            @Override
-            public void run() {
-                fr.ribesg.bukkit.ncore.common.AsyncThenSyncOperation.this.execAsyncFirst();
-                Bukkit.getScheduler().runTask(fr.ribesg.bukkit.ncore.common.AsyncThenSyncOperation.this.plugin, new Runnable() {
-                    @Override
-                    public void run() {
-                        fr.ribesg.bukkit.ncore.common.AsyncThenSyncOperation.this.execSyncThen();
-                    }
-                });
-            }
+        Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> {
+            AsyncThenSyncOperation.this.execAsyncFirst();
+            Bukkit.getScheduler().runTask(AsyncThenSyncOperation.this.plugin, () -> AsyncThenSyncOperation.this.execSyncThen());
         });
     }
 

@@ -142,7 +142,7 @@ public class TimeUtil {
          */
         private final long multiplier;
 
-        private TimeUnits(final long multiplier, final String... stringRepresentations) {
+        TimeUnits(final long multiplier, final String... stringRepresentations) {
             this.multiplier = multiplier;
             this.stringRepresentations = stringRepresentations;
         }

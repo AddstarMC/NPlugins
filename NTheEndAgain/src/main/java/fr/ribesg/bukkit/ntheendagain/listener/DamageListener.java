@@ -91,13 +91,7 @@ public class DamageListener implements Listener {
                         velocity.setY(10);
                     }
                     velocity.normalize().multiply(handler.getConfig().getEdPushForce());
-                    Bukkit.getScheduler().runTask(this.plugin, new Runnable() {
-
-                        @Override
-                        public void run() {
-                            event.getEntity().setVelocity(velocity);
-                        }
-                    });
+                    Bukkit.getScheduler().runTask(this.plugin, () -> event.getEntity().setVelocity(velocity));
                 }
             }
         }

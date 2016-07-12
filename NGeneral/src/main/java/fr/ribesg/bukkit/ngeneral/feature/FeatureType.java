@@ -57,7 +57,7 @@ public enum FeatureType {
      */
     private final Class<? extends Feature> clazz;
 
-    private FeatureType(final Class<? extends Feature> clazz) {
+    FeatureType(final Class<? extends Feature> clazz) {
         this.clazz = clazz;
     }
 

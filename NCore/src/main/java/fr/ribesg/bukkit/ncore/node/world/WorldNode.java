@@ -29,5 +29,5 @@ public interface WorldNode extends Node, InfoCommandHandler {
      *
      * @return the spawn location or null if no world found
      */
-    public Location getWorldSpawnLocation(final String worldName);
+    Location getWorldSpawnLocation(final String worldName);
 }

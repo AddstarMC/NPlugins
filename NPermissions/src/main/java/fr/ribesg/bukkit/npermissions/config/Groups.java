@@ -150,15 +150,15 @@ public class Groups extends AbstractConfig<NPermissions> {
         for (final GroupPermissions group : this.manager.getGroups().values()) {
             final String groupPermission = "group." + group.getGroupName().toLowerCase();
             final String mainPermission = "main" + groupPermission;
-            content.append("# The group '" + group.getGroupName() + "', also defines the following permissions:\n");
-            content.append("# - " + mainPermission + " - For players for whom this group is the main group (unique per player)\n");
-            content.append("# - " + groupPermission + " - For members of this group AND members of subgroups\n");
+            content.append("# The group '").append(group.getGroupName()).append("', also defines the following permissions:\n");
+            content.append("# - ").append(mainPermission).append(" - For players for whom this group is the main group (unique per player)\n");
+            content.append("# - ").append(groupPermission).append(" - For members of this group AND members of subgroups\n");
             final SortedSet<String> groupPerms = group.getAllGroupPerms();
             if (!groupPerms.isEmpty()) {
                 content.append("# Members of this group also have the following permissions:\n");
                 for (final String groupPerm : groupPerms) {
                     if (!groupPermission.equals(groupPerm)) {
-                        content.append("# - " + groupPerm + '\n');
+                        content.append("# - ").append(groupPerm).append('\n');
                     }
                 }
             }

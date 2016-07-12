@@ -131,25 +131,25 @@ public class Config extends AbstractConfig<NEnchantingEgg> {
         frame.addLine("If you don't understand something, please ask on dev.bukkit.org");
         frame.addLine("Ribesg", FrameBuilder.Option.RIGHT);
         for (final String line : frame.build()) {
-            content.append(line + '\n');
+            content.append(line).append('\n');
         }
 
         // Minimum distance between 2 altars
         content.append("# The minimum distance between 2 altars. Default: 500\n");
         content.append("# Note: You can't use a value under 35.\n");
-        content.append("minimumDistanceBetweenTwoAltars: " + this.minimumDistanceBetweenTwoAltars + "\n\n");
+        content.append("minimumDistanceBetweenTwoAltars: ").append(this.minimumDistanceBetweenTwoAltars).append("\n\n");
 
         // Repair boost multiplier
         content.append("# The coefficient applied to durability boost on repair. Default: 1.0\n");
         content.append("# Note: You can't use a value equals to or under 0.0\n");
-        content.append("repairBoostMultiplier: " + this.repairBoostMultiplier + "\n\n");
+        content.append("repairBoostMultiplier: ").append(this.repairBoostMultiplier).append("\n\n");
 
         // Enchantment boost multiplier
         content.append("# The coefficient applied to probabilities of enchantment boost. Default: 1.0\n");
         content.append("# Note: You can't use a value equals to or under 0.0, and you may prefer\n");
         content.append("#       to use values close to 1 to prevent breaking everything.\n");
         content.append("#       Example: 1.1 is an IMPORTANT increase!\n");
-        content.append("enchantmentBoostMultiplier: " + this.enchantmentBoostMultiplier + "\n\n");
+        content.append("enchantmentBoostMultiplier: ").append(this.enchantmentBoostMultiplier).append("\n\n");
 
         // Enchantments max levels
         content.append("# Maximum allowed levels for each enchantment.\n");
@@ -158,14 +158,14 @@ public class Config extends AbstractConfig<NEnchantingEgg> {
         content.append("#        - Any value greater than 10 will be ignored.\n");
         content.append("enchantmentMaxLevels:\n");
         for (final Map.Entry<Enchantment, Integer> e : this.enchantmentsMaxLevels.entrySet()) {
-            content.append("  " + e.getKey().getName() + ": " + e.getValue() + '\n');
+            content.append("  ").append(e.getKey().getName()).append(": ").append(e.getValue()).append('\n');
         }
 
         // Altars
         content.append("# This stores created altars\n");
         content.append("altars:\n");
         for (final Altar a : this.altars.getAltars()) {
-            content.append("- " + a.getCenterLocation() + '\n');
+            content.append("- ").append(a.getCenterLocation()).append('\n');
         }
 
         this.plugin.exiting(this.getClass(), "getConfigString");

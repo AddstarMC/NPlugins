@@ -331,7 +331,7 @@ public class Config extends AbstractConfig<NGeneral> {
         frame.addLine("If you don't understand something, please ask on dev.bukkit.org");
         frame.addLine("Ribesg", FrameBuilder.Option.RIGHT);
         for (final String line : frame.build()) {
-            content.append(line + '\n');
+            content.append(line).append('\n');
         }
         content.append('\n');
 
@@ -343,7 +343,7 @@ public class Config extends AbstractConfig<NGeneral> {
         frame.addLine("Features control", FrameBuilder.Option.CENTER);
         content.append('\n');
         for (final String line : frame.build()) {
-            content.append(line + '\n');
+            content.append(line).append('\n');
         }
         content.append('\n');
 
@@ -352,40 +352,40 @@ public class Config extends AbstractConfig<NGeneral> {
         content.append("# followed by a bunch of spaces to hide it.\n");
         content.append("# You can specify different lines using the ## separator.\n");
         content.append("# For example, this is the perfect place to use Rei's Minimap codes.\n");
-        content.append("initialMessage: " + this.initialMessage + "\n\n");
+        content.append("initialMessage: ").append(this.initialMessage).append("\n\n");
 
         // Auto AFK Feature
         content.append("# Defines if the AutoAfk feature is enabled or not\n");
-        content.append("autoAfkFeature: " + this.hasAutoAfkFeature() + "\n\n");
+        content.append("autoAfkFeature: ").append(this.hasAutoAfkFeature()).append("\n\n");
 
         // Fly Mode Feature
         content.append("# Defines if the FlyMode feature is enabled or not\n");
-        content.append("flyModeFeature: " + this.hasFlyModeFeature() + "\n\n");
+        content.append("flyModeFeature: ").append(this.hasFlyModeFeature()).append("\n\n");
 
         // God Mode Feature
         content.append("# Defines if the GodMode feature is enabled or not\n");
-        content.append("godModeFeature: " + this.hasGodModeFeature() + "\n\n");
+        content.append("godModeFeature: ").append(this.hasGodModeFeature()).append("\n\n");
 
         // Item Network Feature
         content.append("# Defines if the ItemNetwork feature is enabled or not\n");
-        content.append("itemNetworkFeature: " + this.hasItemNetworkFeature() + "\n\n");
+        content.append("itemNetworkFeature: ").append(this.hasItemNetworkFeature()).append("\n\n");
 
         // Protection Sign Feature
         content.append("# Defines if the ProtectionSign feature is enabled or not\n");
-        content.append("protectionSignFeature: " + this.hasProtectionSignFeature() + "\n\n");
+        content.append("protectionSignFeature: ").append(this.hasProtectionSignFeature()).append("\n\n");
 
         // Protection Sign Feature
         content.append("# Defines if the Spy Mode feature is enabled or not\n");
-        content.append("spyModeFeature: " + this.hasSpyModeFeature() + "\n\n");
+        content.append("spyModeFeature: ").append(this.hasSpyModeFeature()).append("\n\n");
 
         // Auto AFK Delay
         content.append("# Time before a player is set to auto-afk\n");
-        content.append("autoAfkDelay: " + this.autoAfkDelay + "\n\n");
+        content.append("autoAfkDelay: ").append(this.autoAfkDelay).append("\n\n");
 
         // Item Network Max Distance
         content.append("# Maximum allowed distance between an Emitter sign and any\n");
         content.append("# Receiver sign of the same network\n");
-        content.append("itemNetworkMaxDistance: " + this.itemNetworkMaxDistance + "\n\n");
+        content.append("itemNetworkMaxDistance: ").append(this.itemNetworkMaxDistance).append("\n\n");
 
         // No Permission for Protection Signs message
         content.append("# Message written on Error signs when player is not allowed to\n");
@@ -394,9 +394,9 @@ public class Config extends AbstractConfig<NGeneral> {
         content.append("#   \"" + DEFAULT_protectionSignNoPermMsgLine1 + "\"\n");
         content.append("#   \"" + DEFAULT_protectionSignNoPermMsgLine2 + "\"\n");
         content.append("#   \"" + DEFAULT_protectionSignNoPermMsgLine3 + "\"\n");
-        content.append("protectionSignNoPermMsgLine1: \"" + this.protectionSignNoPermMsgLine1 + "\"\n");
-        content.append("protectionSignNoPermMsgLine2: \"" + this.protectionSignNoPermMsgLine2 + "\"\n");
-        content.append("protectionSignNoPermMsgLine3: \"" + this.protectionSignNoPermMsgLine3 + "\"\n\n");
+        content.append("protectionSignNoPermMsgLine1: \"").append(this.protectionSignNoPermMsgLine1).append("\"\n");
+        content.append("protectionSignNoPermMsgLine2: \"").append(this.protectionSignNoPermMsgLine2).append("\"\n");
+        content.append("protectionSignNoPermMsgLine3: \"").append(this.protectionSignNoPermMsgLine3).append("\"\n\n");
 
         // Nothing to protect Protection Signs message
         content.append("# Message written on Error signs when there is not valid 'protectable'\n");
@@ -405,9 +405,9 @@ public class Config extends AbstractConfig<NGeneral> {
         content.append("#   \"" + DEFAULT_protectionSignNothingToProtectMsgLine1 + "\"\n");
         content.append("#   \"" + DEFAULT_protectionSignNothingToProtectMsgLine2 + "\"\n");
         content.append("#   \"" + DEFAULT_protectionSignNothingToProtectMsgLine3 + "\"\n");
-        content.append("protectionSignNothingToProtectMsgLine1: \"" + this.protectionSignNothingToProtectMsgLine1 + "\"\n");
-        content.append("protectionSignNothingToProtectMsgLine2: \"" + this.protectionSignNothingToProtectMsgLine2 + "\"\n");
-        content.append("protectionSignNothingToProtectMsgLine3: \"" + this.protectionSignNothingToProtectMsgLine3 + "\"\n\n");
+        content.append("protectionSignNothingToProtectMsgLine1: \"").append(this.protectionSignNothingToProtectMsgLine1).append("\"\n");
+        content.append("protectionSignNothingToProtectMsgLine2: \"").append(this.protectionSignNothingToProtectMsgLine2).append("\"\n");
+        content.append("protectionSignNothingToProtectMsgLine3: \"").append(this.protectionSignNothingToProtectMsgLine3).append("\"\n\n");
 
         // Already protected Protection Signs message
         content.append("# Message written on Error signs when a block that would be protected by the\n");
@@ -416,9 +416,9 @@ public class Config extends AbstractConfig<NGeneral> {
         content.append("#   \"" + DEFAULT_protectionSignAlreadyProtectedMsgLine1 + "\"\n");
         content.append("#   \"" + DEFAULT_protectionSignAlreadyProtectedMsgLine2 + "\"\n");
         content.append("#   \"" + DEFAULT_protectionSignAlreadyProtectedMsgLine3 + "\"\n");
-        content.append("protectionSignAlreadyProtectedMsgLine1: \"" + this.protectionSignAlreadyProtectedMsgLine1 + "\"\n");
-        content.append("protectionSignAlreadyProtectedMsgLine2: \"" + this.protectionSignAlreadyProtectedMsgLine2 + "\"\n");
-        content.append("protectionSignAlreadyProtectedMsgLine3: \"" + this.protectionSignAlreadyProtectedMsgLine3 + "\"\n\n");
+        content.append("protectionSignAlreadyProtectedMsgLine1: \"").append(this.protectionSignAlreadyProtectedMsgLine1).append("\"\n");
+        content.append("protectionSignAlreadyProtectedMsgLine2: \"").append(this.protectionSignAlreadyProtectedMsgLine2).append("\"\n");
+        content.append("protectionSignAlreadyProtectedMsgLine3: \"").append(this.protectionSignAlreadyProtectedMsgLine3).append("\"\n\n");
 
         // Unknown Network Item Network Signs message
         content.append("# Message written on Error signs when the Network Name provided on the sign does not\n");
@@ -427,9 +427,9 @@ public class Config extends AbstractConfig<NGeneral> {
         content.append("#   \"" + DEFAULT_itemNetworkSignUnknownNetworkMsgLine1 + "\"\n");
         content.append("#   \"" + DEFAULT_itemNetworkSignUnknownNetworkMsgLine2 + "\"\n");
         content.append("#   \"" + DEFAULT_itemNetworkSignUnknownNetworkMsgLine3 + "\"\n");
-        content.append("itemNetworkSignUnknownNetworkMsgLine1: \"" + this.itemNetworkSignUnknownNetworkMsgLine1 + "\"\n");
-        content.append("itemNetworkSignUnknownNetworkMsgLine2: \"" + this.itemNetworkSignUnknownNetworkMsgLine2 + "\"\n");
-        content.append("itemNetworkSignUnknownNetworkMsgLine3: \"" + this.itemNetworkSignUnknownNetworkMsgLine3 + "\"\n\n");
+        content.append("itemNetworkSignUnknownNetworkMsgLine1: \"").append(this.itemNetworkSignUnknownNetworkMsgLine1).append("\"\n");
+        content.append("itemNetworkSignUnknownNetworkMsgLine2: \"").append(this.itemNetworkSignUnknownNetworkMsgLine2).append("\"\n");
+        content.append("itemNetworkSignUnknownNetworkMsgLine3: \"").append(this.itemNetworkSignUnknownNetworkMsgLine3).append("\"\n\n");
 
         // Not Allowed Item Network Signs message
         content.append("# Message written on Error signs when the User is not owner of the provided\n");
@@ -438,9 +438,9 @@ public class Config extends AbstractConfig<NGeneral> {
         content.append("#   \"" + DEFAULT_itemNetworkSignNotAllowedMsgLine1 + "\"\n");
         content.append("#   \"" + DEFAULT_itemNetworkSignNotAllowedMsgLine2 + "\"\n");
         content.append("#   \"" + DEFAULT_itemNetworkSignNotAllowedMsgLine3 + "\"\n");
-        content.append("itemNetworkSignNotAllowedMsgLine1: \"" + this.itemNetworkSignNotAllowedMsgLine1 + "\"\n");
-        content.append("itemNetworkSignNotAllowedMsgLine2: \"" + this.itemNetworkSignNotAllowedMsgLine2 + "\"\n");
-        content.append("itemNetworkSignNotAllowedMsgLine3: \"" + this.itemNetworkSignNotAllowedMsgLine3 + "\"\n\n");
+        content.append("itemNetworkSignNotAllowedMsgLine1: \"").append(this.itemNetworkSignNotAllowedMsgLine1).append("\"\n");
+        content.append("itemNetworkSignNotAllowedMsgLine2: \"").append(this.itemNetworkSignNotAllowedMsgLine2).append("\"\n");
+        content.append("itemNetworkSignNotAllowedMsgLine3: \"").append(this.itemNetworkSignNotAllowedMsgLine3).append("\"\n\n");
 
         // Invalid Materials Item Network Signs message
         content.append("# Message written on Error signs when the 3rd line defining\n");
@@ -449,9 +449,9 @@ public class Config extends AbstractConfig<NGeneral> {
         content.append("#   \"" + DEFAULT_itemNetworkSignInvalidMaterialsMsgLine1 + "\"\n");
         content.append("#   \"" + DEFAULT_itemNetworkSignInvalidMaterialsMsgLine2 + "\"\n");
         content.append("#   \"" + DEFAULT_itemNetworkSignInvalidMaterialsMsgLine3 + "\"\n");
-        content.append("itemNetworkSignInvalidMaterialsMsgLine1: \"" + this.itemNetworkSignInvalidMaterialsMsgLine1 + "\"\n");
-        content.append("itemNetworkSignInvalidMaterialsMsgLine2: \"" + this.itemNetworkSignInvalidMaterialsMsgLine2 + "\"\n");
-        content.append("itemNetworkSignInvalidMaterialsMsgLine3: \"" + this.itemNetworkSignInvalidMaterialsMsgLine3 + "\"\n\n");
+        content.append("itemNetworkSignInvalidMaterialsMsgLine1: \"").append(this.itemNetworkSignInvalidMaterialsMsgLine1).append("\"\n");
+        content.append("itemNetworkSignInvalidMaterialsMsgLine2: \"").append(this.itemNetworkSignInvalidMaterialsMsgLine2).append("\"\n");
+        content.append("itemNetworkSignInvalidMaterialsMsgLine3: \"").append(this.itemNetworkSignInvalidMaterialsMsgLine3).append("\"\n\n");
 
         // Too Far Item Network Signs message
         content.append("# Message written on Error signs when the User tries to create a\n");
@@ -460,9 +460,9 @@ public class Config extends AbstractConfig<NGeneral> {
         content.append("#   \"" + DEFAULT_itemNetworkSignTooFarMsgLine1 + "\"\n");
         content.append("#   \"" + DEFAULT_itemNetworkSignTooFarMsgLine2 + "\"\n");
         content.append("#   \"" + DEFAULT_itemNetworkSignTooFarMsgLine3 + "\"\n");
-        content.append("itemNetworkSignTooFarMsgLine1: \"" + this.itemNetworkSignTooFarMsgLine1 + "\"\n");
-        content.append("itemNetworkSignTooFarMsgLine2: \"" + this.itemNetworkSignTooFarMsgLine2 + "\"\n");
-        content.append("itemNetworkSignTooFarMsgLine3: \"" + this.itemNetworkSignTooFarMsgLine3 + "\"\n\n");
+        content.append("itemNetworkSignTooFarMsgLine1: \"").append(this.itemNetworkSignTooFarMsgLine1).append("\"\n");
+        content.append("itemNetworkSignTooFarMsgLine2: \"").append(this.itemNetworkSignTooFarMsgLine2).append("\"\n");
+        content.append("itemNetworkSignTooFarMsgLine3: \"").append(this.itemNetworkSignTooFarMsgLine3).append("\"\n\n");
 
         // ##################
         // ## Misc options ##
@@ -472,17 +472,17 @@ public class Config extends AbstractConfig<NGeneral> {
         frame.addLine("Misc options", FrameBuilder.Option.CENTER);
         content.append('\n');
         for (final String line : frame.build()) {
-            content.append(line + '\n');
+            content.append(line).append('\n');
         }
         content.append('\n');
 
         // Broadcast on AFK
         content.append("# Defines if we broadcast a message when a player changes his AFK state\n");
-        content.append("broadCastOnAfk: " + this.hasBroadCastOnAfk() + "\n\n");
+        content.append("broadCastOnAfk: ").append(this.hasBroadCastOnAfk()).append("\n\n");
 
         // Broadcast on BUSY
         content.append("# Defines if we broadcast a message when a player changes his BUSY state\n");
-        content.append("broadCastOnBusy: " + this.hasBroadCastOnBusy() + "\n\n");
+        content.append("broadCastOnBusy: ").append(this.hasBroadCastOnBusy()).append("\n\n");
 
         return content.toString();
     }

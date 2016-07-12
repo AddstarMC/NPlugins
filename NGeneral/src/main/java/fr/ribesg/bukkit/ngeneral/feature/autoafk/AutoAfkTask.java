@@ -43,13 +43,9 @@ public class AutoAfkTask extends BukkitRunnable {
                     final String playerListName = player.getPlayerListName();
                     if (playerName.startsWith(playerListName)) {
                         // Not BUSY, not already AFK
-                        Bukkit.getScheduler().callSyncMethod(this.feature.getPlugin(), new Callable() {
-
-                            @Override
-                            public Object call() throws Exception {
-                                fr.ribesg.bukkit.ngeneral.feature.autoafk.AutoAfkTask.this.feature.setAfk(playerName, true, null);
-                                return null;
-                            }
+                        Bukkit.getScheduler().callSyncMethod(this.feature.getPlugin(), (Callable) () -> {
+                            AutoAfkTask.this.feature.setAfk(playerName, true, null);
+                            return null;
                         });
                     }
                 }

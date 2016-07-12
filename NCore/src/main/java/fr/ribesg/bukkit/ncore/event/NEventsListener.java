@@ -35,13 +35,7 @@ public class NEventsListener implements Listener {
      */
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerJoin(final PlayerJoinEvent event) {
-        Bukkit.getScheduler().runTaskLater(this.plugin, new Runnable() {
-
-            @Override
-            public void run() {
-                Bukkit.getPluginManager().callEvent(new PlayerJoinedEvent(event.getPlayer()));
-            }
-        }, 1L);
+        Bukkit.getScheduler().runTaskLater(this.plugin, () -> Bukkit.getPluginManager().callEvent(new PlayerJoinedEvent(event.getPlayer())), 1L);
     }
 
     /**

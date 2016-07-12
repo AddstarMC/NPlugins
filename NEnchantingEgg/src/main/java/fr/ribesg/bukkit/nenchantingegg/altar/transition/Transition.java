@@ -78,23 +78,15 @@ public abstract class Transition {
                 altar.setPreviousState(altar.getState());
                 altar.setState(AltarState.IN_TRANSITION);
                 for (final Entry<Integer, Set<Step>> e : this.stepsPerDelay.entrySet()) {
-                    Bukkit.getScheduler().runTaskLater(this.plugin, new Runnable() {
-
-                        @Override
-                        public void run() {
-                            for (final Step step : e.getValue()) {
-                                step.doStep(altar);
-                            }
+                    Bukkit.getScheduler().runTaskLater(this.plugin, () -> {
+                        for (final Step step : e.getValue()) {
+                            step.doStep(altar);
                         }
                     }, e.getKey());
                 }
-                Bukkit.getScheduler().runTaskLater(this.plugin, new Runnable() {
-
-                    @Override
-                    public void run() {
-                        altar.setState(fr.ribesg.bukkit.nenchantingegg.altar.transition.Transition.this.toState);
-                        fr.ribesg.bukkit.nenchantingegg.altar.transition.Transition.this.afterTransition(altar);
-                    }
+                Bukkit.getScheduler().runTaskLater(this.plugin, () -> {
+                    altar.setState(Transition.this.toState);
+                    Transition.this.afterTransition(altar);
                 }, this.maxDelay + 1);
             }
         }

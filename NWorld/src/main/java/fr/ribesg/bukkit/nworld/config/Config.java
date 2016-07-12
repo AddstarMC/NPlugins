@@ -510,7 +510,7 @@ public class Config extends AbstractConfig<NWorld> {
         frame.addLine("If you don't understand something, please ask on dev.bukkit.org");
         frame.addLine("Ribesg", FrameBuilder.Option.RIGHT);
         for (final String line : frame.build()) {
-            content.append(line + '\n');
+            content.append(line).append('\n');
         }
         content.append('\n');
 
@@ -522,7 +522,7 @@ public class Config extends AbstractConfig<NWorld> {
         frame.addLine("General", FrameBuilder.Option.CENTER);
         content.append('\n');
         for (final String line : frame.build()) {
-            content.append(line + '\n');
+            content.append(line).append('\n');
         }
         content.append('\n');
 
@@ -531,19 +531,19 @@ public class Config extends AbstractConfig<NWorld> {
         content.append("# - 0 = Teleports the player to the current world's spawn point\n");
         content.append("# - 1 = Teleports the player to a \"Global\" spawn point\n");
         content.append("# Default : 1\n");
-        content.append("spawnCommandBehaviour: " + this.spawnCommandBehaviour + "\n\n");
+        content.append("spawnCommandBehaviour: ").append(this.spawnCommandBehaviour).append("\n\n");
 
         // Default required permission
         content.append("# The default permission required to warp to a point, set if\n");
         content.append("# not provided in \"/nworld create\" or \"/setwarp\" commands\n");
         content.append("# Default : group.admin\n");
-        content.append("defaultRequiredPermission: \"" + this.defaultRequiredPermission + "\"\n\n");
+        content.append("defaultRequiredPermission: \"").append(this.defaultRequiredPermission).append("\"\n\n");
 
         // Default hidden value
         content.append("# The default value for any new World or Warp created, set if\n");
         content.append("# not provided in \"/nworld create\" or \"/setwarp\" commands\n");
         content.append("# Default : true\n");
-        content.append("defaultHidden: " + this.defaultHidden + "\n\n");
+        content.append("defaultHidden: ").append(this.defaultHidden).append("\n\n");
 
         // Permission shortcuts
         content.append("# You can use those shortcuts when setting a required Permission\n");
@@ -557,7 +557,7 @@ public class Config extends AbstractConfig<NWorld> {
             content.append("  admin: \"group.admin\"\n");
         }
         for (final Map.Entry<String, String> e : this.permissionShortcuts.entrySet()) {
-            content.append("  " + e.getKey() + ": \"" + e.getValue() + "\"\n");
+            content.append("  ").append(e.getKey()).append(": \"").append(e.getValue()).append("\"\n");
         }
 
         // ##############
@@ -568,24 +568,24 @@ public class Config extends AbstractConfig<NWorld> {
         frame.addLine("Messages", FrameBuilder.Option.CENTER);
         content.append('\n');
         for (final String line : frame.build()) {
-            content.append(line + '\n');
+            content.append(line).append('\n');
         }
         content.append('\n');
 
         // Broadcast on world creation
         content.append("# Do we broadcast a message on World creation. Possible values: 0,1\n");
         content.append("# Default : 0\n");
-        content.append("broadcastOnWorldCreate: " + this.broadcastOnWorldCreate + "\n\n");
+        content.append("broadcastOnWorldCreate: ").append(this.broadcastOnWorldCreate).append("\n\n");
 
         // Broadcast on world load
         content.append("# Do we broadcast a message on World load. Possible values: 0,1\n");
         content.append("# Default : 0\n");
-        content.append("broadcastOnWorldLoad: " + this.broadcastOnWorldLoad + "\n\n");
+        content.append("broadcastOnWorldLoad: ").append(this.broadcastOnWorldLoad).append("\n\n");
 
         // Broadcast on world unload
         content.append("# Do we broadcast a message on World unload. Possible values: 0,1\n");
         content.append("# Default : 0\n");
-        content.append("broadcastOnWorldUnload: " + this.broadcastOnWorldUnload + "\n\n");
+        content.append("broadcastOnWorldUnload: ").append(this.broadcastOnWorldUnload).append("\n\n");
 
         // ############
         // ## Worlds ##
@@ -595,7 +595,7 @@ public class Config extends AbstractConfig<NWorld> {
         frame.addLine("Worlds", FrameBuilder.Option.CENTER);
         content.append('\n');
         for (final String line : frame.build()) {
-            content.append(line + '\n');
+            content.append(line).append('\n');
         }
         content.append('\n');
 
@@ -605,15 +605,15 @@ public class Config extends AbstractConfig<NWorld> {
         content.append("# - If this world will be hidden to those that are not allowed to directly warp to it\n");
         content.append("stockWorlds:\n");
         for (final StockWorld w : this.worlds.getStock().values()) {
-            content.append("  \"" + w.getWorldName() + "\":\n");
+            content.append("  \"").append(w.getWorldName()).append("\":\n");
             content.append("    spawnLocation:\n");
-            content.append("      x: " + w.getSpawnLocation().getX() + '\n');
-            content.append("      y: " + w.getSpawnLocation().getY() + '\n');
-            content.append("      z: " + w.getSpawnLocation().getZ() + '\n');
-            content.append("      yaw: " + w.getSpawnLocation().getYaw() + '\n');
-            content.append("      pitch: " + w.getSpawnLocation().getPitch() + '\n');
-            content.append("    requiredPermission: \"" + w.getRequiredPermission() + "\"\n");
-            content.append("    hidden: " + w.isHidden() + '\n');
+            content.append("      x: ").append(w.getSpawnLocation().getX()).append('\n');
+            content.append("      y: ").append(w.getSpawnLocation().getY()).append('\n');
+            content.append("      z: ").append(w.getSpawnLocation().getZ()).append('\n');
+            content.append("      yaw: ").append(w.getSpawnLocation().getYaw()).append('\n');
+            content.append("      pitch: ").append(w.getSpawnLocation().getPitch()).append('\n');
+            content.append("    requiredPermission: \"").append(w.getRequiredPermission()).append("\"\n");
+            content.append("    hidden: ").append(w.isHidden()).append('\n');
         }
         content.append('\n');
 
@@ -628,39 +628,39 @@ public class Config extends AbstractConfig<NWorld> {
         content.append("# - If this world has an associated End world, and the associated parameters\n");
         content.append("additionalWorlds:\n");
         for (final AdditionalWorld w : this.worlds.getAdditional().values()) {
-            content.append("  \"" + w.getWorldName() + "\":\n");
+            content.append("  \"").append(w.getWorldName()).append("\":\n");
             content.append("    spawnLocation:\n");
-            content.append("      x: " + w.getSpawnLocation().getX() + '\n');
-            content.append("      y: " + w.getSpawnLocation().getY() + '\n');
-            content.append("      z: " + w.getSpawnLocation().getZ() + '\n');
-            content.append("      yaw: " + w.getSpawnLocation().getYaw() + '\n');
-            content.append("      pitch: " + w.getSpawnLocation().getPitch() + '\n');
-            content.append("    seed: " + w.getSeed() + '\n');
-            content.append("    requiredPermission: \"" + w.getRequiredPermission() + "\"\n");
-            content.append("    enabled: " + w.isEnabled() + '\n');
-            content.append("    hidden: " + w.isHidden() + '\n');
-            content.append("    hasNether: " + w.hasNether() + '\n');
+            content.append("      x: ").append(w.getSpawnLocation().getX()).append('\n');
+            content.append("      y: ").append(w.getSpawnLocation().getY()).append('\n');
+            content.append("      z: ").append(w.getSpawnLocation().getZ()).append('\n');
+            content.append("      yaw: ").append(w.getSpawnLocation().getYaw()).append('\n');
+            content.append("      pitch: ").append(w.getSpawnLocation().getPitch()).append('\n');
+            content.append("    seed: ").append(w.getSeed()).append('\n');
+            content.append("    requiredPermission: \"").append(w.getRequiredPermission()).append("\"\n");
+            content.append("    enabled: ").append(w.isEnabled()).append('\n');
+            content.append("    hidden: ").append(w.isHidden()).append('\n');
+            content.append("    hasNether: ").append(w.hasNether()).append('\n');
             content.append("    netherWorld: # Ignore this category if this world has no Nether sub-world\n");
             content.append("      spawnLocation:\n");
-            content.append("        x: " + w.getSpawnLocation().getX() + '\n');
-            content.append("        y: " + w.getSpawnLocation().getY() + '\n');
-            content.append("        z: " + w.getSpawnLocation().getZ() + '\n');
-            content.append("        yaw: " + w.getSpawnLocation().getYaw() + '\n');
-            content.append("        pitch: " + w.getSpawnLocation().getPitch() + '\n');
-            content.append("      requiredPermission: \"" + w.getRequiredPermission() + "\"\n");
-            content.append("      enabled: " + w.isEnabled() + '\n');
-            content.append("      hidden: " + w.isHidden() + '\n');
-            content.append("    hasEnd: " + w.hasEnd() + '\n');
+            content.append("        x: ").append(w.getSpawnLocation().getX()).append('\n');
+            content.append("        y: ").append(w.getSpawnLocation().getY()).append('\n');
+            content.append("        z: ").append(w.getSpawnLocation().getZ()).append('\n');
+            content.append("        yaw: ").append(w.getSpawnLocation().getYaw()).append('\n');
+            content.append("        pitch: ").append(w.getSpawnLocation().getPitch()).append('\n');
+            content.append("      requiredPermission: \"").append(w.getRequiredPermission()).append("\"\n");
+            content.append("      enabled: ").append(w.isEnabled()).append('\n');
+            content.append("      hidden: ").append(w.isHidden()).append('\n');
+            content.append("    hasEnd: ").append(w.hasEnd()).append('\n');
             content.append("    endWorld: # Ignore this category if this world has no End sub-world\n");
             content.append("      spawnLocation:\n");
-            content.append("        x: " + w.getSpawnLocation().getX() + '\n');
-            content.append("        y: " + w.getSpawnLocation().getY() + '\n');
-            content.append("        z: " + w.getSpawnLocation().getZ() + '\n');
-            content.append("        yaw: " + w.getSpawnLocation().getYaw() + '\n');
-            content.append("        pitch: " + w.getSpawnLocation().getPitch() + '\n');
-            content.append("      requiredPermission: \"" + w.getRequiredPermission() + "\"\n");
-            content.append("      enabled: " + w.isEnabled() + '\n');
-            content.append("      hidden: " + w.isHidden() + '\n');
+            content.append("        x: ").append(w.getSpawnLocation().getX()).append('\n');
+            content.append("        y: ").append(w.getSpawnLocation().getY()).append('\n');
+            content.append("        z: ").append(w.getSpawnLocation().getZ()).append('\n');
+            content.append("        yaw: ").append(w.getSpawnLocation().getYaw()).append('\n');
+            content.append("        pitch: ").append(w.getSpawnLocation().getPitch()).append('\n');
+            content.append("      requiredPermission: \"").append(w.getRequiredPermission()).append("\"\n");
+            content.append("      enabled: ").append(w.isEnabled()).append('\n');
+            content.append("      hidden: ").append(w.isHidden()).append('\n');
         }
 
         // ###########
@@ -671,7 +671,7 @@ public class Config extends AbstractConfig<NWorld> {
         frame.addLine("Warps", FrameBuilder.Option.CENTER);
         content.append('\n');
         for (final String line : frame.build()) {
-            content.append(line + '\n');
+            content.append(line).append('\n');
         }
         content.append('\n');
 
@@ -681,16 +681,16 @@ public class Config extends AbstractConfig<NWorld> {
         content.append("# - If it is hidden to those who do not have the required permission\n");
         content.append("warps:\n");
         for (final Warp w : this.warps) {
-            content.append("  \"" + w.getName() + "\":\n");
+            content.append("  \"").append(w.getName()).append("\":\n");
             content.append("    location:\n");
-            content.append("      worldName: " + w.getLocation().getWorldName() + '\n');
-            content.append("      x: " + w.getLocation().getX() + '\n');
-            content.append("      y: " + w.getLocation().getY() + '\n');
-            content.append("      z: " + w.getLocation().getZ() + '\n');
-            content.append("      yaw: " + w.getLocation().getYaw() + '\n');
-            content.append("      pitch: " + w.getLocation().getPitch() + '\n');
-            content.append("    requiredPermission: \"" + w.getRequiredPermission() + "\"\n");
-            content.append("    hidden: " + w.isHidden() + '\n');
+            content.append("      worldName: ").append(w.getLocation().getWorldName()).append('\n');
+            content.append("      x: ").append(w.getLocation().getX()).append('\n');
+            content.append("      y: ").append(w.getLocation().getY()).append('\n');
+            content.append("      z: ").append(w.getLocation().getZ()).append('\n');
+            content.append("      yaw: ").append(w.getLocation().getYaw()).append('\n');
+            content.append("      pitch: ").append(w.getLocation().getPitch()).append('\n');
+            content.append("    requiredPermission: \"").append(w.getRequiredPermission()).append("\"\n");
+            content.append("    hidden: ").append(w.isHidden()).append('\n');
         }
 
         return content.toString();

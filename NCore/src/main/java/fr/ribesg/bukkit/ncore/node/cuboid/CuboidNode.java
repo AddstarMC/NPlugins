@@ -33,7 +33,7 @@ public interface CuboidNode extends Node, InfoCommandHandler {
      *
      * @return true if the Player is jailed, false otherwise
      */
-    public boolean isJailed(final UUID id);
+    boolean isJailed(final UUID id);
 
     /**
      * Jails the Player if he's not jailed and if the provided jail name
@@ -44,7 +44,7 @@ public interface CuboidNode extends Node, InfoCommandHandler {
      *
      * @return true if the Player can be, and is now considered, jailed
      */
-    public boolean jail(final UUID id, final String jailName);
+    boolean jail(final UUID id, final String jailName);
 
     /**
      * Unjails a Player
@@ -53,14 +53,14 @@ public interface CuboidNode extends Node, InfoCommandHandler {
      *
      * @return true if the Player was jailed
      */
-    public boolean unJail(final UUID id);
+    boolean unJail(final UUID id);
 
     /**
      * Gets a set of all existing jails.
      *
      * @return a set of all existing jails
      */
-    public Set<String> getJailsSet();
+    Set<String> getJailsSet();
 
     /**
      * Gets the Location of a Jail.
@@ -69,7 +69,7 @@ public interface CuboidNode extends Node, InfoCommandHandler {
      *
      * @return the Location of the jail, or null if it does not exist
      */
-    public NLocation getJailLocation(final String jailName);
+    NLocation getJailLocation(final String jailName);
 
     /**
      * Checks if a Player is in a Region with INVISIBLE Flag.
@@ -79,5 +79,5 @@ public interface CuboidNode extends Node, InfoCommandHandler {
      * @return true if the Player is in a Region with INVISIBLE Flag,
      * false otherwise
      */
-    public boolean isInInvisibleRegion(final Player player);
+    boolean isInInvisibleRegion(final Player player);
 }

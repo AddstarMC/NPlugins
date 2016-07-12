@@ -161,12 +161,12 @@ public abstract class AbstractMessages {
         content.append('\n');
 
         for (final Message m : this.messagesMap.values()) {
-            content.append("# Default value    : " + m.getDefaultMessage() + '\n');
-            content.append("# Default useHeader: " + m.defaultUseHeader() + '\n');
-            content.append("# Awaited arguments: " + m.getAwaitedArgsString() + '\n');
-            content.append(m.getId().name() + ":\n");
-            content.append("  value: \"" + (m.getConfigMessage() != null ? m.getConfigMessage() : m.getDefaultMessage()) + "\"\n");
-            content.append("  useHeader: " + m.useHeader() + "\n\n");
+            content.append("# Default value    : ").append(m.getDefaultMessage()).append('\n');
+            content.append("# Default useHeader: ").append(m.defaultUseHeader()).append('\n');
+            content.append("# Awaited arguments: ").append(m.getAwaitedArgsString()).append('\n');
+            content.append(m.getId().name()).append(":\n");
+            content.append("  value: \"").append(m.getConfigMessage() != null ? m.getConfigMessage() : m.getDefaultMessage()).append("\"\n");
+            content.append("  useHeader: ").append(m.useHeader()).append("\n\n");
         }
         return content.toString();
     }

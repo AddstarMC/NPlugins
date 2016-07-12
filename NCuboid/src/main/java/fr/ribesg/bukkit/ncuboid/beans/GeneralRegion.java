@@ -20,7 +20,7 @@ import org.bukkit.util.Vector;
 
 public abstract class GeneralRegion extends Region implements Comparable<GeneralRegion> {
 
-    public static enum RegionType {
+    public enum RegionType {
         // Cuboid Region
         CUBOID,
 

@@ -147,7 +147,7 @@ public class Config extends AbstractConfig<NCore> {
         frame.addLine("If you don't understand something, please ask on dev.bukkit.org");
         frame.addLine("Ribesg", FrameBuilder.Option.RIGHT);
         for (final String line : frame.build()) {
-            content.append(line + '\n');
+            content.append(line).append('\n');
         }
 
         // updateCheck. Default: true
@@ -156,7 +156,7 @@ public class Config extends AbstractConfig<NCore> {
         content.append("# - Automatic check for updates\n");
         content.append("# - The whole /updater command\n");
         content.append("# - File download\n");
-        content.append("updateCheck: " + this.updateCheck + "\n\n");
+        content.append("updateCheck: ").append(this.updateCheck).append("\n\n");
 
         // updateCheckInterval: Default: 43200
         content.append("# Interval between Update check, in seconds. Default : 43200\n");
@@ -178,14 +178,14 @@ public class Config extends AbstractConfig<NCore> {
         content.append("# Note: This is not persistent through restarts.\n");
         content.append("# Note: Values below 15 minutes are useless because of an internal cache.\n");
         content.append("#\n");
-        content.append("updateCheckInterval: " + this.updateCheckInterval + "\n\n");
+        content.append("updateCheckInterval: ").append(this.updateCheckInterval).append("\n\n");
 
         // checkFor. Default: NCore, NCuboid, NEnchantingEgg, NGeneral, NPlayer, NTalk, NTheEndAgain, NWorld
         content.append("# Enable update check for each specific node. Default: all nodes\n");
         content.append("# Note: Will not consider unknown plugins nor unused nodes.\n");
         content.append("checkFor:\n");
         for (final String pluginName : this.checkFor) {
-            content.append("- " + pluginName + '\n');
+            content.append("- ").append(pluginName).append('\n');
         }
         content.append('\n');
 
@@ -199,7 +199,7 @@ public class Config extends AbstractConfig<NCore> {
         content.append("#\n");
         content.append("# Note: Generate a key from https://dev.bukkit.org/home/servermods-apikey/\n");
         content.append("#       You must be logged in.\n");
-        content.append("apiKey: " + this.apiKey + "\n\n");
+        content.append("apiKey: ").append(this.apiKey).append("\n\n");
 
         // proxyAddress. Default: empty
         content.append("# Proxy informations for the Updater. Default: empty\n");
@@ -207,35 +207,35 @@ public class Config extends AbstractConfig<NCore> {
             content.append("proxyHost: \"\"\n");
             content.append("proxyPort: \"\"\n");
         } else {
-            content.append("proxyHost: \"" + this.proxyAddress.getHostName() + "\"\n");
-            content.append("proxyPort: " + this.proxyAddress.getPort() + '\n');
+            content.append("proxyHost: \"").append(this.proxyAddress.getHostName()).append("\"\n");
+            content.append("proxyPort: ").append(this.proxyAddress.getPort()).append('\n');
         }
         content.append('\n');
 
         // translatableUnits
         content.append("# Here you can translate what's written in every plugin when\n");
         content.append("# a duration is printed.\n");
-        content.append("second: " + this.second + '\n');
-        content.append("seconds: " + this.seconds + '\n');
-        content.append("minute: " + this.minute + '\n');
-        content.append("minutes: " + this.minutes + '\n');
-        content.append("hour: " + this.hour + '\n');
-        content.append("hours: " + this.hours + '\n');
-        content.append("day: " + this.day + '\n');
-        content.append("days: " + this.days + '\n');
-        content.append("week: " + this.week + '\n');
-        content.append("weeks: " + this.weeks + '\n');
-        content.append("month: " + this.month + '\n');
-        content.append("months: " + this.months + '\n');
-        content.append("year: " + this.year + '\n');
-        content.append("years: " + this.years + '\n');
+        content.append("second: ").append(this.second).append('\n');
+        content.append("seconds: ").append(this.seconds).append('\n');
+        content.append("minute: ").append(this.minute).append('\n');
+        content.append("minutes: ").append(this.minutes).append('\n');
+        content.append("hour: ").append(this.hour).append('\n');
+        content.append("hours: ").append(this.hours).append('\n');
+        content.append("day: ").append(this.day).append('\n');
+        content.append("days: ").append(this.days).append('\n');
+        content.append("week: ").append(this.week).append('\n');
+        content.append("weeks: ").append(this.weeks).append('\n');
+        content.append("month: ").append(this.month).append('\n');
+        content.append("months: ").append(this.months).append('\n');
+        content.append("year: ").append(this.year).append('\n');
+        content.append("years: ").append(this.years).append('\n');
         content.append('\n');
 
         // debugEnabled. Default: empty
         content.append("# Enables debug mode for each specific node. Default: empty\n");
         content.append("debugEnabled:\n");
         for (final String debugged : this.debugEnabled) {
-            content.append("- " + debugged + '\n');
+            content.append("- ").append(debugged).append('\n');
         }
 
         return content.toString();

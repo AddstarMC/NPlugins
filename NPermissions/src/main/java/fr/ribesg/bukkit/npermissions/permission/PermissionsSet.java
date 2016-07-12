@@ -172,7 +172,7 @@ public abstract class PermissionsSet {
      * browse through dependency of this PermissionsSet.
      */
     public void computePermissions() {
-        this.computedPermissions = this.computePermissions(new HashMap<String, Boolean>());
+        this.computedPermissions = this.computePermissions(new HashMap<>());
     }
 
     /**

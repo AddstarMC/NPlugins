@@ -367,13 +367,7 @@ public class PlayerCommandHandler implements CommandExecutor, Listener {
                     } else {
                         this.plugin.sendMessage(player, MessageId.player_teleportingToUserHome, realUserName);
                         dest.getChunk().load(true);
-                        this.plugin.getServer().getScheduler().runTask(this.plugin, new Runnable() {
-
-                            @Override
-                            public void run() {
-                                player.teleport(dest);
-                            }
-                        });
+                        this.plugin.getServer().getScheduler().runTask(this.plugin, () -> player.teleport(dest));
                     }
                 }
             }
@@ -389,13 +383,7 @@ public class PlayerCommandHandler implements CommandExecutor, Listener {
                 } else {
                     this.plugin.sendMessage(player, MessageId.player_teleportingToYourHome);
                     dest.getChunk().load(true);
-                    this.plugin.getServer().getScheduler().runTask(this.plugin, new Runnable() {
-
-                        @Override
-                        public void run() {
-                            player.teleport(dest);
-                        }
-                    });
+                    this.plugin.getServer().getScheduler().runTask(this.plugin, () -> player.teleport(dest));
                 }
             }
         }

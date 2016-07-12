@@ -121,8 +121,10 @@ public class ItemMetaUtil {
      * @param nameString        the DisplayName String
      * @param loreString        the Lore String representation
      * @param specialMetaString the Special Meta part String representation
+     * @param separators        A String[] of seperators
      *
      * @return the same ItemMeta, completed
+     * @throws InventoryUtilException if the ItemMeta cannot be retrieved
      */
     public static ItemMeta fromString(final ItemMeta meta, final String nameString, final String loreString, final String specialMetaString, final String[] separators) throws InventoryUtilException {
         if (meta instanceof BookMeta) {

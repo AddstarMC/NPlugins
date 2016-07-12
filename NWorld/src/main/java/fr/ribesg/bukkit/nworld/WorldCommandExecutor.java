@@ -162,13 +162,7 @@ public class WorldCommandExecutor implements CommandExecutor {
             if (Perms.has(player, world.getRequiredPermission()) || Perms.hasWorldWarpAll(player)) {
                 final Location loc = world.getSpawnLocation().toBukkitLocation();
                 loc.getChunk().load();
-                Bukkit.getScheduler().runTaskLater(this.plugin, new Runnable() {
-
-                    @Override
-                    public void run() {
-                        player.teleport(loc);
-                    }
-                }, 1L);
+                Bukkit.getScheduler().runTaskLater(this.plugin, () -> player.teleport(loc), 1L);
                 this.plugin.sendMessage(sender, MessageId.world_teleportedToWorld, world.getWorldName());
                 return true;
             } else if (!world.isHidden()) {
@@ -605,12 +599,12 @@ public class WorldCommandExecutor implements CommandExecutor {
                     final boolean hasPermission = Perms.has(sender, warp.getRequiredPermission()) || Perms.hasWarpAll(sender);
                     if (hasPermission) {
                         if (warp.isHidden()) {
-                            builder.append(ChatColor.GRAY + ", " + ChatColor.DARK_GREEN + warp.getName());
+                            builder.append(ChatColor.GRAY + ", " + ChatColor.DARK_GREEN).append(warp.getName());
                         } else {
-                            builder.append(ChatColor.GRAY + ", " + ChatColor.GREEN + warp.getName());
+                            builder.append(ChatColor.GRAY + ", " + ChatColor.GREEN).append(warp.getName());
                         }
                     } else if (!warp.isHidden()) {
-                        builder.append(ChatColor.GRAY + ", " + ChatColor.RED + warp.getName());
+                        builder.append(ChatColor.GRAY + ", " + ChatColor.RED).append(warp.getName());
                     }
                 }
             }
@@ -658,13 +652,7 @@ public class WorldCommandExecutor implements CommandExecutor {
                     this.plugin.sendMessage(sender, MessageId.world_warpUnloadedWorld, warp.getLocation().getWorldName(), warp.getName());
                 } else {
                     loc.getChunk().load();
-                    Bukkit.getScheduler().runTaskLater(this.plugin, new Runnable() {
-
-                        @Override
-                        public void run() {
-                            player.teleport(loc);
-                        }
-                    }, 1L);
+                    Bukkit.getScheduler().runTaskLater(this.plugin, () -> player.teleport(loc), 1L);
                     this.plugin.sendMessage(sender, MessageId.world_teleportedToWarp, warp.getName());
                 }
                 return true;

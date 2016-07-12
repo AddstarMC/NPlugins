@@ -12,11 +12,8 @@ package fr.ribesg.bukkit.ncore.util;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import org.bukkit.Bukkit;
 
 /**
  * This class is a tool to build Framed text for nice output, in configs

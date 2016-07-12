@@ -167,37 +167,29 @@ public class Updater {
     }
 
     public void checkForUpdates(@Nullable final CommandSender sender, @Nullable final String nodeName) {
-        Bukkit.getScheduler().runTaskAsynchronously(this.plugin, new Runnable() {
-
-            @Override
-            public void run() {
-                for (final JavaPlugin plugin : fr.ribesg.bukkit.ncore.updater.Updater.this.plugins.values()) {
-                    if (plugin != null && (nodeName == null || plugin.getName().equalsIgnoreCase(nodeName)) && VersionUtil.isRelease('v' + plugin.getDescription().getVersion())) {
-                        final String version = VersionUtil.getVersion('v' + plugin.getDescription().getVersion());
-                        Boolean result = null;
-                        FileDescription latestFile = null;
-                        try {
-                            if (!fr.ribesg.bukkit.ncore.updater.Updater.this.isUpToDate(plugin.getName(), version)) {
-                                latestFile = fr.ribesg.bukkit.ncore.updater.Updater.this.getLatestVersion(plugin.getName());
-                                result = false;
-                            } else {
-                                result = true;
-                            }
-                        } catch (final IOException e) {
-                            plugin.getLogger().log(Level.SEVERE, "Failed to check for update for node " + plugin.getName() + ": " + e.getMessage());
+        Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> {
+            for (final JavaPlugin plugin1 : Updater.this.plugins.values()) {
+                if (plugin1 != null && (nodeName == null || plugin1.getName().equalsIgnoreCase(nodeName)) && VersionUtil.isRelease('v' + plugin1.getDescription().getVersion())) {
+                    final String version = VersionUtil.getVersion('v' + plugin1.getDescription().getVersion());
+                    Boolean result = null;
+                    FileDescription latestFile = null;
+                    try {
+                        if (!Updater.this.isUpToDate(plugin1.getName(), version)) {
+                            latestFile = Updater.this.getLatestVersion(plugin1.getName());
+                            result = false;
+                        } else {
+                            result = true;
                         }
-
-                        final Boolean finalResult = result;
-                        final FileDescription finalLatestFile = latestFile;
-                        Bukkit.getScheduler().callSyncMethod(plugin, new Callable<Object>() {
-
-                            @Override
-                            public Object call() throws Exception {
-                                fr.ribesg.bukkit.ncore.updater.Updater.this.checkedForUpdates(sender == null ? Bukkit.getConsoleSender() : sender, plugin, finalResult, finalLatestFile);
-                                return null;
-                            }
-                        });
+                    } catch (final IOException e) {
+                        plugin1.getLogger().log(Level.SEVERE, "Failed to check for update for node " + plugin1.getName() + ": " + e.getMessage());
                     }
+
+                    final Boolean finalResult = result;
+                    final FileDescription finalLatestFile = latestFile;
+                    Bukkit.getScheduler().callSyncMethod(plugin1, () -> {
+                        Updater.this.checkedForUpdates(sender == null ? Bukkit.getConsoleSender() : sender, plugin1, finalResult, finalLatestFile);
+                        return null;
+                    });
                 }
             }
         });

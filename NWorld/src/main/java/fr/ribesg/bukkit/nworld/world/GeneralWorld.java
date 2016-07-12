@@ -166,13 +166,7 @@ public abstract class GeneralWorld implements Comparable<GeneralWorld> {
         }
 
         // Unload the world
-        Bukkit.getScheduler().runTaskLater(this.plugin, new Runnable() {
-
-            @Override
-            public void run() {
-                Bukkit.unloadWorld(fr.ribesg.bukkit.nworld.world.GeneralWorld.this.getWorldName(), true);
-            }
-        }, 1L);
+        Bukkit.getScheduler().runTaskLater(this.plugin, () -> Bukkit.unloadWorld(GeneralWorld.this.getWorldName(), true), 1L);
 
         this.setEnabled(false);
     }

@@ -20,5 +20,5 @@ public interface InfoCommandHandler {
      * @param query      the query of the info command
      * @param infoObject the Info object
      */
-    public void populateInfo(final CommandSender sender, final String query, final Info infoObject);
+    void populateInfo(final CommandSender sender, final String query, final Info infoObject);
 }

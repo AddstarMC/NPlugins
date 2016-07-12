@@ -25,13 +25,7 @@ public class EnchantmentUtil {
     /**
      * A comparator to sort Enchantments by name
      */
-    static final Comparator<Enchantment> ENCHANTMENT_COMPARATOR = new Comparator<Enchantment>() {
-
-        @Override
-        public int compare(final Enchantment a, final Enchantment b) {
-            return a.getName().compareTo(b.getName());
-        }
-    };
+    static final Comparator<Enchantment> ENCHANTMENT_COMPARATOR = (a, b) -> a.getName().compareTo(b.getName());
 
     /**
      * Creates a String representing this ItemStack's enchantments.

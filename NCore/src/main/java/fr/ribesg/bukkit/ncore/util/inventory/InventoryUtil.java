@@ -35,21 +35,17 @@ public class InventoryUtil {
 
     private static Comparator<ItemStack> getComparator() {
         if (comparator == null) {
-            comparator = new Comparator<ItemStack>() {
-
-                @Override
-                public int compare(final ItemStack o1, final ItemStack o2) {
-                    if (o2 == null) {
-                        return -1;
-                    } else if (o1 == null) {
-                        return 1;
+            comparator = (o1, o2) -> {
+                if (o2 == null) {
+                    return -1;
+                } else if (o1 == null) {
+                    return 1;
+                } else {
+                    final int compareIds = Integer.compare(o1.getTypeId(), o2.getTypeId());
+                    if (compareIds != 0) {
+                        return compareIds;
                     } else {
-                        final int compareIds = Integer.compare(o1.getTypeId(), o2.getTypeId());
-                        if (compareIds != 0) {
-                            return compareIds;
-                        } else {
-                            return Short.compare(o1.getDurability(), o2.getDurability());
-                        }
+                        return Short.compare(o1.getDurability(), o2.getDurability());
                     }
                 }
             };

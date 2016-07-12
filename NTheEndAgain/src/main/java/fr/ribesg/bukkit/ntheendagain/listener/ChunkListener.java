@@ -17,7 +17,6 @@ import fr.ribesg.bukkit.ntheendagain.handler.EndWorldHandler;
 import fr.ribesg.bukkit.ntheendagain.world.EndChunk;
 import fr.ribesg.bukkit.ntheendagain.world.EndChunks;
 
-import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -161,14 +160,10 @@ public class ChunkListener implements Listener {
                         // this.plugin.debug(" ..... regenerate chunk now");
                         event.getWorld().regenerateChunk(x, z);
 
-                        Bukkit.getScheduler().runTaskLater(this.plugin, new Runnable() {
-
-                            @Override
-                            public void run() {
-                                // Note that .refreshChunk() is deprecated with explanation
-                                // "This method is not guaranteed to work suitably across all client implementations"
-                                event.getWorld().refreshChunk(x, z);
-                            }
+                        Bukkit.getScheduler().runTaskLater(this.plugin, () -> {
+                            // Note that .refreshChunk() is deprecated with explanation
+                            // "This method is not guaranteed to work suitably across all client implementations"
+                            event.getWorld().refreshChunk(x, z);
                         }, 100L);
 
                     }
@@ -210,7 +205,7 @@ public class ChunkListener implements Listener {
 
                                 // plugin.debug("onEndChunkLoad ... actual health is " + new DecimalFormat("#.##").format(ed.getHealth()));
 
-                                handler.getDragons().put(dragonId, new HashMap<String, Double>());
+                                handler.getDragons().put(dragonId, new HashMap<>());
                             }
                             handler.getLoadedDragons().add(dragonId);
 

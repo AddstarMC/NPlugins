@@ -32,7 +32,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.plugin.PluginManager;
 
-import org.mcstats.Metrics;
 
 /**
  * The main plugin class.
@@ -169,41 +168,6 @@ public class NWorld extends NPlugin implements WorldNode {
         this.setCommandExecutor("warp", executor);
         this.setCommandExecutor("setwarp", executor);
         this.setCommandExecutor("delwarp", executor);
-
-        // Metrics - Worlds
-        final Metrics.Graph g1 = this.getMetrics().createGraph("Amount of Worlds");
-        g1.addPlotter(new Metrics.Plotter("Normal") {
-
-            @Override
-            public int getValue() {
-                return fr.ribesg.bukkit.nworld.NWorld.this.getWorlds().sizeNormal();
-            }
-        });
-        g1.addPlotter(new Metrics.Plotter("Nether") {
-
-            @Override
-            public int getValue() {
-                return fr.ribesg.bukkit.nworld.NWorld.this.getWorlds().sizeNether();
-            }
-        });
-        g1.addPlotter(new Metrics.Plotter("End") {
-
-            @Override
-            public int getValue() {
-                return fr.ribesg.bukkit.nworld.NWorld.this.getWorlds().sizeEnd();
-            }
-        });
-
-        // Metrics - Warps
-        final Metrics.Graph g2 = this.getMetrics().createGraph("Amount of Warps");
-        g2.addPlotter(new Metrics.Plotter() {
-
-            @Override
-            public int getValue() {
-                return fr.ribesg.bukkit.nworld.NWorld.this.getWarps().size();
-            }
-        });
-
         return true;
     }
 

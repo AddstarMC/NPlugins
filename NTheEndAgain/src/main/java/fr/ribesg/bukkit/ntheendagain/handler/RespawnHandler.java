@@ -63,13 +63,7 @@ public class RespawnHandler {
         Config config = this.worldHandler.getConfig();
         int randomRespawnTimeSec = config.getRandomRespawnTimeSeconds();
 
-        Bukkit.getScheduler().runTaskLater(this.worldHandler.getPlugin(), new Runnable() {
-
-            @Override
-            public void run() {
-                fr.ribesg.bukkit.ntheendagain.handler.RespawnHandler.this.respawn();
-            }
-        }, randomRespawnTimeSec * 20L);
+        Bukkit.getScheduler().runTaskLater(this.worldHandler.getPlugin(), () -> RespawnHandler.this.respawn(), randomRespawnTimeSec * 20L);
 
         config.updateNextExpectedRespawnTime(randomRespawnTimeSec);
 
@@ -144,22 +138,18 @@ public class RespawnHandler {
         }
         if (regenerated) {
             this.plugin.debug("At least one chunk has been regen'd, respawn later");
-            Bukkit.getScheduler().runTaskLater(this.worldHandler.getPlugin(), new Runnable() {
-
-                @Override
-                public void run() {
-                    if (world.spawnEntity(loc, EntityType.ENDER_DRAGON) == null) {
-                        fr.ribesg.bukkit.ntheendagain.handler.RespawnHandler.this.retryRespawn(loc);
-                    }
-                    Config config = fr.ribesg.bukkit.ntheendagain.handler.RespawnHandler.this.worldHandler.getConfig();
-
-                    long randomRespawnTimeSec = config.getRandomRespawnTimeSeconds();
-                    long nextRespawnNanoTime = System.nanoTime() + randomRespawnTimeSec * 1_000_000_000;
-                    config.setNextRespawnTaskTime(nextRespawnNanoTime);
-
-                    config.updateNextExpectedRespawnTime(randomRespawnTimeSec);
-
+            Bukkit.getScheduler().runTaskLater(this.worldHandler.getPlugin(), () -> {
+                if (world.spawnEntity(loc, EntityType.ENDER_DRAGON) == null) {
+                    RespawnHandler.this.retryRespawn(loc);
                 }
+                Config config = RespawnHandler.this.worldHandler.getConfig();
+
+                long randomRespawnTimeSec = config.getRandomRespawnTimeSeconds();
+                long nextRespawnNanoTime = System.nanoTime() + randomRespawnTimeSec * 1_000_000_000;
+                config.setNextRespawnTaskTime(nextRespawnNanoTime);
+
+                config.updateNextExpectedRespawnTime(randomRespawnTimeSec);
+
             }, EndWorldHandler.REGEN_TO_RESPAWN_DELAY);
         } else {
             this.plugin.debug("No chunk has been regen'd, respawn now");

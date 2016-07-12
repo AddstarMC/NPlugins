@@ -109,7 +109,7 @@ public class ChatFilter extends AbstractConfig<NTalk> {
         frame.addLine("If you don't understand something, please ask on dev.bukkit.org");
         frame.addLine("Ribesg", FrameBuilder.Option.RIGHT);
         for (final String line : frame.build()) {
-            content.append(line + '\n');
+            content.append(line).append('\n');
         }
 
         content.append("# You can define your filters here.\n");
@@ -169,12 +169,12 @@ public class ChatFilter extends AbstractConfig<NTalk> {
         content.append("filters:\n");
 
         for (final Filter filter : this.getAll()) {
-            content.append("  \"" + filter.getOutputString() + "\":\n");
+            content.append("  \"").append(filter.getOutputString()).append("\":\n");
             for (final Map.Entry<String, Object> e : filter.getConfigMap().entrySet()) {
                 if (e.getValue() instanceof String) {
-                    content.append("    " + e.getKey() + ": \"" + e.getValue().toString().replaceAll("\\\\", "\\\\\\\\") + "\"\n");
+                    content.append("    ").append(e.getKey()).append(": \"").append(e.getValue().toString().replaceAll("\\\\", "\\\\\\\\")).append("\"\n");
                 } else {
-                    content.append("    " + e.getKey() + ": " + e.getValue() + '\n');
+                    content.append("    ").append(e.getKey()).append(": ").append(e.getValue()).append('\n');
                 }
             }
         }

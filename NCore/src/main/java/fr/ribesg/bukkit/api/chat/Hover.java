@@ -234,6 +234,7 @@ public final class Hover implements ConfigurationSerializable {
      * @param map the map to convert to a Hover chat message part
      *
      * @see ConfigurationSerializable
+     * @return the Hover
      */
     public static Hover deserialize(final Map<String, Object> map) {
         final Object typeName = map.get("type");

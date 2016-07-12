@@ -25,7 +25,6 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
 import java.util.UUID;
-import java.util.logging.Level;
 
 /**
  * @author Ribesg

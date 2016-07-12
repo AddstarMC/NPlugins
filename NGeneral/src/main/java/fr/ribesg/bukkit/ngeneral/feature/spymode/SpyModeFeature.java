@@ -61,13 +61,7 @@ public class SpyModeFeature extends Feature {
         }
         Dynmap.hidePlayer(spy);
         if (spied != null) {
-            Bukkit.getScheduler().runTaskLater(this.getPlugin(), new Runnable() {
-
-                @Override
-                public void run() {
-                    spy.teleport(spied.getLocation());
-                }
-            }, 1L);
+            Bukkit.getScheduler().runTaskLater(this.getPlugin(), () -> spy.teleport(spied.getLocation()), 1L);
         }
     }
 
@@ -76,18 +70,14 @@ public class SpyModeFeature extends Feature {
         if (previousLocation != null) {
             spy.teleport(previousLocation.toBukkitLocation());
         }
-        Bukkit.getScheduler().runTaskLater(this.getPlugin(), new Runnable() {
-
-            @Override
-            public void run() {
-                final CuboidNode cuboid = fr.ribesg.bukkit.ngeneral.feature.spymode.SpyModeFeature.this.getPlugin().getCore().getCuboidNode();
-                if (cuboid == null || !cuboid.isInInvisibleRegion(spy)) {
-                    for (final Player other : Bukkit.getOnlinePlayers()) {
-                        other.showPlayer(spy);
-                    }
+        Bukkit.getScheduler().runTaskLater(this.getPlugin(), () -> {
+            final CuboidNode cuboid = SpyModeFeature.this.getPlugin().getCore().getCuboidNode();
+            if (cuboid == null || !cuboid.isInInvisibleRegion(spy)) {
+                for (final Player other : Bukkit.getOnlinePlayers()) {
+                    other.showPlayer(spy);
                 }
-                Dynmap.showPlayer(spy);
             }
+            Dynmap.showPlayer(spy);
         }, 1L);
     }
 }

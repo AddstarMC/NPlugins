@@ -61,7 +61,7 @@ public class UserDb {
 
     public List<User> getByIp(final String ip) {
         final List<User> res = this.usersPerIp.get(ip);
-        return res == null ? new ArrayList<User>() : res;
+        return res == null ? new ArrayList<>() : res;
     }
 
     public User newUser(final UUID userId, final String passwordHash, final String currentIp) {

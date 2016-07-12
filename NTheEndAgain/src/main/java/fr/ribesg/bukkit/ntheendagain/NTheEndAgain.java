@@ -9,7 +9,6 @@
 
 package fr.ribesg.bukkit.ntheendagain;
 
-import fr.ribesg.bukkit.ncore.lang.MessageId;
 import fr.ribesg.bukkit.ncore.node.NPlugin;
 import fr.ribesg.bukkit.ncore.node.theendagain.TheEndAgainNode;
 import fr.ribesg.bukkit.ntheendagain.handler.EndWorldHandler;
@@ -24,15 +23,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.util.HashMap;
-import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.InvalidConfigurationException;
-
-import org.mcstats.Metrics;
 
 public class NTheEndAgain extends NPlugin implements TheEndAgainNode {
 
@@ -52,8 +48,8 @@ public class NTheEndAgain extends NPlugin implements TheEndAgainNode {
 
 	/**
      * Reload the config
-     * @param sender
-     * @throws IOException
+     * @param sender The Sender
+     * @throws IOException if the config cant be loaded
      */
     protected void reloadConfig(final CommandSender sender) throws IOException {
         this.entering(this.getClass(), "reLoadConfig");
@@ -118,7 +114,7 @@ public class NTheEndAgain extends NPlugin implements TheEndAgainNode {
                                 "(changed from " + savedRespawnTimerMin + "-" + savedRespawnTimerMax +
                                 " seconds to " + updatedRespawnTimerMin + "-" + updatedRespawnTimerMax + " seconds)";
                         this.debug(msg);
-                        msgAddon.append('\n' + msg);
+                        msgAddon.append('\n').append(msg);
                     }
                     showDetails = true;
                 } else if (savedRegenTimer != updatedRegenTimer) {
@@ -126,7 +122,7 @@ public class NTheEndAgain extends NPlugin implements TheEndAgainNode {
                         msg = "Note: the new regen timer value will not take effect until after the next regen " +
                                 "(changed from " + savedRegenTimer + " to " + updatedRegenTimer + ")";
                         this.debug(msg);
-                        msgAddon.append('\n' + msg);
+                        msgAddon.append('\n').append(msg);
                     }
                     showDetails = true;
                 }
@@ -175,7 +171,7 @@ public class NTheEndAgain extends NPlugin implements TheEndAgainNode {
                         // Unknown mode
                         msg = "Unknown value for regenOuterEnd: " + updatedRegenOuterEnd;
                         this.error(msg);
-                        msgAddon.append('\n' + msg);
+                        msgAddon.append('\n').append(msg);
                         break;
                 }
 
@@ -193,7 +189,7 @@ public class NTheEndAgain extends NPlugin implements TheEndAgainNode {
 
 	/**
      * Show NTheEndAgain config values for each world of type THE_END
-     * @param sender
+     * @param sender the Commandsender
      */
     public void showStatus(final CommandSender sender) {
 
@@ -211,7 +207,7 @@ public class NTheEndAgain extends NPlugin implements TheEndAgainNode {
 
     /**
      * Show NTheEndAgain config values for each world of type THE_END
-     * @param sender
+     * @param sender the Commandsender
      * @param handler End world handler
      * @param msgAddon Additional text to append (assumed to start with \n)
      */
@@ -223,7 +219,7 @@ public class NTheEndAgain extends NPlugin implements TheEndAgainNode {
         this.debug("Config details for world " + config.getWorldName() + " (" + currentWorld.getEnvironment().toString() + ")");
 
         StringBuilder multiLineMsg = new StringBuilder();
-        multiLineMsg.append("Config for " + currentWorld.getName());
+        multiLineMsg.append("Config for ").append(currentWorld.getName());
 
         String msg;
 
@@ -269,7 +265,7 @@ public class NTheEndAgain extends NPlugin implements TheEndAgainNode {
         }
 
         this.debug(msg);
-        multiLineMsg.append('\n' + msg);
+        multiLineMsg.append('\n').append(msg);
 
         int regenType = config.getRegenType();
 
@@ -292,7 +288,7 @@ public class NTheEndAgain extends NPlugin implements TheEndAgainNode {
         }
 
         this.debug(msg);
-        multiLineMsg.append('\n' + msg);
+        multiLineMsg.append('\n').append(msg);
 
         int regenOuterEnd = config.getRegenOuterEnd();
 
@@ -300,11 +296,11 @@ public class NTheEndAgain extends NPlugin implements TheEndAgainNode {
             case 0:
                 msg = "Outer end islands will not auto-regen";
                 this.debug(msg);
-                multiLineMsg.append('\n' + msg);
+                multiLineMsg.append('\n').append(msg);
             case 1:
                 msg = "Outer end islands will regenerate every time the central island is regenerated";
                 this.debug(msg);
-                multiLineMsg.append('\n' + msg);
+                multiLineMsg.append('\n').append(msg);
                 break;
             case 2:
                 long systemTime = System.currentTimeMillis();
@@ -326,7 +322,7 @@ public class NTheEndAgain extends NPlugin implements TheEndAgainNode {
                 }
 
                 this.debug(msg);
-                multiLineMsg.append('\n' + msg);
+                multiLineMsg.append('\n').append(msg);
 
                 break;
             default:
@@ -345,7 +341,7 @@ public class NTheEndAgain extends NPlugin implements TheEndAgainNode {
         } else if (nb == 1) {
             multiLineMsg.append('\n' + "There is 1 EnderDragon alive");
         } else {
-            multiLineMsg.append('\n' + "There are " + nb + " EnderDragons alive");
+            multiLineMsg.append('\n' + "There are ").append(nb).append(" EnderDragons alive");
         }
 
         // Look for a scheduled respawn event
@@ -361,7 +357,7 @@ public class NTheEndAgain extends NPlugin implements TheEndAgainNode {
         }
 
         this.debug(msg);
-        multiLineMsg.append('\n' + msg);
+        multiLineMsg.append('\n').append(msg);
 
         // Append any extra text
         if (msgAddon.length() > 0)
@@ -435,100 +431,6 @@ public class NTheEndAgain extends NPlugin implements TheEndAgainNode {
 
         this.debug("Registering command...");
         this.setCommandExecutor("nend", new TheEndAgainCommandExecutor(this));
-
-        this.debug("Handling Metrics...");
-        final Metrics.Graph g1 = this.getMetrics().createGraph("Amount of End Worlds handled");
-        g1.addPlotter(new Metrics.Plotter() {
-
-            @Override
-            public int getValue() {
-                return fr.ribesg.bukkit.ntheendagain.NTheEndAgain.this.getWorldHandlers().size();
-            }
-        });
-
-        // Metrics - Type of regeneration
-        int disabled = 0;
-        int hard = 0;
-        int soft = 0;
-        int crystal = 0;
-        for (final EndWorldHandler h : this.worldHandlers.values()) {
-            if (h.getConfig().getRegenType() == 0) {
-                disabled++;
-            } else {
-                switch (h.getConfig().getRegenMethod()) {
-                    case 0:
-                        hard++;
-                        break;
-                    case 1:
-                        soft++;
-                        break;
-                    case 2:
-                        crystal++;
-                        break;
-                    default:
-                        break;
-                }
-            }
-        }
-        final int finalDisabled = disabled;
-        final int finalHard = hard;
-        final int finalSoft = soft;
-        final int finalCrystal = crystal;
-
-        final Metrics.Graph g2 = this.getMetrics().createGraph("Regeneration Method");
-        g2.addPlotter(new Metrics.Plotter("Disabled") {
-
-            @Override
-            public int getValue() {
-                return finalDisabled;
-            }
-        });
-        g2.addPlotter(new Metrics.Plotter("Hard Regen") {
-
-            @Override
-            public int getValue() {
-                return finalHard;
-            }
-        });
-        g2.addPlotter(new Metrics.Plotter("Soft Regen") {
-
-            @Override
-            public int getValue() {
-                return finalSoft;
-            }
-        });
-        g2.addPlotter(new Metrics.Plotter("Crystals Only") {
-
-            @Override
-            public int getValue() {
-                return finalCrystal;
-            }
-        });
-
-        // Metrics - Regeneration on Stop
-        int regenOnStop = 0;
-        for (final EndWorldHandler h : this.worldHandlers.values()) {
-            if (h.getConfig().getHardRegenOnStop() == 1) {
-                regenOnStop++;
-            }
-        }
-        final int finalRegenOnStop = regenOnStop;
-
-        final Metrics.Graph g3 = this.getMetrics().createGraph("Hard Regeneration on Stop");
-        g3.addPlotter(new Metrics.Plotter("Enabled") {
-
-            @Override
-            public int getValue() {
-                return finalRegenOnStop;
-            }
-        });
-        g3.addPlotter(new Metrics.Plotter("Disabled") {
-
-            @Override
-            public int getValue() {
-                return fr.ribesg.bukkit.ntheendagain.NTheEndAgain.this.getWorldHandlers().size() - finalRegenOnStop;
-            }
-        });
 
         this.exiting(this.getClass(), "onNodeEnable");
         return true;

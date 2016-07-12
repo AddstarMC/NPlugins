@@ -206,13 +206,7 @@ public class EnderDragonListener implements Listener {
             this.plugin.broadcastMessage(playersKilled);
             final Set<String> players = dmgPercentageMap.keySet();
             final String[] sortedPlayers = players.toArray(new String[players.size()]);
-            Arrays.sort(sortedPlayers, new Comparator<String>() {
-
-                @Override
-                public int compare(final String a, final String b) {
-                    return -Float.compare(dmgPercentageMap.get(a), dmgPercentageMap.get(b));
-                }
-            });
+            Arrays.sort(sortedPlayers, (a, b) -> -Float.compare(dmgPercentageMap.get(a), dmgPercentageMap.get(b)));
             for (final String playerName : sortedPlayers) {
                 final float percentage = dmgPercentageMap.get(playerName);
                 if (percentage < THRESHOLD) {
@@ -756,7 +750,7 @@ public class EnderDragonListener implements Listener {
                             int initialHealth = handler.getConfig().getEdHealth();
                             this.plugin.debug("onEnderDragonSpawn ... spawned EnderDragon, UUID " + dragonId + ", health " + initialHealth);
 
-                            handler.getDragons().put(dragonId, new HashMap<String, Double>());
+                            handler.getDragons().put(dragonId, new HashMap<>());
 
                             ed.setMaxHealth(initialHealth);
                             ed.setHealth(ed.getMaxHealth());

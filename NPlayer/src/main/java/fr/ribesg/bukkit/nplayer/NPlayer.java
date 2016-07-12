@@ -32,8 +32,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.plugin.PluginManager;
 
-import org.mcstats.Metrics;
-
 public class NPlayer extends NPlugin implements PlayerNode {
 
     // Configs
@@ -145,23 +143,6 @@ public class NPlayer extends NPlugin implements PlayerNode {
 
         this.debug("Registering CommandHandler's Listeners...");
         pm.registerEvents(playerCommandHandler, this);
-
-        this.debug("Initializing Metrics...");
-        final Metrics.Graph g = this.getMetrics().createGraph("Amount of Players");
-        g.addPlotter(new Metrics.Plotter("Registered") {
-
-            @Override
-            public int getValue() {
-                return fr.ribesg.bukkit.nplayer.NPlayer.this.getUserDb().size();
-            }
-        });
-        g.addPlotter(new Metrics.Plotter("Played in the last 2 weeks") {
-
-            @Override
-            public int getValue() {
-                return fr.ribesg.bukkit.nplayer.NPlayer.this.getUserDb().recurrentSize();
-            }
-        });
 
         this.exiting(this.getClass(), "onNodeEnable");
         return true;

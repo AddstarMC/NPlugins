@@ -28,7 +28,6 @@ import fr.ribesg.bukkit.ncore.util.FrameBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.mcstats.Metrics;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -47,7 +46,6 @@ public class NCore extends JavaPlugin {
     private FilterManager filterManager;
 
     private Map<String, Node> nodes;
-    private Metrics           metrics;
     private Config            pluginConfig;
     private UuidDb            uuidDb;
     private Updater           updater;
@@ -57,12 +55,6 @@ public class NCore extends JavaPlugin {
     public void onEnable() {
         this.logger = this.getLogger();
         this.filterManager = new FilterManager();
-
-        try {
-            this.metrics = new Metrics(this);
-        } catch (final IOException e) {
-            e.printStackTrace();
-        }
 
         // Config
         try {
@@ -86,13 +78,7 @@ public class NCore extends JavaPlugin {
 
         this.nodes = new HashMap<>();
 
-        Bukkit.getScheduler().runTaskLaterAsynchronously(this, new Runnable() {
-
-            @Override
-            public void run() {
-                NCore.this.afterNodesLoad();
-            }
-        }, 5 * 20L /* ~5 seconds */);
+        Bukkit.getScheduler().runTaskLaterAsynchronously(this, () -> NCore.this.afterNodesLoad(), 5 * 20L /* ~5 seconds */);
 
         Bukkit.getPluginManager().registerEvents(new NEventsListener(this), this);
         Bukkit.getPluginManager().registerEvents(new UpdaterListener(this), this);
@@ -111,97 +97,39 @@ public class NCore extends JavaPlugin {
 
     private void afterNodesLoad() {
         boolean noNodeFound = true;
-        final Metrics.Graph nodesUsedGraph = this.metrics.createGraph("Nodes used");
 
         if (this.get(Node.CUBOID) != null) {
-            nodesUsedGraph.addPlotter(new Metrics.Plotter(Node.CUBOID.substring(1)) {
-
-                @Override
-                public int getValue() {
-                    return 1;
-                }
-            });
             noNodeFound = false;
         }
 
         if (this.get(Node.ENCHANTING_EGG) != null) {
-            nodesUsedGraph.addPlotter(new Metrics.Plotter(Node.ENCHANTING_EGG.substring(1)) {
-
-                @Override
-                public int getValue() {
-                    return 1;
-                }
-            });
             noNodeFound = false;
         }
 
         if (this.get(Node.GENERAL) != null) {
-            nodesUsedGraph.addPlotter(new Metrics.Plotter(Node.GENERAL.substring(1)) {
-
-                @Override
-                public int getValue() {
-                    return 1;
-                }
-            });
             noNodeFound = false;
         }
 
         if (this.get(Node.PLAYER) != null) {
-            nodesUsedGraph.addPlotter(new Metrics.Plotter(Node.PLAYER.substring(1)) {
-
-                @Override
-                public int getValue() {
-                    return 1;
-                }
-            });
             noNodeFound = false;
         }
 
         if (this.get(Node.PERMISSIONS) != null) {
-            nodesUsedGraph.addPlotter(new Metrics.Plotter(Node.PERMISSIONS.substring(1)) {
-
-                @Override
-                public int getValue() {
-                    return 1;
-                }
-            });
             noNodeFound = false;
         }
 
         if (this.get(Node.TALK) != null) {
-            nodesUsedGraph.addPlotter(new Metrics.Plotter(Node.TALK.substring(1)) {
-
-                @Override
-                public int getValue() {
-                    return 1;
-                }
-            });
             noNodeFound = false;
         }
 
         if (this.get(Node.THE_END_AGAIN) != null) {
-            nodesUsedGraph.addPlotter(new Metrics.Plotter(Node.THE_END_AGAIN.substring(1)) {
-
-                @Override
-                public int getValue() {
-                    return 1;
-                }
-            });
             noNodeFound = false;
         }
 
         if (this.get(Node.WORLD) != null) {
-            nodesUsedGraph.addPlotter(new Metrics.Plotter(Node.WORLD.substring(1)) {
-
-                @Override
-                public int getValue() {
-                    return 1;
-                }
-            });
             noNodeFound = false;
         }
 
-        this.metrics.start();
 
         if (noNodeFound) {
             final FrameBuilder frame = new FrameBuilder();

@@ -465,10 +465,10 @@ public class Config extends AbstractConfig<NTheEndAgain> {
         frame.addLine("If you don't understand something, please ask on dev.bukkit.org");
         frame.addLine("Ribesg", FrameBuilder.Option.RIGHT);
         for (final String line : frame.build()) {
-            content.append(line + '\n');
+            content.append(line).append('\n');
         }
 
-        content.append("\n# This config file is about the world \"" + this.worldName + "\"\n\n");
+        content.append("\n# This config file is about the world \"").append(this.worldName).append("\"\n\n");
 
         // ############# //
         // ## GENERAL ## //
@@ -492,7 +492,7 @@ public class Config extends AbstractConfig<NTheEndAgain> {
         content.append("# Note: to completely disable the filter and allow compatibility with other plugins using it,\n");
         content.append("#       please be sure to set it to 0 in EVERY End World config file.\n");
         content.append("#\n");
-        content.append("filterMovedTooQuicklySpam: " + this.filterMovedTooQuicklySpam + "\n\n");
+        content.append("filterMovedTooQuicklySpam: ").append(this.filterMovedTooQuicklySpam).append("\n\n");
 
         // ################# //
         // ## ENDERDRAGON ## //
@@ -508,11 +508,11 @@ public class Config extends AbstractConfig<NTheEndAgain> {
 
         // edHealth
         content.append("# The health value EnderDragons will spawn with. Default: " + DEFAULT_edHealth + '\n');
-        content.append("edHealth: " + this.edHealth + "\n\n");
+        content.append("edHealth: ").append(this.edHealth).append("\n\n");
 
         // edDamageMultiplier
         content.append("# Scale damages done by EnderDragon. Default: " + DEFAULT_edDamageMultiplier + '\n');
-        content.append("edDamageMultiplier: " + this.edDamageMultiplier + "\n\n");
+        content.append("edDamageMultiplier: ").append(this.edDamageMultiplier).append("\n\n");
 
         // edPushesPlayers
         content.append("# Do we 'simulate' the EnderDragon-Pushes-Player behaviour? Default: " + DEFAULT_edPushesPlayers + '\n');
@@ -521,12 +521,12 @@ public class Config extends AbstractConfig<NTheEndAgain> {
         content.append("#       0: Disabled.\n");
         content.append("#       1: Enabled.\n");
         content.append("#\n");
-        content.append("edPushesPlayers: " + this.edPushesPlayers + "\n\n");
+        content.append("edPushesPlayers: ").append(this.edPushesPlayers).append("\n\n");
 
         // edPushForce
         content.append("# Simulated EnderDragon Push force. Default: " + DEFAULT_edPushForce + '\n');
         content.append("# Should be a value between 0.01 and 10.0\n");
-        content.append("edPushForce: " + this.edPushForce + "\n\n");
+        content.append("edPushForce: ").append(this.edPushForce).append("\n\n");
 
         // edEggHandling
         content.append("# The way the DragonEgg will spawn (one per dragon). Default: " + DEFAULT_edEggHandling + '\n');
@@ -535,7 +535,7 @@ public class Config extends AbstractConfig<NTheEndAgain> {
         content.append("#       1: Award to player. The egg will be randomly given to one of the best fighters.\n");
         content.append("#       2: Drop on ground. The egg will be dropped on the ground where the dragon dies.\n");
         content.append("#\n");
-        content.append("edEggHandling: " + this.edEggHandling + "\n\n");
+        content.append("edEggHandling: ").append(this.edEggHandling).append("\n\n");
 
         // edExpHandling
         content.append("# The way the reward XP will be given to player. Default: " + DEFAULT_edExpHandling + '\n');
@@ -543,11 +543,11 @@ public class Config extends AbstractConfig<NTheEndAgain> {
         content.append("#       0: Disabled. XP orbs will spawn normally.\n");
         content.append("#       1: Enabled. XP will be split between fighters, more XP for better fighters.\n");
         content.append("#\n");
-        content.append("edExpHandling: " + this.edExpHandling + "\n\n");
+        content.append("edExpHandling: ").append(this.edExpHandling).append("\n\n");
 
         // edExpReward
         content.append("# The value of the XP drop. Default: " + DEFAULT_edExpReward + '\n');
-        content.append("edExpReward: " + this.edExpReward + "\n\n");
+        content.append("edExpReward: ").append(this.edExpReward).append("\n\n");
 
         // edPortalSpawn
         content.append("# The way portal spawn will be handled. Default: " + DEFAULT_edPortalSpawn + '\n');
@@ -557,7 +557,7 @@ public class Config extends AbstractConfig<NTheEndAgain> {
         content.append("#       1: Egg. Portal will be removed but not the DragonEgg\n");
         content.append("#       2: Enabled. Portal will not spawn. No more cut obsidian towers. /!\\ No Egg if dragonEggHandling=0.\n");
         content.append("#\n");
-        content.append("edPortalSpawn: " + this.edPortalSpawn + "\n\n");
+        content.append("edPortalSpawn: ").append(this.edPortalSpawn).append("\n\n");
 
         // ################### //
         // ## ENDERCRYSTALS ## //
@@ -579,7 +579,7 @@ public class Config extends AbstractConfig<NTheEndAgain> {
         content.append("#       = 1.0: Vanilla. EnderDragon gains 1 HP per tick.\n");
         content.append("#       > 1.0: EnderDragon gains x HP per tick (use integer value of 2 or more).\n");
         content.append("#\n");
-        content.append("ecHealthRegainRate: " + this.ecHealthRegainRate + "\n\n");
+        content.append("ecHealthRegainRate: ").append(this.ecHealthRegainRate).append("\n\n");
 
         // ################## //
         // ## REGENERATION ## //
@@ -601,7 +601,7 @@ public class Config extends AbstractConfig<NTheEndAgain> {
         content.append("#       2: Periodic - From load time. Regen every <regenTimer> seconds after boot/load.\n");
         content.append("#       3: Periodic - Persistent. Regen every <regenTimer> seconds, persistent through reboots/reloads\n");
         content.append("#\n");
-        content.append("regenType: " + this.regenType + "\n\n");
+        content.append("regenType: ").append(this.regenType).append("\n\n");
 
         // regenMethod
         content.append("# Select your definition of \"regen\". Default: " + DEFAULT_regenMethod + '\n');
@@ -612,7 +612,7 @@ public class Config extends AbstractConfig<NTheEndAgain> {
         content.append("#\n");
         content.append("# Note: Regeneration does not regenerate Protected chunks.\n");
         content.append("#\n");
-        content.append("regenMethod: " + this.regenMethod + "\n\n");
+        content.append("regenMethod: ").append(this.regenMethod).append("\n\n");
 
         // regenTimer
         content.append("# The time between each regen. Ignored if regenType is not Periodic (2 or 3). Default: " +
@@ -637,7 +637,7 @@ public class Config extends AbstractConfig<NTheEndAgain> {
         content.append("#\n");
         content.append("# Note: You should NOT use low value. Some hours of delay are recommended.\n");
         content.append("#\n");
-        content.append("regenTimer: " + this.regenTimer + "\n\n");
+        content.append("regenTimer: ").append(this.regenTimer).append("\n\n");
 
         // regenAction
         content.append("# What do we do to players in the End when we want to regen the world? Default: " + DEFAULT_regenAction + '\n');
@@ -649,7 +649,7 @@ public class Config extends AbstractConfig<NTheEndAgain> {
         content.append("#\n");
         content.append("#       2: Do nothing. Should only be used with regenMethod=2\n");
         content.append("#\n");
-        content.append("regenAction: " + this.regenAction + "\n\n");
+        content.append("regenAction: ").append(this.regenAction).append("\n\n");
 
         // hardRegenOnStop
         content.append("# Activate hard regeneration on server stop. This will only slow down server stop.\n");
@@ -659,17 +659,17 @@ public class Config extends AbstractConfig<NTheEndAgain> {
         content.append("#       0: Disabled.\n");
         content.append("#       1: Enabled.\n");
         content.append("#\n");
-        content.append("hardRegenOnStop: " + this.hardRegenOnStop + "\n\n");
+        content.append("hardRegenOnStop: ").append(this.hardRegenOnStop).append("\n\n");
 
         // slowSoftRegenChunks
         content.append("# Select the number of chunks to be regen every slowSoftRegenTimer after a Soft Regeneration has started.\n");
         content.append("# Default value: " + DEFAULT_slowSoftRegenChunks + '\n');
-        content.append("slowSoftRegenChunks: " + this.slowSoftRegenChunks + "\n\n");
+        content.append("slowSoftRegenChunks: ").append(this.slowSoftRegenChunks).append("\n\n");
 
         // slowSoftRegenTimer
         content.append("# Select the rate at which slowSoftRegenChunks chunks will be regenerated after a\n");
         content.append("# Soft Regeneration has started. Default value: " + DEFAULT_slowSoftRegenTimer + '\n');
-        content.append("slowSoftRegenTimer: " + this.slowSoftRegenTimer + "\n\n");
+        content.append("slowSoftRegenTimer: ").append(this.slowSoftRegenTimer).append("\n\n");
 
         // regenOuterEnd
         content.append("# Control regeneration of the outer end chunks. Default: " + DEFAULT_regenOuterEnd + '\n');
@@ -682,7 +682,7 @@ public class Config extends AbstractConfig<NTheEndAgain> {
         content.append("# Mode 2 is useful for regenerating the central island frequently (for example every 2 to 4 hours)\n");
         content.append("# while regenerating the outer end less frequently (for example, every 30 days).\n");
         content.append("#\n");
-        content.append("regenOuterEnd: " + this.regenOuterEnd + "\n\n");
+        content.append("regenOuterEnd: ").append(this.regenOuterEnd).append("\n\n");
 
         // outerEndRegenHours
         content.append("# How often to regenerate the outer end, in hours. Default: " + DEFAULT_outerEndRegenHours + '\n');
@@ -698,7 +698,7 @@ public class Config extends AbstractConfig<NTheEndAgain> {
         content.append("#        672: 4 weeks\n");
         content.append("#        720: 30 days\n");
         content.append("#\n");
-        content.append("outerEndRegenHours: " + this.outerEndRegenHours + "\n\n");
+        content.append("outerEndRegenHours: ").append(this.outerEndRegenHours).append("\n\n");
 
         // ############# //
         // ## RESPAWN ## //
@@ -714,7 +714,7 @@ public class Config extends AbstractConfig<NTheEndAgain> {
 
         // respawnNumber
         content.append("# This is the amount of EnderDragons you want to be spawned. Default: " + DEFAULT_respawnNumber + '\n');
-        content.append("respawnNumber: " + this.respawnNumber + "\n\n");
+        content.append("respawnNumber: ").append(this.respawnNumber).append("\n\n");
 
         // respawnType
         content.append("# Select when you want to respawn Dragons automagically. Default: " + DEFAULT_respawnType + '\n');
@@ -728,7 +728,7 @@ public class Config extends AbstractConfig<NTheEndAgain> {
         content.append("#\n");
         content.append("# IMPORTANT NOTE: Regen type 6 was buggy and thus removed (was Respawn every X seconds after the last Dragon alive's death, persistent through reboots/reloads).\n");
         content.append("#\n");
-        content.append("respawnType: " + this.respawnType + "\n\n");
+        content.append("respawnType: ").append(this.respawnType).append("\n\n");
 
         // respawnTimer
         content.append("# The X value in the previous comments. Defaults: " +
@@ -757,8 +757,8 @@ public class Config extends AbstractConfig<NTheEndAgain> {
         content.append("# Note: You CAN use low value if regenType is not set to 1.\n");
         content.append("#       But maybe you should consider using respawnType=1 or respawnType=2 instead of a low periodic.\n");
         content.append("#\n");
-        content.append("respawnTimerMin: " + this.respawnTimerMin + '\n');
-        content.append("respawnTimerMax: " + this.respawnTimerMax + "\n\n");
+        content.append("respawnTimerMin: ").append(this.respawnTimerMin).append('\n');
+        content.append("respawnTimerMax: ").append(this.respawnTimerMax).append("\n\n");
 
         // ################ //
         // ## DROP TABLE ## //
@@ -778,7 +778,7 @@ public class Config extends AbstractConfig<NTheEndAgain> {
         content.append("#       0: Stock. Drops will just fall from the EnderDragon death Location\n");
         content.append("#       1: Distribution. Drops will be distributed exactly like the DragonEgg\n");
         content.append("#\n");
-        content.append("dropTableHandling: " + this.dropTableHandling + "\n\n");
+        content.append("dropTableHandling: ").append(this.dropTableHandling).append("\n\n");
 
         content.append("# Drop table for the EnderDragons. Complete informations: http://ribe.sg/is-config\n");
         content.append("# Example drop table:\n");
@@ -832,7 +832,7 @@ public class Config extends AbstractConfig<NTheEndAgain> {
         content.append("#       true:  Protected from regeneration\n");
         content.append("#       false: Unprotected from regeneration\n");
         content.append("#\n");
-        content.append("defaultProtected: " + this.defaultProtected + "\n\n");
+        content.append("defaultProtected: ").append(this.defaultProtected).append("\n\n");
 
         // verboseRegenLogging
         content.append("# Controls whether to log the location of every chunk that is regenerated.\n");
@@ -840,7 +840,7 @@ public class Config extends AbstractConfig<NTheEndAgain> {
         content.append("#       true:  Verbose logging is enabled\n");
         content.append("#       false: Logs chunk location every 5 seconds, but only if debugging is enabled (use /debug enable NTheEndAgain)\n");
         content.append("#\n");
-        content.append("verboseRegenLogging: " + this.verboseRegenLogging + "\n\n");
+        content.append("verboseRegenLogging: ").append(this.verboseRegenLogging).append("\n\n");
 
         // ########## //
         // ## DATA ## //
@@ -856,15 +856,15 @@ public class Config extends AbstractConfig<NTheEndAgain> {
 
         // nextRegenTaskTime
         content.append("# Used to allow Regen task timer persistence (based on System.nanoTime). /!\\ PLEASE DO NOT TOUCH THIS !\n");
-        content.append("nextRegenTaskTime: " + (this.regenTimer == 0 ? "0" : this.nextRegenTaskTime) + "\n\n");
+        content.append("nextRegenTaskTime: ").append(this.regenTimer == 0 ? "0" : this.nextRegenTaskTime).append("\n\n");
 
         // nextRespawnTaskTime
         content.append("# Used to allow Respawn task timer persistence (based on System.nanoTime). /!\\ PLEASE DO NOT TOUCH THIS !\n");
-        content.append("nextRespawnTaskTime: " + (this.respawnTimerMax == 0 ? "0" : this.nextRespawnTaskTime) + "\n\n");
+        content.append("nextRespawnTaskTime: ").append(this.respawnTimerMax == 0 ? "0" : this.nextRespawnTaskTime).append("\n\n");
 
         // nextOuterEndRegenTime
         content.append("# Used to allow Outer End Regen persistence (based on System.currentTimeMillis). /!\\ PLEASE DO NOT TOUCH THIS !\n");
-        content.append("nextOuterEndRegenTime: " + (this.regenOuterEnd == 0 ? "0" : this.nextOuterEndRegenTime) + "\n\n");
+        content.append("nextOuterEndRegenTime: ").append(this.regenOuterEnd == 0 ? "0" : this.nextOuterEndRegenTime).append("\n\n");
 
         return content.toString();
     }

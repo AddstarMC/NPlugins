@@ -27,8 +27,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import org.mcstats.Metrics;
-
 /**
  * This class represents a plugin node of the N plugin suite
  *
@@ -44,8 +42,6 @@ public abstract class NPlugin extends JavaPlugin implements Node {
     private NCore   core;
     private boolean enabled;
     private boolean debugEnabled;
-
-    private Metrics metrics;
 
     @Override
     public void onEnable() {
@@ -73,12 +69,6 @@ public abstract class NPlugin extends JavaPlugin implements Node {
             this.debugEnabled = this.core.getPluginConfig().isDebugEnabled(this.getName());
             if (this.debugEnabled) {
                 this.info("DEBUG MODE ENABLED!");
-            }
-            try {
-                this.metrics = new Metrics(this);
-                this.metrics.start();
-            } catch (final IOException e) {
-                this.error("Failed to initialize Metrics", e);
             }
             try {
                 this.loadMessages();
@@ -207,10 +197,6 @@ public abstract class NPlugin extends JavaPlugin implements Node {
 
     public NCore getCore() {
         return this.core;
-    }
-
-    protected Metrics getMetrics() {
-        return this.metrics;
     }
 
     // ##################### //

@@ -62,8 +62,6 @@ import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 
-import org.mcstats.Metrics;
-
 /**
  * TODO
  *
@@ -171,16 +169,6 @@ public class NCuboid extends NPlugin implements CuboidNode {
 
         this.debug("Initializing Dynmap bridge...");
         this.dynmapBridge.initialize(this.db);
-
-        this.debug("Initializing Metrics...");
-        final Metrics.Graph g = this.getMetrics().createGraph("Amount of Regions");
-        g.addPlotter(new Metrics.Plotter() {
-
-            @Override
-            public int getValue() {
-                return fr.ribesg.bukkit.ncuboid.NCuboid.this.getDb().size();
-            }
-        });
 
         this.exiting(this.getClass(), "onNodeEnable");
         return true;

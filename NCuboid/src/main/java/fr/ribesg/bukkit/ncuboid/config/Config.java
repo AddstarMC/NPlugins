@@ -107,12 +107,12 @@ public class Config extends AbstractConfig<NCuboid> {
         frame.addLine("If you don't understand something, please ask on dev.bukkit.org");
         frame.addLine("Ribesg", FrameBuilder.Option.RIGHT);
         for (final String line : frame.build()) {
-            content.append(line + '\n');
+            content.append(line).append('\n');
         }
 
         // selectionItemMaterial. Default : Stick/280
         content.append("# The tool used to select points and get informations about blocks protection. Default : 180 (Stick)\n");
-        content.append("selectionItemMaterial: " + this.selectionItemMaterial.name() + "\n\n");
+        content.append("selectionItemMaterial: ").append(this.selectionItemMaterial.name()).append("\n\n");
 
         // groupConfigs
         content.append("# Here, you can configure for each group:\n");
@@ -123,11 +123,11 @@ public class Config extends AbstractConfig<NCuboid> {
         content.append("# Note: For any of those values, '-1' means 'unlimited'.\n");
         content.append("groupConfigs:\n");
         for (final GroupConfig gc : this.groupConfigs.values()) {
-            content.append("  # Group '" + gc.getGroupName() + "'. The permission for this group is " + gc.getGroupPerm() + '\n');
-            content.append("  " + gc.getGroupName() + ":\n");
-            content.append("    maxRegionNb: " + gc.getMaxRegionNb() + '\n');
-            content.append("    maxRegion1DSize: " + gc.getMaxRegion1DSize() + '\n');
-            content.append("    maxRegion3DSize: " + gc.getMaxRegion3DSize() + '\n');
+            content.append("  # Group '").append(gc.getGroupName()).append("'. The permission for this group is ").append(gc.getGroupPerm()).append('\n');
+            content.append("  ").append(gc.getGroupName()).append(":\n");
+            content.append("    maxRegionNb: ").append(gc.getMaxRegionNb()).append('\n');
+            content.append("    maxRegion1DSize: ").append(gc.getMaxRegion1DSize()).append('\n');
+            content.append("    maxRegion3DSize: ").append(gc.getMaxRegion3DSize()).append('\n');
         }
 
         return content.toString();

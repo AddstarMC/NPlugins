@@ -29,5 +29,5 @@ public interface GeneralNode extends Node, InfoCommandHandler {
      *
      * @return true if the Player is in Spy Mode, false otherwise
      */
-    public boolean isSpy(final UUID playerId);
+    boolean isSpy(final UUID playerId);
 }

@@ -51,14 +51,10 @@ public class FlyModeListener implements Listener {
             final boolean wasFlying = event.getPlayer().isFlying();
             final Player player = event.getPlayer();
             if (Perms.hasFly(event.getPlayer()) && this.feature.hasFlyMode(event.getPlayer())) {
-                Bukkit.getScheduler().runTaskLater(this.feature.getPlugin(), new Runnable() {
-
-                    @Override
-                    public void run() {
-                        if (player.isOnline()) {
-                            player.setAllowFlight(true);
-                            player.setFlying(wasFlying);
-                        }
+                Bukkit.getScheduler().runTaskLater(this.feature.getPlugin(), () -> {
+                    if (player.isOnline()) {
+                        player.setAllowFlight(true);
+                        player.setFlying(wasFlying);
                     }
                 }, 1L);
             }

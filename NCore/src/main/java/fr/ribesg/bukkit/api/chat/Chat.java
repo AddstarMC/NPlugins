@@ -20,8 +20,8 @@ public final class Chat {
     /**
      * TODO
      *
-     * @param to
-     * @param messages
+     * @param to The player to message
+     * @param messages the message to send
      */
     public static void sendMessage(final Player to, final Message... messages) {
         // TODO
@@ -30,8 +30,8 @@ public final class Chat {
     /**
      * TODO
      *
-     * @param permission
-     * @param messages
+     * @param permission the permission to check
+     * @param messages the message to to send
      */
     public static void broadcast(final String permission, final Message... messages) {
         // TODO
@@ -40,7 +40,7 @@ public final class Chat {
     /**
      * TODO
      *
-     * @param messages
+     * @param messages the message to send
      */
     public static void broadcastMessage(final Message... messages) {
         // TODO

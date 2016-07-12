@@ -190,6 +190,7 @@ public final class Click implements ConfigurationSerializable {
      * @param map the map to convert to a Click chat message part
      *
      * @see ConfigurationSerializable
+     * @return Click the click
      */
     public static Click deserialize(final Map<String, Object> map) {
         final Object typeName = map.get("type");

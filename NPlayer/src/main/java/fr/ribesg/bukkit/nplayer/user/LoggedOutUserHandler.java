@@ -10,8 +10,6 @@
 package fr.ribesg.bukkit.nplayer.user;
 
 import fr.ribesg.bukkit.ncore.event.PlayerGridMoveEvent;
-import fr.ribesg.bukkit.ncore.event.PlayerJoinedEvent;
-import fr.ribesg.bukkit.ncore.lang.MessageId;
 import fr.ribesg.bukkit.ncore.util.TimeUtil;
 import fr.ribesg.bukkit.nplayer.NPlayer;
 
@@ -52,13 +50,7 @@ public class LoggedOutUserHandler implements Listener {
         this.plugin = plugin;
         this.loggedOutPlayers = new HashMap<>();
 
-        Bukkit.getScheduler().runTaskTimer(plugin, new Runnable() {
-
-            @Override
-            public void run() {
-                fr.ribesg.bukkit.nplayer.user.LoggedOutUserHandler.this.poisonLoggedOutPlayers();
-            }
-        }, 20 * 5, 20 * 5);
+        Bukkit.getScheduler().runTaskTimer(plugin, () -> LoggedOutUserHandler.this.poisonLoggedOutPlayers(), 20 * 5, 20 * 5);
     }
 
     public void notifyConnect(final Player player) {

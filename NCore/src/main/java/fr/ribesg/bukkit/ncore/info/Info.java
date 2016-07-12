@@ -23,7 +23,7 @@ public final class Info {
     /**
      *
      */
-    public static enum Type {
+    public enum Type {
         FULL,
         PLAYER,
         REGION,

@@ -24,5 +24,5 @@ public interface DenyFilter {
      * @return true if this DenyFilter prevents this message from being logged,
      * false otherwise
      */
-    public boolean denies(final String message);
+    boolean denies(final String message);
 }
