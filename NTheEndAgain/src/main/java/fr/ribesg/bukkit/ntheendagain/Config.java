@@ -774,7 +774,7 @@ public class Config extends AbstractConfig<NTheEndAgain> {
         // respawnTimer
         content.append("# The X value in the previous comments. Defaults: " +
                        DEFAULT_respawnTimerMin +
-                       " < " +
+                       " to " +
                        DEFAULT_respawnTimerMax +
                        '\n');
         content.append("# A value will be randomly chosen for each iteration. The chosen value vill be between min and max\n");
@@ -896,19 +896,19 @@ public class Config extends AbstractConfig<NTheEndAgain> {
         content.append('\n');
 
         // taskTimeVersion
-        content.append("# Indicates that TaskTimes are based on System.currentTimeMillis instead of System.nanoTime. /!\\ PLEASE DO NOT TOUCH THIS !\n");
+        content.append("# TaskTimes are based on System.currentTimeMillis instead of System.nanoTime. /!\\ PLEASE DO NOT TOUCH THIS !\n");
         content.append("taskTimeVersion: 2\n\n");
 
         // nextRegenTaskTime
-        content.append("# Used to allow Regen task timer persistence (based on System.currentTimeMillis). /!\\ PLEASE DO NOT TOUCH THIS !\n");
+        content.append("# Used to allow Regen task timer persistence. /!\\ PLEASE DO NOT TOUCH THIS !\n");
         content.append("nextRegenTaskTime: " + (this.regenTimer == 0 ? "0" : this.nextRegenTaskTime) + "\n\n");
 
         // nextRespawnTaskTime
-        content.append("# Used to allow Respawn task timer persistence (based on System.currentTimeMillis). /!\\ PLEASE DO NOT TOUCH THIS !\n");
+        content.append("# Used to allow Respawn task timer persistence. /!\\ PLEASE DO NOT TOUCH THIS !\n");
         content.append("nextRespawnTaskTime: " + (this.respawnTimerMax == 0 ? "0" : this.nextRespawnTaskTime) + "\n\n");
 
         // lastOuterEndRegenTime
-        content.append("# Used to allow Outer End Regen persistence (based on System.currentTimeMillis). /!\\ PLEASE DO NOT TOUCH THIS !\n");
+        content.append("# Used to allow Outer End Regen persistence. /!\\ PLEASE DO NOT TOUCH THIS !\n");
         content.append("lastOuterEndRegenTime: " + this.lastOuterEndRegenTime + "\n\n");
 
         // Regen Counts

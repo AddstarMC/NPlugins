@@ -25,6 +25,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.UUID;
 
 /**
@@ -164,7 +165,12 @@ public class RegenHandler {
                 double outerEndRegenElapsedTimeHours = (System.currentTimeMillis() - lastOuterEndRegenTimeMillis) / 1000.0 / 60 / 60;
 
                 if (outerEndRegenElapsedTimeHours > outerEndRegenHours) {
+                    this.plugin.debug("Need to regen the outer end: " +
+                            new DecimalFormat("#.##").format(outerEndRegenElapsedTimeHours) + " > " + outerEndRegenHours);
                     return true;
+                } else {
+                    this.plugin.debug("Do not regen the outer end: " +
+                            new DecimalFormat("#.##").format(outerEndRegenElapsedTimeHours) + " < " + outerEndRegenHours);
                 }
 
                 break;
@@ -354,6 +360,8 @@ public class RegenHandler {
             int newOuterEndRegenCount = config.getOuterEndRegenCount() + 1;
             plugin.debug("Updating centralEndRegenCount to " + newOuterEndRegenCount);
             config.setOuterEndRegenCount(newOuterEndRegenCount);
+
+            config.setLastOuterEndRegenTime(System.currentTimeMillis(), "IncrementRegenCounts");
         }
 
         try {
