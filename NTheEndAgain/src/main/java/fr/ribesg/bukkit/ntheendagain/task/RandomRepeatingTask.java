@@ -43,9 +43,13 @@ public abstract class RandomRepeatingTask implements Runnable {
      */
     public void run() {
         final boolean success = this.exec();
-        final long delay = this.getDelay();
-        Bukkit.getScheduler().runTaskLater(this.worldHandler.getPlugin(), this, delay * 20);
-        this.setNextConfigTime(System.nanoTime() + (success ? delay : 0) * 1_000_000_000);
+        final long delaySeconds = this.getDelay();
+        Bukkit.getScheduler().runTaskLater(this.worldHandler.getPlugin(), this, delaySeconds * 20);
+
+        if (success)
+            this.setNextConfigTime(System.currentTimeMillis() + delaySeconds * 1000);
+        else
+            this.setNextConfigTime(System.currentTimeMillis());
     }
 
     /**
@@ -64,29 +68,29 @@ public abstract class RandomRepeatingTask implements Runnable {
     /**
      * Sets the next execution time for this task.
      *
-     * @param nextTaskTime the next execution time for this task, based on System.nanoTime
+     * @param nextTaskTime the next execution time for this task, based on System.currentTimeMillis
      */
     protected abstract void setNextConfigTime(final long nextTaskTime);
 
     /**
      * Build an initial delay according to the nextTaskTime
      *
-     * @param nextTaskTime the next Task Time, based on System.nanoTime
+     * @param nextTaskTime the next Task Time, based on System.currentTimeMillis
      *
      * @return the initial delay, in seconds
      */
     protected long buildInitialDelay(final long nextTaskTime) {
-        long initialDelay = nextTaskTime - System.nanoTime();
+        long initialDelay = nextTaskTime - System.currentTimeMillis();
         if (initialDelay < 0) {
             initialDelay = 0;
         }
 
         // Convert to seconds
-        return initialDelay / 1_000_000_000;
+        return initialDelay / 1000;
     }
 
     /**
-     * @return a Random value between the minimum and maximum delay set in config
+     * @return Random value, in seconds between the minimum and maximum delay set in config
      */
     protected abstract long getDelay();
 }

@@ -44,7 +44,7 @@ public class RespawnTask extends RandomRepeatingTask {
     protected long getInitialDelay() {
         Config config = this.worldHandler.getConfig();
 
-        // This is a nanoTime value
+        // This time is based on System.currentTimeMillis()
         long nextRespawnTaskTime = config.getNextRespawnTaskTime();
         if (this.worldHandler.getConfig().getRespawnType() == 4) {
             nextRespawnTaskTime = 0;
@@ -58,7 +58,7 @@ public class RespawnTask extends RandomRepeatingTask {
 
     @Override
     /**
-     * @return a Random value between the minimum and maximum delay set in config
+     * @return Random value, in seconds between the minimum and maximum delay set in config
      */
     protected long getDelay() {
         return this.worldHandler.getConfig().getRandomRespawnTimeSeconds();
@@ -68,13 +68,13 @@ public class RespawnTask extends RandomRepeatingTask {
     /**
      * Sets the next execution time for this task.
      *
-     * @param nextTaskTime the next execution time for this task, based on System.nanoTime
+     * @param nextTaskTime the next execution time for this task, based on System.currentTimeMillis
      */
     protected void setNextConfigTime(final long nextTaskTime) {
         Config config = this.worldHandler.getConfig();
-        config.setNextRespawnTaskTime(nextTaskTime);
+        config.setNextRespawnTaskTime(nextTaskTime, "RespawnTask.setNextConfigTime");
 
-        int respawnDelaySeconds = (int)((nextTaskTime - System.nanoTime()) / 1_000_000_000);
+        int respawnDelaySeconds = (int)((nextTaskTime - System.currentTimeMillis()) / 1000);
         config.updateNextExpectedRespawnTime(respawnDelaySeconds);
     }
 }

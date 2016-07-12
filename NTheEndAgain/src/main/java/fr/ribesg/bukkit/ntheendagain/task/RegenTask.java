@@ -50,7 +50,7 @@ public class RegenTask extends RandomRepeatingTask {
 
     @Override
     /**
-     * @return a Random value between the minimum and maximum delay set in config
+     * @return Random value, in seconds between the minimum and maximum delay set in config
      */
     protected long getDelay() {
         return this.worldHandler.getConfig().getRegenTimer();
@@ -60,9 +60,9 @@ public class RegenTask extends RandomRepeatingTask {
     /**
      * Sets the next execution time for this task.
      *
-     * @param nextTaskTime the next execution time for this task, based on System.nanoTime
+     * @param nextTaskTime the next execution time for this task, based on System.currentTimeMillis
      */
     protected void setNextConfigTime(final long nextTaskTime) {
-        this.worldHandler.getConfig().setNextRegenTaskTime(nextTaskTime);
+        this.worldHandler.getConfig().setNextRegenTaskTime(nextTaskTime, "RegenTask.setNextConfigTime");
     }
 }

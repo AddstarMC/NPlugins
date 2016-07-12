@@ -41,11 +41,11 @@ public class RespawnHandler {
     }
 
     public boolean respawn() {
-        this.plugin.entering(this.getClass(), "respawn");
+        // this.plugin.entering(this.getClass(), "respawn");
         final boolean result;
 
         if (this.worldHandler.getConfig().getRegenType() == 1) {
-            this.plugin.debug("Regen before respan");
+            this.plugin.debug("Regen before respawn");
             this.worldHandler.getRegenHandler().regenThenRespawn();
             result = true;
         } else {
@@ -53,7 +53,7 @@ public class RespawnHandler {
             result = this.respawnDragons();
         }
 
-        this.plugin.exiting(this.getClass(), "respawn", Boolean.toString(result));
+        // this.plugin.exiting(this.getClass(), "respawn", Boolean.toString(result));
         return result;
     }
 
@@ -63,14 +63,21 @@ public class RespawnHandler {
         Config config = this.worldHandler.getConfig();
         int randomRespawnTimeSec = config.getRandomRespawnTimeSeconds();
 
-        Bukkit.getScheduler().runTaskLater(this.worldHandler.getPlugin(), () -> RespawnHandler.this.respawn(), randomRespawnTimeSec * 20L);
+        Bukkit.getScheduler().runTaskLater(this.worldHandler.getPlugin(), new Runnable() {
+
+            @Override
+            public void run() {
+                fr.ribesg.bukkit.ntheendagain.handler.RespawnHandler.this.respawn();
+            }
+        }, randomRespawnTimeSec * 20L);
 
         config.updateNextExpectedRespawnTime(randomRespawnTimeSec);
 
         this.plugin.entering(this.getClass(), "respawnLater");
     }
 
-    /*package*/ void respawnNoRegen() {
+    /*package*/
+    void respawnNoRegen() {
         this.plugin.entering(this.getClass(), "respawnNoRegen");
 
         this.respawnDragons();
@@ -138,18 +145,22 @@ public class RespawnHandler {
         }
         if (regenerated) {
             this.plugin.debug("At least one chunk has been regen'd, respawn later");
-            Bukkit.getScheduler().runTaskLater(this.worldHandler.getPlugin(), () -> {
-                if (world.spawnEntity(loc, EntityType.ENDER_DRAGON) == null) {
-                    RespawnHandler.this.retryRespawn(loc);
+            Bukkit.getScheduler().runTaskLater(this.worldHandler.getPlugin(), new Runnable() {
+
+                @Override
+                public void run() {
+                    if (world.spawnEntity(loc, EntityType.ENDER_DRAGON) == null) {
+                        fr.ribesg.bukkit.ntheendagain.handler.RespawnHandler.this.retryRespawn(loc);
+                    }
+                    Config config = fr.ribesg.bukkit.ntheendagain.handler.RespawnHandler.this.worldHandler.getConfig();
+
+                    long randomRespawnTimeSec = config.getRandomRespawnTimeSeconds();
+                    long nextRespawnTimeMilli = System.currentTimeMillis() + randomRespawnTimeSec * 1000;
+                    config.setNextRespawnTaskTime(nextRespawnTimeMilli, "RespawnHandler.respawnDragon");
+
+                    config.updateNextExpectedRespawnTime(randomRespawnTimeSec);
+
                 }
-                Config config = RespawnHandler.this.worldHandler.getConfig();
-
-                long randomRespawnTimeSec = config.getRandomRespawnTimeSeconds();
-                long nextRespawnNanoTime = System.nanoTime() + randomRespawnTimeSec * 1_000_000_000;
-                config.setNextRespawnTaskTime(nextRespawnNanoTime);
-
-                config.updateNextExpectedRespawnTime(randomRespawnTimeSec);
-
             }, EndWorldHandler.REGEN_TO_RESPAWN_DELAY);
         } else {
             this.plugin.debug("No chunk has been regen'd, respawn now");
