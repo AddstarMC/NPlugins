@@ -158,44 +158,30 @@ public class EndWorldHandler {
             final long nextRespawnExecTime = this.config.getNextRespawnTaskTime();
             this.loadConfig();
 
-            this.config.setNextRegenTaskTime(this.config.getRegenTimer() == 0 ? 0 : nextRegenExecTime);
-            this.config.setNextRespawnTaskTime(this.config.getRespawnTimerMax() == 0 ? 0 : nextRespawnExecTime);
+            int regenType = this.config.getRegenType();
+            if (this.config.getRegenTimer() == 0 || !(regenType == 2 || regenType == 3))
+                this.config.setNextRegenTaskTime(0, "EndWorldHandler.unload");
+            else
+                this.config.setNextRegenTaskTime(nextRegenExecTime, "EndWorldHandler.unload");
 
-            int regenOuterEnd = this.config.getRegenOuterEnd();
-            switch (regenOuterEnd) {
-                case 0:
-                case 1:
-                    this.config.setNextOuterEndRegenTime(0);
-                    break;
-                case 2:
-                    if (this.config.getNextOuterEndRegenTime() <= 0) {
-                        int outerEndRegenHours = this.config.getOuterEndRegenHours();
-                        if (outerEndRegenHours < 1) {
-                            outerEndRegenHours = 1;
-                            this.plugin.debug("outerEndRegenHours cannot be 0 when regenOuterEnd is 2; setting to 1");
-                            config.setOuterEndRegenHours(outerEndRegenHours);
-                        }
-                        this.config.setNextOuterEndRegenTime(System.currentTimeMillis() + outerEndRegenHours * 60L * 60L * 1000L);
-                    }
-                    break;
-                default:
-                    // Unknown mode
-                    this.plugin.error("Unknown value for regenOuterEnd: " + regenOuterEnd);
-                    break;
-            }
+            int respawnType = this.config.getRespawnType();
+            if (this.config.getRespawnTimerMax() == 0 || respawnType == 0)
+                this.config.setNextRespawnTaskTime(0 , "EndWorldHandler.unload");
+            else
+                this.config.setNextRespawnTaskTime(nextRespawnExecTime, "EndWorldHandler.unload");
 
             this.saveConfig();
         } catch (final IOException e) {
             this.plugin.getLogger().severe("An error occured, stacktrace follows:");
             e.printStackTrace();
-            this.plugin.getLogger().severe("This error occured when NTheEndAgain tried to save " + e.getMessage() + ".yml");
+            this.plugin.getLogger().severe("This error occured when NTheEndAgain's EndWorldHandler tried to save " + e.getMessage() + ".yml");
         }
         try {
             this.saveChunks();
         } catch (final IOException e) {
             this.plugin.getLogger().severe("An error occured, stacktrace follows:");
             e.printStackTrace();
-            this.plugin.getLogger().severe("This error occured when NTheEndAgain tried to save " + e.getMessage() + ".yml");
+            this.plugin.getLogger().severe("This error occured when NTheEndAgain's EndWorldHandler tried to save " + e.getMessage() + ".yml");
             this.plugin.getLogger().severe("/!\\ THIS MEANS THAT PROTECTED CHUNKS COULD BE REGENERATED ON NEXT REGEN IN THIS WORLD /!\\");
         }
     }

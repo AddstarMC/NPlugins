@@ -52,7 +52,7 @@ public class NTheEndAgain extends NPlugin implements TheEndAgainNode {
      * @throws IOException if the config cant be loaded
      */
     protected void reloadConfig(final CommandSender sender) throws IOException {
-        this.entering(this.getClass(), "reLoadConfig");
+        // this.entering(this.getClass(), "reLoadConfig");
 
         this.debug("Reloading End world config ...");
 
@@ -73,12 +73,11 @@ public class NTheEndAgain extends NPlugin implements TheEndAgainNode {
                 final int savedRegenTimer = config.getRegenTimer();
 
                 final int savedRegenOuterEnd = config.getRegenOuterEnd();
-                final int savedOuterEndRegenHours = config.getOuterEndRegenHours();
 
                 try {
                     handler.loadConfig();
                 } catch (final IOException e) {
-                    this.error("This error occured when NTheEndAgain tried to load " + e.getMessage() + ".yml", e);
+                    this.error("This error occured when NTheEndAgain.reloadConfig tried to load " + e.getMessage() + ".yml", e);
                     break;
                 }
 
@@ -132,16 +131,7 @@ public class NTheEndAgain extends NPlugin implements TheEndAgainNode {
 
                 switch (updatedRegenOuterEnd) {
                     case 0:
-                        config.setNextOuterEndRegenTime(0);
-                        if (showDetails) {
-                            msg = "Outer end islands will not auto-regen";
-                        }
-                        break;
                     case 1:
-                        config.setNextOuterEndRegenTime(0);
-                        if (showDetails) {
-                            msg = "Outer end islands will regenerate every time the central island is regenerated";
-                        }
                         break;
                     case 2:
                         if (updatedOuterEndRegenHours < 1) {
@@ -149,23 +139,6 @@ public class NTheEndAgain extends NPlugin implements TheEndAgainNode {
                             this.debug("outerEndRegenHours cannot be 0 when regenOuterEnd is 2; setting to 1");
                             config.setOuterEndRegenHours(updatedOuterEndRegenHours);
                         }
-
-                        long newOuterEndRegenTimeMillis;
-                        long systemTime = System.currentTimeMillis();
-                        long currentOuterEndRegenTime = config.getNextOuterEndRegenTime();
-
-                        if (currentOuterEndRegenTime <= 0 || savedOuterEndRegenHours <= 0) {
-                            newOuterEndRegenTimeMillis = systemTime + updatedOuterEndRegenHours * 60L * 60L * 1000L;
-                        } else {
-                            newOuterEndRegenTimeMillis = currentOuterEndRegenTime + (updatedOuterEndRegenHours - savedOuterEndRegenHours) * 60L * 60L * 1000L;
-                            if (newOuterEndRegenTimeMillis < systemTime)
-                                newOuterEndRegenTimeMillis = systemTime;
-                        }
-
-                        this.debug("systemTimeMillis:               " + systemTime);
-                        this.debug("currentOuterEndRegenTimeMillis: " + currentOuterEndRegenTime);
-                        this.debug("new    OuterEndRegenTimeMillis: " + newOuterEndRegenTimeMillis);
-
                         break;
                     default:
                         // Unknown mode
@@ -291,6 +264,28 @@ public class NTheEndAgain extends NPlugin implements TheEndAgainNode {
         multiLineMsg.append('\n').append(msg);
 
         int regenOuterEnd = config.getRegenOuterEnd();
+        int outerEndRegenHours = config.getOuterEndRegenHours();
+        int outerEndRegenCount = config.getOuterEndRegenCount();
+
+        long currentTime = System.currentTimeMillis();
+        long lastOuterEndRegenTimeMillis = config.getLastOuterEndRegenTime();
+
+        // Compute the number of hours ago that the outer end was last regen'd
+        double outerEndRegenElapsedTimeHours = (currentTime - lastOuterEndRegenTimeMillis) / 1000.0 / 60 / 60;
+
+        String lastOuterEndRegenTime;
+
+        if (outerEndRegenCount > 0) {
+            if (outerEndRegenElapsedTimeHours < 24)
+                lastOuterEndRegenTime = "last regenerated " + new DecimalFormat("#.#").format(outerEndRegenElapsedTimeHours) + " hours ago";
+            else
+                lastOuterEndRegenTime = "last regenerated " + new DecimalFormat("#.#").format(outerEndRegenElapsedTimeHours / 24) + " days ago";
+        } else {
+            lastOuterEndRegenTime = "never regenerated";
+        }
+
+        this.debug("systemTimeMillis:      " + currentTime);
+        this.debug("lastOuterEndRegenTime: " + lastOuterEndRegenTimeMillis);
 
         switch (regenOuterEnd) {
             case 0:
@@ -299,27 +294,28 @@ public class NTheEndAgain extends NPlugin implements TheEndAgainNode {
                 multiLineMsg.append('\n').append(msg);
             case 1:
                 msg = "Outer end islands will regenerate every time the central island is regenerated";
+                if (outerEndRegenCount > 0)
+                    msg += "; " + lastOuterEndRegenTime;
+
                 this.debug(msg);
                 multiLineMsg.append('\n').append(msg);
                 break;
             case 2:
-                long systemTime = System.currentTimeMillis();
-                long outerEndRegenTimeMillis = config.getNextOuterEndRegenTime();
 
-                this.debug("systemTimeMillis:        " + systemTime);
-                this.debug("outerEndRegenTimeMillis: " + outerEndRegenTimeMillis);
-
-                float outerEndRegenTimeDays = (outerEndRegenTimeMillis - systemTime) / 1000.0F / 60.0F / 60.0F / 24.0F;
-
-                if (outerEndRegenTimeDays < 1) {
-                    if (outerEndRegenTimeDays <= 0) {
-                        msg = "Outer end islands will regen the next time an auto-regen occurs";
-                    } else {
-                        msg = "Outer end islands will regen in " + new DecimalFormat("#.#").format(outerEndRegenTimeDays * 24) + " hours";
-                    }
+                if (outerEndRegenElapsedTimeHours > outerEndRegenHours) {
+                    msg = "Outer end islands will regen the next time an auto-regen occurs";
                 } else {
-                    msg = "Outer end islands will regen in " + new DecimalFormat("#.##").format(outerEndRegenTimeDays) + " days";
+                    double hoursRemaining = outerEndRegenHours - outerEndRegenElapsedTimeHours;
+                    if (hoursRemaining < 24) {
+                        msg = "Outer end islands will regen in " + new DecimalFormat("#.#").format(hoursRemaining) + " hours";
+                    } else {
+                        msg = "Outer end islands will regen in " + new DecimalFormat("#.##").format(hoursRemaining / 24.0) + " days";
+                    }
+
                 }
+
+                if (outerEndRegenCount > 0)
+                    msg += "; " + lastOuterEndRegenTime;
 
                 this.debug(msg);
                 multiLineMsg.append('\n').append(msg);
@@ -470,7 +466,7 @@ public class NTheEndAgain extends NPlugin implements TheEndAgainNode {
             handler.initLater();
             return true;
         } catch (final IOException e) {
-            this.error("This error occured when NTheEndAgain tried to load " + e.getMessage() + ".yml", e);
+            this.error("This error occured when NTheEndAgain.loadWorld tried to load " + e.getMessage() + ".yml", e);
             return false;
         }
     }

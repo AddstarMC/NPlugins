@@ -24,6 +24,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
+import java.io.IOException;
 import java.util.UUID;
 
 /**
@@ -49,7 +50,7 @@ public class RegenHandler {
     }
 
     public void regen() {
-        this.plugin.entering(this.getClass(), "regen");
+        // this.plugin.entering(this.getClass(), "regen");
         Config config = this.worldHandler.getConfig();
 
         int regenMethod = config.getRegenMethod();
@@ -57,7 +58,7 @@ public class RegenHandler {
 
         this.regen(regenMethod, regenOuterEndNow);
 
-        this.plugin.exiting(this.getClass(), "regen");
+        // this.plugin.exiting(this.getClass(), "regen");
     }
 
     public void regen(final int regenMethod) {
@@ -66,8 +67,8 @@ public class RegenHandler {
         this.regen(regenMethod, regenOuterEndNow);
     }
 
-    public void regen(final int regenMethod, final Boolean regenOuterEndNow) {
-        this.plugin.entering(this.getClass(), "regen(int, int)");
+    private void regen(final int regenMethod, final Boolean regenOuterEndNow) {
+        // this.plugin.entering(this.getClass(), "regen(int, int)");
 
         this.plugin.debug("Kicking players out of the world/server...");
         this.kickPlayers();
@@ -100,7 +101,7 @@ public class RegenHandler {
             }
         }, EndWorldHandler.KICK_TO_REGEN_DELAY);
 
-        this.plugin.exiting(this.getClass(), "regen(int, int)");
+        // this.plugin.exiting(this.getClass(), "regen(int, int)");
     }
 
     public void hardRegenOnStop() {
@@ -117,7 +118,7 @@ public class RegenHandler {
 
     /*package*/
     void regenThenRespawn() {
-        this.plugin.entering(this.getClass(), "regenThenRespawn");
+        // this.plugin.entering(this.getClass(), "regenThenRespawn");
 
         this.regen();
 
@@ -134,7 +135,7 @@ public class RegenHandler {
             }
         }, EndWorldHandler.REGEN_TO_RESPAWN_DELAY);
 
-        this.plugin.exiting(this.getClass(), "regenThenRespawn");
+        // this.plugin.exiting(this.getClass(), "regenThenRespawn");
     }
 
     /**
@@ -146,26 +147,26 @@ public class RegenHandler {
 
         switch (regenOuterEnd) {
             case 0:
-                config.setNextOuterEndRegenTime(0);
                 return false;
             case 1:
-                config.setNextOuterEndRegenTime(0);
                 return true;
             case 2:
-                long nextRegenTaskTime = config.getNextOuterEndRegenTime();
+                long lastOuterEndRegenTimeMillis = config.getLastOuterEndRegenTime();
+                int outerEndRegenHours = config.getOuterEndRegenHours();
 
-                if (nextRegenTaskTime == 0 || nextRegenTaskTime < System.currentTimeMillis()) {
-                    int outerEndRegenHours = config.getOuterEndRegenHours();
+                if (outerEndRegenHours < 1) {
+                    outerEndRegenHours = 1;
+                    this.plugin.debug("outerEndRegenHours cannot be 0 when regenOuterEnd is 2; setting to 1");
+                    config.setOuterEndRegenHours(outerEndRegenHours);
+                }
 
-                    if (outerEndRegenHours < 1) {
-                        outerEndRegenHours = 1;
-                        this.plugin.debug("outerEndRegenHours cannot be 0 when regenOuterEnd is 2; setting to 1");
-                        config.setOuterEndRegenHours(outerEndRegenHours);
-                    }
-                    config.setNextOuterEndRegenTime(System.currentTimeMillis() + outerEndRegenHours * 60L * 60L * 1000L);
+                // Compute the number of hours ago that the outer end was last regen'd
+                double outerEndRegenElapsedTimeHours = (System.currentTimeMillis() - lastOuterEndRegenTimeMillis) / 1000.0 / 60 / 60;
 
+                if (outerEndRegenElapsedTimeHours > outerEndRegenHours) {
                     return true;
                 }
+
                 break;
             default:
                 // Unknown mode
@@ -177,14 +178,13 @@ public class RegenHandler {
     }
 
     private void hardRegen(final Boolean regenOuterEndNow, final boolean pluginDisabled) {
-        this.plugin.entering(this.getClass(), "hardRegen");
+        // this.plugin.entering(this.getClass(), "hardRegen");
 
         final NTheEndAgain plugin = this.worldHandler.getPlugin();
         final World endWorld = this.worldHandler.getEndWorld();
         final EndChunks chunks = this.worldHandler.getChunks();
 
         final String prefix = "[REGEN " + endWorld.getName() + "] ";
-
 
         if (regenOuterEndNow)
             plugin.info(prefix + "Regenerating end world, including outer islands (hard regen) ...");
@@ -202,6 +202,10 @@ public class RegenHandler {
         long lastTime = System.currentTimeMillis();
 
         plugin.debug("Starting regeneration...");
+
+        // Increment the regen counts
+        IncrementRegenCounts(regenOuterEndNow);
+
         for (final EndChunk c : chunks) {
             if (System.currentTimeMillis() - lastTime > 500) {
                 plugin.info(prefix + regen + " chunks regenerated (" + i * 100 / totalChunks + "% done)");
@@ -227,7 +231,7 @@ public class RegenHandler {
         }
         plugin.info(prefix + "Done.");
 
-        plugin.exiting(this.getClass(), "hardRegen");
+        // plugin.exiting(this.getClass(), "hardRegen");
     }
 
     private void softRegen(
@@ -235,14 +239,16 @@ public class RegenHandler {
             final boolean pluginDisabled,
             final boolean hardRegenInProgress) {
 
-        this.plugin.entering(this.getClass(), "softRegen");
+        // this.plugin.entering(this.getClass(), "softRegen");
 
         World endWorld = this.worldHandler.getEndWorld();
 
         Config config = this.worldHandler.getConfig();
         Boolean verboseLogging = config.getVerboseRegenLogging();
 
-        if (!hardRegenInProgress) {
+        if (hardRegenInProgress) {
+            plugin.debug("using softRegen to find chunks to process via hardRegen");
+        } else {
             final String worldName = endWorld.getName();
             final String prefix = "[REGEN " + worldName + "] ";
 
@@ -250,6 +256,9 @@ public class RegenHandler {
                 plugin.info(prefix + "Regenerating end world, including outer islands (soft regen) ...");
             else
                 plugin.info(prefix + "Regenerating end world, central island only (soft regen) ...");
+
+            // Increment the regen counts
+            IncrementRegenCounts(regenOuterEndNow);
         }
 
         this.plugin.debug("Calling softRegen on chunks...");
@@ -269,7 +278,7 @@ public class RegenHandler {
             this.worldHandler.getSlowSoftRegeneratorTaskHandler().run();
         }
 
-        this.plugin.exiting(this.getClass(), "softRegen");
+        // this.plugin.exiting(this.getClass(), "softRegen");
     }
 
     private void crystalRegen() {
@@ -285,7 +294,7 @@ public class RegenHandler {
     }
 
     private void kickPlayers() {
-        this.plugin.entering(this.getClass(), "kickPlayers");
+        // this.plugin.entering(this.getClass(), "kickPlayers");
 
         final Config config = this.worldHandler.getConfig();
         final NTheEndAgain plugin = this.worldHandler.getPlugin();
@@ -331,6 +340,28 @@ public class RegenHandler {
                 throw new IllegalStateException("Invalid configuration value regenAction found at Runtime, please report this!");
         }
 
-        plugin.exiting(this.getClass(), "kickPlayers");
+        // plugin.exiting(this.getClass(), "kickPlayers");
+    }
+
+    private void IncrementRegenCounts(Boolean regenOuterEndNow) {
+        Config config = this.worldHandler.getConfig();
+        int newCentralEndRegenCount = config.getCentralEndRegenCount() + 1;
+
+        plugin.debug("Updating centralEndRegenCount to " + newCentralEndRegenCount);
+        config.setCentralEndRegenCount(newCentralEndRegenCount);
+
+        if (regenOuterEndNow) {
+            int newOuterEndRegenCount = config.getOuterEndRegenCount() + 1;
+            plugin.debug("Updating centralEndRegenCount to " + newOuterEndRegenCount);
+            config.setOuterEndRegenCount(newOuterEndRegenCount);
+        }
+
+        try {
+            this.worldHandler.saveConfig();
+        } catch (final IOException e) {
+            this.plugin.getLogger().severe("An error occured, stacktrace follows:");
+            e.printStackTrace();
+            this.plugin.getLogger().severe("This error occurred when NTheEndAgain.IncrementRegenCounts tried to save " + e.getMessage() + ".yml");
+        }
     }
 }
