@@ -297,6 +297,7 @@ public class NTheEndAgain extends NPlugin implements TheEndAgainNode {
                 msg = "Outer end islands will not auto-regen";
                 this.debug(msg);
                 multiLineMsg.append('\n').append(msg);
+                break;
             case 1:
                 msg = "Outer end islands will regenerate every time the central island is regenerated";
                 if (outerEndRegenCount > 0)
@@ -325,7 +326,7 @@ public class NTheEndAgain extends NPlugin implements TheEndAgainNode {
                 // Unknown mode
                 msg = "Unknown value for regenOuterEnd: " + regenOuterEnd;
                 this.error(msg);
-                ShowMessage(sender, msg, ChatColor.RED);
+                showMessage(sender, msg, ChatColor.RED);
                 break;
         }
 
@@ -359,8 +360,17 @@ public class NTheEndAgain extends NPlugin implements TheEndAgainNode {
         if (msgAddon.length() > 0)
             multiLineMsg.append(msgAddon.toString());
 
-        ShowMessage(sender, multiLineMsg.toString());
+        showMessage(sender, multiLineMsg.toString());
 
+    }
+
+    /**
+     * Format a number with 2 digits after the decimal place
+     * @param value the value to format
+     * @return a String formatted
+     */
+    public String formatNumber(double value) {
+        return formatNumber(value, 2);
     }
 
     /**
@@ -369,7 +379,7 @@ public class NTheEndAgain extends NPlugin implements TheEndAgainNode {
      * @param digitsAfterDecimal decimal places
      * @return a String formatted
      */
-    private String formatNumber(double value, int digitsAfterDecimal) {
+    public String formatNumber(double value, int digitsAfterDecimal) {
         String formatString;
 
         if (digitsAfterDecimal <= 0) {
@@ -578,11 +588,11 @@ public class NTheEndAgain extends NPlugin implements TheEndAgainNode {
         return THE_END_AGAIN;
     }
 
-    private void ShowMessage(final CommandSender sender, String message) {
-        ShowMessage(sender, message, ChatColor.AQUA);
+    public void showMessage(final CommandSender sender, String message) {
+        showMessage(sender, message, ChatColor.AQUA);
     }
 
-    private void ShowMessage(final CommandSender sender, String message, ChatColor messageColor)
+    public void showMessage(final CommandSender sender, String message, ChatColor messageColor)
     {
         // [NTheEndAgain]
         String PREFIX = "§0[§c§lN§6TheEndAgain§0] §f";
