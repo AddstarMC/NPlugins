@@ -29,7 +29,7 @@ public class RespawnTask extends RandomRepeatingTask {
     public boolean exec() {
         this.worldHandler.getPlugin().entering(this.getClass(), "exec");
 
-        final boolean res = this.worldHandler.getRespawnHandler().respawn();
+        final boolean res = this.worldHandler.getRespawnHandler().respawn(false);
 
         this.worldHandler.getPlugin().exiting(this.getClass(), "exec", Boolean.toString(res));
         return res;

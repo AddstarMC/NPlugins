@@ -33,6 +33,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.BlockFace;
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Entity;
@@ -94,6 +95,45 @@ public class EndChunks implements Iterable<EndChunk> {
             throw new IllegalArgumentException("Wrong world, this EndChunks object handles world \"" + this.worldName + "\", " +
                                                "not world \"" + worldName + '"');
         }
+    }
+
+    /**
+     * Forget all saved dragons currently being tracked by EndChunks
+     * Note that dragons are added to an EndChunk when it is unloaded,
+     * but they are removed from the chunk when it is re-loaded
+     */
+    public void forgetAllDragons(CommandSender sender, boolean checkOuterEnd, NTheEndAgain plugin) {
+        int dragonsRemoved = 0;
+        for (final EndChunk ec : this) {
+            if (!checkOuterEnd) {
+                if (Math.abs(ec.getX()) >= 30 || Math.abs(ec.getZ()) >= 30 ) {
+                    // Skip this outer end chunk
+                    continue;
+                }
+            }
+            int dragonCount = ec.getSavedDragons();
+            if (dragonCount > 0) {
+                if (dragonCount > 1)
+                    plugin.info("Removing " + dragonCount + " saved dragons from chunk " + ec.getCoordsString(false));
+                else
+                    plugin.info("Removing 1 saved dragon from chunk " + ec.getCoordsString(false));
+
+                ec.resetSavedDragons();
+
+                dragonsRemoved += dragonCount;
+            }
+        }
+
+        String msg;
+        if (dragonsRemoved == 0) {
+            msg = "Did not find any saved dragons to remove from unloaded chunks";
+        } else {
+            msg = "Removed " + dragonsRemoved + " saved dragon(s) from unloaded chunks";
+        }
+
+        plugin.debug(msg);
+        plugin.showMessage(sender, msg);
+
     }
 
     public void softRegen(Boolean regenOuterEnd, Boolean verboseLogging, NTheEndAgain plugin) {

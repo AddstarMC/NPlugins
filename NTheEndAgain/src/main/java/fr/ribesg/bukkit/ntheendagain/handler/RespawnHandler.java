@@ -40,17 +40,18 @@ public class RespawnHandler {
         this.plugin = worldHandler.getPlugin();
     }
 
-    public boolean respawn() {
+    public boolean respawn(boolean forceSpawn) {
         // this.plugin.entering(this.getClass(), "respawn");
         final boolean result;
 
-        if (this.worldHandler.getConfig().getRegenType() == 1) {
+        if (this.worldHandler.getConfig().getRegenType() == 1 &&
+                this.worldHandler.getNumberOfAliveEnderDragons() == 0) {
             this.plugin.debug("Regen before respawn");
-            this.worldHandler.getRegenHandler().regenThenRespawn();
+            this.worldHandler.getRegenHandler().regenThenRespawn(forceSpawn);
             result = true;
         } else {
             this.plugin.debug("Respawn now!");
-            result = this.respawnDragons();
+            result = this.respawnDragons(forceSpawn);
         }
 
         // this.plugin.exiting(this.getClass(), "respawn", Boolean.toString(result));
@@ -63,7 +64,7 @@ public class RespawnHandler {
         Config config = this.worldHandler.getConfig();
         int randomRespawnTimeSec = config.getRandomRespawnTimeSeconds();
 
-        Bukkit.getScheduler().runTaskLater(this.worldHandler.getPlugin(), () -> RespawnHandler.this.respawn(), randomRespawnTimeSec * 20L);
+        Bukkit.getScheduler().runTaskLater(this.worldHandler.getPlugin(), () -> RespawnHandler.this.respawn(false), randomRespawnTimeSec * 20L);
 
         config.updateNextExpectedRespawnTime(randomRespawnTimeSec);
 
@@ -71,22 +72,32 @@ public class RespawnHandler {
     }
 
     /*package*/
-    void respawnNoRegen() {
+    void respawnNoRegen(boolean forceSpawn) {
         this.plugin.entering(this.getClass(), "respawnNoRegen");
 
-        this.respawnDragons();
+        this.respawnDragons(forceSpawn);
 
         this.plugin.exiting(this.getClass(), "respawnNoRegen");
     }
 
-    private boolean respawnDragons() {
+    private boolean respawnDragons(boolean forceSpawn) {
         this.plugin.entering(this.getClass(), "respawnDragons");
 
-        final int nbAlive = this.worldHandler.getNumberOfAliveEnderDragons();
         final int respawnNumber = this.worldHandler.getConfig().getRespawnNumber();
+        final int nbAlive = this.worldHandler.getNumberOfAliveEnderDragons();
+
+        final int aliveStartIndex;
+        if (forceSpawn && (nbAlive >= respawnNumber)) {
+            // Force 1 dragon to be spawned
+            aliveStartIndex = respawnNumber - 1;
+        } else {
+            // Respawn enough dragons so the number of live dragons becomes respawnNumber
+            aliveStartIndex = this.worldHandler.getNumberOfAliveEnderDragons();
+        }
+
         int respawning = 0;
         boolean result = true;
-        for (int i = nbAlive; i < respawnNumber; i++) {
+        for (int i = aliveStartIndex; i < respawnNumber; i++) {
             result &= this.respawnDragon();
             respawning++;
         }

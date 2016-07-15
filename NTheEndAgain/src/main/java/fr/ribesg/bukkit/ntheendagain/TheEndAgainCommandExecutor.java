@@ -63,6 +63,13 @@ public class TheEndAgainCommandExecutor implements CommandExecutor {
                             this.plugin.sendMessage(sender, MessageId.noPermissionForCommand);
                             return true;
                         }
+                    case "forcespawn":
+                        if (Perms.hasRespawn(sender)) {
+                            return this.cmdForceSpawn(sender, Arrays.copyOfRange(args, 1, args.length));
+                        } else {
+                            this.plugin.sendMessage(sender, MessageId.noPermissionForCommand);
+                            return true;
+                        }
                     case "nbenderdragon":
                     case "nbed":
                     case "nb":
@@ -72,6 +79,14 @@ public class TheEndAgainCommandExecutor implements CommandExecutor {
                             this.plugin.sendMessage(sender, MessageId.noPermissionForCommand);
                             return true;
                         }
+                    case "forgetalldragons":
+                        if (Perms.hasRespawn(sender)) {
+                            return this.cmdForgetAllDragons(sender, Arrays.copyOfRange(args, 1, args.length));
+                        } else {
+                            this.plugin.sendMessage(sender, MessageId.noPermissionForCommand);
+                            return true;
+                        }
+
                     case "chunk":
                         if (args.length < 2) {
                             return false;
@@ -137,7 +152,7 @@ public class TheEndAgainCommandExecutor implements CommandExecutor {
     private boolean cmdHelp(final CommandSender sender) {
         // TODO We will create some kind of great Help thing later for the whole NPlugins suite
         //      Or maybe we will just use the Bukkit /help command...
-        sender.sendMessage("Available subcommands: help, regen, respawn, nb, " +
+        sender.sendMessage("Available subcommands: help, regen, respawn, forcespawn, nb, forgetalldragons, " +
                 "chunk info, chunk protect, chunk unprotect, " +
                 "reload config, reload messages, status");
         return true;
@@ -172,7 +187,44 @@ public class TheEndAgainCommandExecutor implements CommandExecutor {
         } else {
             final EndWorldHandler handler = this.plugin.getHandler(StringUtil.toLowerCamelCase(parsedArgs[0]));
             if (handler != null) {
-                handler.getRespawnHandler().respawn();
+                handler.getRespawnHandler().respawn(false);
+            } else {
+                this.plugin.sendMessage(sender, MessageId.unknownWorld, parsedArgs[0]);
+            }
+        }
+        return true;
+    }
+
+    private boolean cmdForceSpawn(final CommandSender sender, final String[] args) {
+        final String[] parsedArgs = this.checkWorldArgument(sender, args);
+        if (parsedArgs == null) {
+            // The sender already received a message
+            return true;
+        } else {
+            final EndWorldHandler handler = this.plugin.getHandler(StringUtil.toLowerCamelCase(parsedArgs[0]));
+            if (handler != null) {
+                // Pass true for forceSpawn
+                handler.getRespawnHandler().respawn(true);
+            } else {
+                this.plugin.sendMessage(sender, MessageId.unknownWorld, parsedArgs[0]);
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Forget all saved dragons being tracked by EndChunks
+     */
+    private boolean cmdForgetAllDragons(final CommandSender sender, final String[] args) {
+        final String[] parsedArgs = this.checkWorldArgument(sender, args);
+        if (parsedArgs == null) {
+            // The sender already received a message
+            return true;
+        } else {
+            final EndWorldHandler handler = this.plugin.getHandler(StringUtil.toLowerCamelCase(parsedArgs[0]));
+            if (handler != null) {
+                // Pass false for checkOuterEnd
+                handler.getChunks().forgetAllDragons(sender, false, this.plugin);
             } else {
                 this.plugin.sendMessage(sender, MessageId.unknownWorld, parsedArgs[0]);
             }

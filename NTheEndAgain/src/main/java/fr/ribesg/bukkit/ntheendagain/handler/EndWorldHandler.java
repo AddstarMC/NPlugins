@@ -116,7 +116,7 @@ public class EndWorldHandler {
 
             if (this.config.getRespawnType() == 3) {
                 // Respawn the dragons now, but do not regenerate the chunks
-                this.respawnHandler.respawnNoRegen();
+                this.respawnHandler.respawnNoRegen(false);
             } /*
                * Respawn Type 6 (deprecated)
                else if (this.config.getRespawnType() == 6) {
@@ -262,12 +262,15 @@ public class EndWorldHandler {
 
                         if (!this.dragons.containsKey(dragonId)) {
                             int initialHealth = this.config.getEdHealth();
-                            plugin.debug("EndWorldHandler.countEntities ... found EnderDragon, UUID " + dragonId + ", health " + initialHealth);
+                            org.bukkit.Location dragonLoc = ed.getLocation();
+
+                            plugin.debug("EndWorldHandler.countEntities ... " +
+                                    "found EnderDragon at " +
+                                    (int)dragonLoc.getX() + " " + (int)dragonLoc.getY() + " " + (int)dragonLoc.getZ() +
+                                    ", UUID " + dragonId + ", health " + initialHealth);
 
                             ed.setMaxHealth(initialHealth);
                             ed.setHealth(ed.getMaxHealth());
-
-                            // plugin.debug("EndWorldHandler.countEntities ... actual health is " + new DecimalFormat("#.##").format(ed.getHealth()));
 
                             this.dragons.put(dragonId, new HashMap<>());
                             this.loadedDragons.add(dragonId);

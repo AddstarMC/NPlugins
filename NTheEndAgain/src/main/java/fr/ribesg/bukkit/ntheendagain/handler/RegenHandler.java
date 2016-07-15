@@ -25,7 +25,6 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
 import java.io.IOException;
-import java.text.DecimalFormat;
 import java.util.UUID;
 
 /**
@@ -118,7 +117,7 @@ public class RegenHandler {
     }
 
     /*package*/
-    void regenThenRespawn() {
+    void regenThenRespawn(boolean forceSpawn) {
         // this.plugin.entering(this.getClass(), "regenThenRespawn");
 
         this.regen();
@@ -130,7 +129,7 @@ public class RegenHandler {
             public void run() {
                 fr.ribesg.bukkit.ntheendagain.handler.RegenHandler.this.plugin.entering(this.getClass(), "run", "task from regenThenRespawn");
 
-                fr.ribesg.bukkit.ntheendagain.handler.RegenHandler.this.worldHandler.getRespawnHandler().respawnNoRegen();
+                fr.ribesg.bukkit.ntheendagain.handler.RegenHandler.this.worldHandler.getRespawnHandler().respawnNoRegen(forceSpawn);
 
                 fr.ribesg.bukkit.ntheendagain.handler.RegenHandler.this.plugin.exiting(this.getClass(), "run", "task from regenThenRespawn");
             }
@@ -166,11 +165,11 @@ public class RegenHandler {
 
                 if (outerEndRegenElapsedTimeHours > outerEndRegenHours) {
                     this.plugin.debug("Need to regen the outer end: " +
-                            new DecimalFormat("#.##").format(outerEndRegenElapsedTimeHours) + " > " + outerEndRegenHours);
+                            this.plugin.formatNumber(outerEndRegenElapsedTimeHours) + " > " + outerEndRegenHours);
                     return true;
                 } else {
                     this.plugin.debug("Do not regen the outer end: " +
-                            new DecimalFormat("#.##").format(outerEndRegenElapsedTimeHours) + " < " + outerEndRegenHours);
+                            this.plugin.formatNumber(outerEndRegenElapsedTimeHours) + " < " + outerEndRegenHours);
                 }
 
                 break;
