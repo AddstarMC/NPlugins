@@ -191,8 +191,15 @@ public class ChunkListener implements Listener {
 
                             final EnderDragon ed = (EnderDragon)e;
                             UUID dragonId = ed.getUniqueId();
+                            org.bukkit.Location dragonLoc = ed.getLocation();
 
-                            this.plugin.debug("onEndChunkLoad ... found EnderDragon, UUID " + dragonId);
+                            this.plugin.debug("onEndChunkLoad ... " +
+                                    "found EnderDragon in chunk " + endChunk.getCoordsString(false) +
+                                    " (at " +
+                                    (int)dragonLoc.getX() + " " +
+                                    (int)dragonLoc.getY() + " " +
+                                    (int)dragonLoc.getZ() + ")" +
+                                    ", UUID " + dragonId + ", health " + this.plugin.formatNumber(ed.getHealth()));
 
                             if (!handler.getDragons().containsKey(dragonId)) {
 
@@ -211,7 +218,10 @@ public class ChunkListener implements Listener {
                         } else if (e.getType() == EntityType.ENDER_CRYSTAL) {
 
                             this.plugin.debug("onEndChunkLoad ... found crystal at " +
-                                    e.getLocation().getX() + ", " + e.getLocation().getY() + ", " + e.getLocation().getZ());
+                                    (int)e.getLocation().getX() + " " +
+                                    (int)e.getLocation().getY() + " " +
+                                    (int)e.getLocation().getZ());
+
                             endChunk.addCrystalLocation(e);
                         }
                     }
@@ -233,18 +243,20 @@ public class ChunkListener implements Listener {
             final String worldName = event.getWorld().getName();
             final EndWorldHandler handler = this.plugin.getHandler(StringUtil.toLowerCamelCase(worldName));
             if (handler != null) {
-                EndChunk chunk = handler.getChunks().getChunk(event.getChunk());
-                if (chunk == null) {
-                    chunk = handler.getChunks().addChunk(event.getChunk());
+                EndChunk endChunk = handler.getChunks().getChunk(event.getChunk());
+                if (endChunk == null) {
+                    endChunk = handler.getChunks().addChunk(event.getChunk());
                 }
                 for (final Entity e : event.getChunk().getEntities()) {
                     if (e.getType() == EntityType.ENDER_DRAGON) {
                         final EnderDragon ed = (EnderDragon)e;
                         UUID dragonId = ed.getUniqueId();
-                        this.plugin.debug("onEndChunkUnload ... remove EnderDragon, UUID " + dragonId);
+                        this.plugin.debug("onEndChunkUnload ... " +
+                                "remove EnderDragon from chunk " + endChunk.getCoordsString(false) +
+                                ", UUID " + dragonId);
 
                         handler.getLoadedDragons().remove(dragonId);
-                        chunk.incrementSavedDragons();
+                        endChunk.incrementSavedDragons();
                     }
                 }
             }

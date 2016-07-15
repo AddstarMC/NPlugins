@@ -17,7 +17,6 @@ import fr.ribesg.bukkit.ntheendagain.Config;
 import fr.ribesg.bukkit.ntheendagain.NTheEndAgain;
 import fr.ribesg.bukkit.ntheendagain.handler.EndWorldHandler;
 
-import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -62,7 +61,6 @@ public class EnderDragonListener implements Listener {
      */
     private static final float         THRESHOLD = 0.15f;
     private static final Random        RANDOM    = new Random();
-    private static final DecimalFormat FORMAT    = new DecimalFormat("#0.00");
 
     private final NTheEndAgain plugin;
 
@@ -183,7 +181,10 @@ public class EnderDragonListener implements Listener {
                     if (RANDOM.nextFloat() <= pair.getValue()) {
                         endWorld.dropItemNaturally(loc, is);
                         this.plugin.debug(" ... Dropping item " + is.toString() +
-                                " at " + loc.getX() + ", " + loc.getY() + ", " + loc.getZ());
+                                " at " +
+                                (int)loc.getX() + ", " +
+                                (int)loc.getY() + ", " +
+                                (int)loc.getZ());
                     }
                 }
             }
@@ -211,7 +212,7 @@ public class EnderDragonListener implements Listener {
                 if (percentage < THRESHOLD) {
                     break;
                 } else {
-                    this.plugin.broadcastMessage(playersKilledLine, playerName, FORMAT.format(percentage * 100f));
+                    this.plugin.broadcastMessage(playersKilledLine, playerName, this.plugin.formatNumber(percentage * 100f));
                 }
             }
         }
@@ -758,7 +759,7 @@ public class EnderDragonListener implements Listener {
 
                         } else {
                             this.plugin.debug("onEnderDragonSpawn ... spawned EnderDragon, UUID " + dragonId +
-                                    "; default health of " + new DecimalFormat("#.##").format(ed.getHealth()));
+                                    "; default health of " + this.plugin.formatNumber(ed.getHealth()));
                         }
                         handler.getLoadedDragons().add(dragonId);
                     }

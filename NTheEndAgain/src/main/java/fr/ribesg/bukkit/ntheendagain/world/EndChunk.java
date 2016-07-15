@@ -181,6 +181,13 @@ public class EndChunk {
         return this.coords;
     }
 
+    public String getCoordsString(boolean includeWorld) {
+        if (includeWorld)
+            return this.coords.getWorldName() + " " + this.getX() + "," + this.getZ();
+        else
+            return this.getX() + "," + this.getZ();
+    }
+
     @Override
     public int hashCode() {
         return this.coords.hashCode();
