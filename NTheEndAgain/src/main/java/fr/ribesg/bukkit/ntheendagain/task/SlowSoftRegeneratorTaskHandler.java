@@ -61,9 +61,12 @@ public class SlowSoftRegeneratorTaskHandler {
 
     public SlowSoftRegeneratorTaskHandler(final EndWorldHandler handler) {
         this.handler = handler;
-        if (handler.getSlowSoftRegeneratorTaskHandler() != null) {
-            handler.getSlowSoftRegeneratorTaskHandler().cancel();
+
+        SlowSoftRegeneratorTaskHandler slowSoftRegenTask = handler.getSlowSoftRegeneratorTaskHandler();
+        if (slowSoftRegenTask != null) {
+            slowSoftRegenTask.cancel();
         }
+
         handler.setSlowSoftRegeneratorTaskHandler(this);
 
         this.slowSoftRegenChunks = handler.getConfig().getSlowSoftRegenChunks();

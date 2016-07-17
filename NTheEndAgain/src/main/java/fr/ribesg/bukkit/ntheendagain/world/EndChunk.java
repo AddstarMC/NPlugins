@@ -182,10 +182,11 @@ public class EndChunk {
     }
 
     public String getCoordsString(boolean includeWorld) {
+        String coordsString = String.format("%1$4s", this.getX()) + "," + String.format("%1$4s", this.getZ());
         if (includeWorld)
-            return this.coords.getWorldName() + " " + this.getX() + "," + this.getZ();
+            return this.coords.getWorldName() + " " + coordsString;
         else
-            return this.getX() + "," + this.getZ();
+            return coordsString;
     }
 
     @Override

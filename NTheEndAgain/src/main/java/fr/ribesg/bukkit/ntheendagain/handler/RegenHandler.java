@@ -83,7 +83,7 @@ public class RegenHandler {
                 switch (regenMethod) {
                     case 0:
                         fr.ribesg.bukkit.ntheendagain.handler.RegenHandler.this.plugin.debug("Hard regen...");
-                        fr.ribesg.bukkit.ntheendagain.handler.RegenHandler.this.hardRegen(regenOuterEndNow, false);
+                        fr.ribesg.bukkit.ntheendagain.handler.RegenHandler.this.hardRegen(false);
                         break;
                     case 1:
                         fr.ribesg.bukkit.ntheendagain.handler.RegenHandler.this.plugin.debug("Soft regen...");
@@ -107,11 +107,8 @@ public class RegenHandler {
     public void hardRegenOnStop() {
         this.plugin.entering(this.getClass(), "hardRegenOnStop");
 
-        Config config = this.worldHandler.getConfig();
-
-        Boolean regenOuterEndNow = checkRegenOuterEndNow(config);
-
-        this.hardRegen(regenOuterEndNow, true);
+        // Pass true for pluginDisabled
+        this.hardRegen(true);
 
         this.plugin.exiting(this.getClass(), "hardRegenOnStop");
     }
@@ -182,7 +179,7 @@ public class RegenHandler {
         return false;
     }
 
-    private void hardRegen(final Boolean regenOuterEndNow, final boolean pluginDisabled) {
+    private void hardRegen(final boolean pluginDisabled) {
         // this.plugin.entering(this.getClass(), "hardRegen");
 
         final NTheEndAgain plugin = this.worldHandler.getPlugin();
@@ -191,10 +188,9 @@ public class RegenHandler {
 
         final String prefix = "[REGEN " + endWorld.getName() + "] ";
 
-        if (regenOuterEndNow)
-            plugin.info(prefix + "Regenerating end world, including outer islands (hard regen) ...");
-        else
-            plugin.info(prefix + "Regenerating end world, central island only (soft hard) ...");
+        // Never regen the outer end via hard regen; it takes way too long
+        boolean regenOuterEndNow = false;
+        plugin.info(prefix + "Regenerating end world, central island only (hard) ...");
 
         plugin.debug("Kicking players out of the world/server...");
         this.kickPlayers();
@@ -210,6 +206,9 @@ public class RegenHandler {
 
         // Increment the regen counts
         IncrementRegenCounts(regenOuterEndNow);
+
+        // Reset the cancelRequested flag
+        this.plugin.resetCancelRegenFlag();
 
         for (final EndChunk c : chunks) {
             if (System.currentTimeMillis() - lastTime > 500) {
@@ -233,6 +232,11 @@ public class RegenHandler {
                 regen++;
             }
             i++;
+
+            if (this.plugin.getCancelRegenFlag()) {
+                plugin.info(prefix + "Aborted regeneration (hard)");
+                break;
+            }
         }
         plugin.info(prefix + "Done.");
 
@@ -264,6 +268,9 @@ public class RegenHandler {
 
             // Increment the regen counts
             IncrementRegenCounts(regenOuterEndNow);
+
+            // Reset the cancelRequested flag
+            this.plugin.resetCancelRegenFlag();
         }
 
         this.plugin.debug("Calling softRegen on chunks...");

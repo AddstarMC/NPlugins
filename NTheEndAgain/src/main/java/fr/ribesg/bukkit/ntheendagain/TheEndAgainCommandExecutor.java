@@ -14,6 +14,7 @@ import fr.ribesg.bukkit.ncore.lang.MessageId;
 import fr.ribesg.bukkit.ncore.util.StringUtil;
 import fr.ribesg.bukkit.ncore.util.WorldUtil;
 import fr.ribesg.bukkit.ntheendagain.handler.EndWorldHandler;
+import fr.ribesg.bukkit.ntheendagain.task.SlowSoftRegeneratorTaskHandler;
 import fr.ribesg.bukkit.ntheendagain.world.EndChunk;
 import fr.ribesg.bukkit.ntheendagain.world.EndChunks;
 import org.bukkit.World;
@@ -50,6 +51,13 @@ public class TheEndAgainCommandExecutor implements CommandExecutor {
                     case "regen":
                         if (Perms.hasRegen(sender)) {
                             return this.cmdRegen(sender, Arrays.copyOfRange(args, 1, args.length));
+                        } else {
+                            this.plugin.sendMessage(sender, MessageId.noPermissionForCommand);
+                            return true;
+                        }
+                    case "cancelregen":
+                        if (Perms.hasRegen(sender)) {
+                            return this.cmdCancelRegen(sender, Arrays.copyOfRange(args, 1, args.length));
                         } else {
                             this.plugin.sendMessage(sender, MessageId.noPermissionForCommand);
                             return true;
@@ -152,7 +160,7 @@ public class TheEndAgainCommandExecutor implements CommandExecutor {
     private boolean cmdHelp(final CommandSender sender) {
         // TODO We will create some kind of great Help thing later for the whole NPlugins suite
         //      Or maybe we will just use the Bukkit /help command...
-        sender.sendMessage("Available subcommands: help, regen, respawn, forcespawn, nb, forgetalldragons, " +
+        sender.sendMessage("Available subcommands: help, regen, cancelRegen, respawn, forceSpawn, nb, forgetAllDragons, " +
                 "chunk info, chunk protect, chunk unprotect, " +
                 "reload config, reload messages, status");
         return true;
@@ -172,6 +180,35 @@ public class TheEndAgainCommandExecutor implements CommandExecutor {
                 } else {
                     handler.getRegenHandler().regen();
                 }
+            } else {
+                this.plugin.sendMessage(sender, MessageId.unknownWorld, parsedArgs[0]);
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Cancels any in-progress regens
+     */
+    private boolean cmdCancelRegen(final CommandSender sender, final String[] args) {
+        final String[] parsedArgs = this.checkWorldArgument(sender, args);
+        if (parsedArgs == null) {
+            // The sender already received a message
+            return true;
+        } else {
+            final EndWorldHandler handler = this.plugin.getHandler(StringUtil.toLowerCamelCase(parsedArgs[0]));
+            if (handler != null) {
+
+                // Cancel any in-progress slow regens
+                SlowSoftRegeneratorTaskHandler slowSoftRegenTask = handler.getSlowSoftRegeneratorTaskHandler();
+                if (slowSoftRegenTask != null) {
+                    plugin.info("Aborted regeneration (soft)");
+                    slowSoftRegenTask.cancel();
+                }
+
+                // Cancel any in-progress hard regens
+                plugin.cancelRegen();
+
             } else {
                 this.plugin.sendMessage(sender, MessageId.unknownWorld, parsedArgs[0]);
             }

@@ -10,6 +10,7 @@
 package fr.ribesg.bukkit.ntheendagain.world;
 
 import fr.ribesg.bukkit.ncore.common.ChunkCoord;
+import fr.ribesg.bukkit.ntheendagain.Config;
 import fr.ribesg.bukkit.ntheendagain.NTheEndAgain;
 import fr.ribesg.bukkit.ntheendagain.handler.EndWorldHandler;
 
@@ -137,12 +138,25 @@ public class EndChunks implements Iterable<EndChunk> {
     }
 
     public void softRegen(Boolean regenOuterEnd, Boolean verboseLogging, NTheEndAgain plugin) {
+
         for (final EndChunk ec : this) {
-            if (!regenOuterEnd) {
-                if (Math.abs(ec.getX()) >= 30 || Math.abs(ec.getZ()) >= 30 ) {
+            int chunkX = ec.getX();
+            int chunkZ = ec.getZ();
+
+            if (regenOuterEnd) {
+
+                if (Math.abs(chunkX) > plugin.MAX_TRACKED_CHUNK_X ||
+                    Math.abs(chunkZ) > plugin.MAX_TRACKED_CHUNK_Z) {
+                    if (chunkX % 10 == 0 && chunkZ % 10 == 0)
+                        plugin.debug(" ... skip outer island chunk at " + ec.getCoordsString(false) + " (outside RegenCoord limits)");
+                    continue;
+                }
+
+            } else {
+                if (Math.abs(chunkX) >= 30 || Math.abs(chunkZ) >= 30 ) {
                     // Skip this outer end chunk
-                    if (verboseLogging)
-                        plugin.debug(" ... skip outer island chunk at " + ec.getX() + ", " + ec.getZ());
+                    if (verboseLogging && chunkX % 10 == 0 && chunkZ % 10 == 0)
+                        plugin.debug(" ... skip outer island chunk at " + ec.getCoordsString(false) + " (skipping all)");
                     continue;
                 }
             }

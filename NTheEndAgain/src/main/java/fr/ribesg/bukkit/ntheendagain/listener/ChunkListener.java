@@ -80,7 +80,10 @@ public class ChunkListener implements Listener {
 
                 final EndChunks chunks = handler.getChunks();
                 final Chunk chunk = event.getChunk();
-                EndChunk endChunk = chunks.getChunk(worldName, chunk.getX(), chunk.getZ());
+                final int chunkX = chunk.getX();
+                final int chunkZ = chunk.getZ();
+
+                EndChunk endChunk = chunks.getChunk(worldName, chunkX, chunkZ);
 
                 /*
                  * Chunk has to be regen
@@ -89,9 +92,6 @@ public class ChunkListener implements Listener {
                  *   - Schedule a refresh
                  */
                 if (endChunk != null && endChunk.hasToBeRegen()) {
-
-                    int chunkX = endChunk.getX();
-                    int chunkZ = endChunk.getZ();
 
                     if (lastChunkCoordsValid) {
                         if (chunkX == lastChunkCoordX && chunkZ == lastChunkCoordZ) {
@@ -118,8 +118,8 @@ public class ChunkListener implements Listener {
 
                     Config config = handler.getConfig();
                     Boolean verboseLogging = config.getVerboseRegenLogging();
-                    String regenMessage = " ... regen chunk at " + chunkX + ", " + chunkZ +
-                            " (" + chunksRegenerated + " chunks regenerated)";
+                    String regenMessage = " ... regen chunk at " + endChunk.getCoordsString(false) +
+                            "  (" + chunksRegenerated + " chunks regenerated)";
 
                     if (verboseLogging) {
                         if (this.plugin.isDebugEnabled())
@@ -179,6 +179,11 @@ public class ChunkListener implements Listener {
                  */
                 else {
                     if (endChunk == null) {
+                        // New end chunk; possibly add it
+                        if (Math.abs(chunkX) > plugin.MAX_TRACKED_CHUNK_X || Math.abs(chunkZ) > plugin.MAX_TRACKED_CHUNK_Z) {
+                            // Chunk is too far out; ignore it
+                            return;
+                        }
                         endChunk = chunks.addChunk(chunk);
                     }
 
@@ -243,11 +248,20 @@ public class ChunkListener implements Listener {
             final String worldName = event.getWorld().getName();
             final EndWorldHandler handler = this.plugin.getHandler(StringUtil.toLowerCamelCase(worldName));
             if (handler != null) {
-                EndChunk endChunk = handler.getChunks().getChunk(event.getChunk());
+                final Chunk chunk = event.getChunk();
+                final int chunkX = chunk.getX();
+                final int chunkZ = chunk.getZ();
+
+                EndChunk endChunk = handler.getChunks().getChunk(chunk);
                 if (endChunk == null) {
-                    endChunk = handler.getChunks().addChunk(event.getChunk());
+                    if (Math.abs(chunkX) > plugin.MAX_TRACKED_CHUNK_X || Math.abs(chunkZ) > plugin.MAX_TRACKED_CHUNK_Z) {
+                        // Chunk is too far out; ignore it
+                        return;
+                    }
+                    endChunk = handler.getChunks().addChunk(chunk);
                 }
-                for (final Entity e : event.getChunk().getEntities()) {
+
+                for (final Entity e : chunk.getEntities()) {
                     if (e.getType() == EntityType.ENDER_DRAGON) {
                         final EnderDragon ed = (EnderDragon)e;
                         UUID dragonId = ed.getUniqueId();
