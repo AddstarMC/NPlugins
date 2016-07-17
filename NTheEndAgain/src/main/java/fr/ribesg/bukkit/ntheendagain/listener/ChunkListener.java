@@ -179,8 +179,10 @@ public class ChunkListener implements Listener {
                  */
                 else {
                     if (endChunk == null) {
+                        Config config = handler.getConfig();
+
                         // New end chunk; possibly add it
-                        if (Math.abs(chunkX) > plugin.MAX_TRACKED_CHUNK_X || Math.abs(chunkZ) > plugin.MAX_TRACKED_CHUNK_Z) {
+                        if (Math.abs(chunkX) > config.getMaxTrackedChunkX() || Math.abs(chunkZ) > config.getMaxTrackedChunkZ()) {
                             // Chunk is too far out; ignore it
                             return;
                         }
@@ -254,7 +256,10 @@ public class ChunkListener implements Listener {
 
                 EndChunk endChunk = handler.getChunks().getChunk(chunk);
                 if (endChunk == null) {
-                    if (Math.abs(chunkX) > plugin.MAX_TRACKED_CHUNK_X || Math.abs(chunkZ) > plugin.MAX_TRACKED_CHUNK_Z) {
+                    Config config = handler.getConfig();
+
+                    // New end chunk; possibly add it
+                    if (Math.abs(chunkX) > config.getMaxTrackedChunkX() || Math.abs(chunkZ) > config.getMaxTrackedChunkZ()) {
                         // Chunk is too far out; ignore it
                         return;
                     }

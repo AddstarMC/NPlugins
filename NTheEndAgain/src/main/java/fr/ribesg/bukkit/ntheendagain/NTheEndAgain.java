@@ -36,17 +36,6 @@ public class NTheEndAgain extends NPlugin implements TheEndAgainNode {
     // Configs
     private Messages messages;
 
-    // With slowSoftRegenChunks at 5 and slowSoftRegenTimer at 5, the regen rate is
-    // roughly 1000 chunks/minute
-    //
-    // Chunks with x or z values beyond these values are not tracked,
-    // in order to keep survivalTheEndChunks.yml file at a reasonable size, and
-    // in order to allow outer end island regens to finish in a reasonable amount of time
-    //
-    public final int MAX_TRACKED_CHUNK_X = 150;
-    public final int MAX_TRACKED_CHUNK_Z = 150;
-
-
     // Actual plugin data
     private HashMap<String, EndWorldHandler> worldHandlers;
 

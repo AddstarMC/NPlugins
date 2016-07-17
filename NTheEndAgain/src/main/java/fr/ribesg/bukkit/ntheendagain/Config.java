@@ -120,6 +120,16 @@ public class Config extends AbstractConfig<NTheEndAgain> {
     private static final int DEFAULT_outerEndRegenHours = 720;
     private int outerEndRegenHours;
 
+    // Chunks with x or z values beyond these values are not tracked,
+    // in order to keep the survivalTheEndChunks.yml file at a reasonable size, and
+    // in order to allow outer end island regens to finish in a reasonable amount of time
+    //
+    private static final int DEFAULT_maxTrackedChunkX = 150;
+    private int maxTrackedChunkX;
+
+    private static final int DEFAULT_maxTrackedChunkZ = 150;
+    private int maxTrackedChunkZ;
+
     // What do we do to players in the End when world regen starts
     // 0: Kick them. This way they can rejoin immediately in the End at the same place.
     // 1: Teleport them to the spawn point of the Main (= first) world.
@@ -132,6 +142,8 @@ public class Config extends AbstractConfig<NTheEndAgain> {
     private int hardRegenOnStop;
 
     // Number of chunks to be regen every slowSoftRegenTimer after a Soft Regeneration has started
+    // With slowSoftRegenChunks at 5 and slowSoftRegenTimer at 5,
+    // the regen rate is roughly 1000 chunks/minute
     private static final int DEFAULT_slowSoftRegenChunks = 5;
     private int slowSoftRegenChunks;
 
@@ -221,6 +233,9 @@ public class Config extends AbstractConfig<NTheEndAgain> {
         this.setRegenMethod(DEFAULT_regenMethod);
         this.setRegenOuterEnd(DEFAULT_regenOuterEnd);
         this.setOuterEndRegenHours(DEFAULT_outerEndRegenHours);
+        this.setMaxTrackedChunkX(DEFAULT_maxTrackedChunkX);
+        this.setMaxTrackedChunkZ(DEFAULT_maxTrackedChunkZ);
+
         this.setRegenAction(DEFAULT_regenAction);
         this.setHardRegenOnStop(DEFAULT_hardRegenOnStop);
         this.setSlowSoftRegenChunks(DEFAULT_slowSoftRegenChunks);
@@ -348,6 +363,18 @@ public class Config extends AbstractConfig<NTheEndAgain> {
         if (!this.match(this.outerEndRegenHours, 0, Integer.MAX_VALUE)) {
             this.wrongValue(fileName, "outerEndRegenHours", this.outerEndRegenHours, DEFAULT_outerEndRegenHours);
             this.setOuterEndRegenHours(DEFAULT_outerEndRegenHours);
+        }
+
+        this.setMaxTrackedChunkX(config.getInt("maxTrackedChunkX", DEFAULT_maxTrackedChunkX));
+        if (!this.match(this.maxTrackedChunkX, 0, Integer.MAX_VALUE)) {
+            this.wrongValue(fileName, "maxTrackedChunkX", this.maxTrackedChunkX, DEFAULT_maxTrackedChunkX);
+            this.setMaxTrackedChunkX(DEFAULT_maxTrackedChunkX);
+        }
+
+        this.setMaxTrackedChunkZ(config.getInt("maxTrackedChunkZ", DEFAULT_maxTrackedChunkZ));
+        if (!this.match(this.maxTrackedChunkZ, 0, Integer.MAX_VALUE)) {
+            this.wrongValue(fileName, "maxTrackedChunkZ", this.maxTrackedChunkZ, DEFAULT_maxTrackedChunkZ);
+            this.setMaxTrackedChunkZ(DEFAULT_maxTrackedChunkZ);
         }
 
         this.setRegenAction(config.getInt("regenAction", DEFAULT_regenAction));
@@ -741,6 +768,22 @@ public class Config extends AbstractConfig<NTheEndAgain> {
         content.append("#\n");
         content.append("outerEndRegenHours: ").append(this.outerEndRegenHours).append("\n\n");
 
+        content.append("# Maximum chunk X and chunk Z value for tracking chunks in the end. Default: " + DEFAULT_maxTrackedChunkX + '\n');
+        content.append("# Tracked chunks are regenerated when the outer end islands are regenerated.\n");
+        content.append("# (outer end chunks are never regenerated when a hard regen runs)\n");
+        content.append("#\n");
+        content.append("# Values over 150 can lead to outer end island regeneration taking several hours (in soft regen mode).\n");
+        content.append("# Cancel a long-running soft regeneration task using /nend cancelRegen.\n");
+        content.append("# Note that these are chunk numbers, not world coordinates.\n");
+        content.append("# For example, the chunk at (X,Z) = (100,50) is located at world coordinates (1600,800).\n");
+        content.append("#\n");
+        content.append("# When comparing chunk X and Z to these limits, an absolute value is applied.\n");
+        content.append("# Thus, using the defaults, chunks at (-140,-140) and at (140,140) would be regenerated\n");
+        content.append("# but chunks at (-155,175) and at (152,100) would not be regenerated\n");
+        content.append("#\n");
+        content.append("maxTrackedChunkX: ").append(this.maxTrackedChunkX).append("\n\n");
+        content.append("maxTrackedChunkZ: ").append(this.maxTrackedChunkZ).append("\n\n");
+
         // ############# //
         // ## RESPAWN ## //
         // ############# //
@@ -934,7 +977,6 @@ public class Config extends AbstractConfig<NTheEndAgain> {
     public float getEdDamageMultiplier() {
         return this.edDamageMultiplier;
     }
-
     private void setEdDamageMultiplier(final float edDamageMultiplier) {
         this.edDamageMultiplier = edDamageMultiplier;
     }
@@ -942,7 +984,6 @@ public class Config extends AbstractConfig<NTheEndAgain> {
     public int getEdEggHandling() {
         return this.edEggHandling;
     }
-
     private void setEdEggHandling(final int edEggHandling) {
         this.edEggHandling = edEggHandling;
     }
@@ -950,7 +991,6 @@ public class Config extends AbstractConfig<NTheEndAgain> {
     public int getEdExpHandling() {
         return this.edExpHandling;
     }
-
     private void setEdExpHandling(final int edExpHandling) {
         this.edExpHandling = edExpHandling;
     }
@@ -958,7 +998,6 @@ public class Config extends AbstractConfig<NTheEndAgain> {
     public int getEdExpReward() {
         return this.edExpReward;
     }
-
     private void setEdExpReward(final int edExpReward) {
         this.edExpReward = edExpReward;
     }
@@ -966,7 +1005,6 @@ public class Config extends AbstractConfig<NTheEndAgain> {
     public int getEdHealth() {
         return this.edHealth;
     }
-
     private void setEdHealth(final int edHealth) {
         this.edHealth = edHealth;
     }
@@ -974,7 +1012,6 @@ public class Config extends AbstractConfig<NTheEndAgain> {
     public int getEdPortalSpawn() {
         return this.edPortalSpawn;
     }
-
     private void setEdPortalSpawn(final int edPortalSpawn) {
         this.edPortalSpawn = edPortalSpawn;
     }
@@ -982,7 +1019,6 @@ public class Config extends AbstractConfig<NTheEndAgain> {
     public int getEdPushesPlayers() {
         return this.edPushesPlayers;
     }
-
     private void setEdPushesPlayers(final int edPushesPlayers) {
         this.edPushesPlayers = edPushesPlayers;
     }
@@ -990,17 +1026,14 @@ public class Config extends AbstractConfig<NTheEndAgain> {
     public float getEdPushForce() {
         return this.edPushForce;
     }
-
     public void setEdPushForce(final float edPushForce) {
         this.edPushForce = edPushForce;
     }
 
     // EnderCrystals
-
     public float getEcHealthRegainRate() {
         return this.ecHealthRegainRate;
     }
-
     public void setEcHealthRegainRate(final float ecHealthRegainRate) {
         this.ecHealthRegainRate = ecHealthRegainRate;
     }
@@ -1010,7 +1043,6 @@ public class Config extends AbstractConfig<NTheEndAgain> {
     public int getHardRegenOnStop() {
         return this.hardRegenOnStop;
     }
-
     private void setHardRegenOnStop(final int hardRegenOnStop) {
         this.hardRegenOnStop = hardRegenOnStop;
     }
@@ -1018,7 +1050,6 @@ public class Config extends AbstractConfig<NTheEndAgain> {
     public int getRegenAction() {
         return this.regenAction;
     }
-
     private void setRegenAction(final int regenAction) {
         this.regenAction = regenAction;
     }
@@ -1026,7 +1057,6 @@ public class Config extends AbstractConfig<NTheEndAgain> {
     public int getRegenMethod() {
         return this.regenMethod;
     }
-
     private void setRegenMethod(final int regenMethod) {
         this.regenMethod = regenMethod;
     }
@@ -1034,7 +1064,6 @@ public class Config extends AbstractConfig<NTheEndAgain> {
     public int getRegenOuterEnd() {
         return this.regenOuterEnd;
     }
-
     private void setRegenOuterEnd(final int regenOuterEnd) {
         this.regenOuterEnd = regenOuterEnd;
     }
@@ -1042,15 +1071,27 @@ public class Config extends AbstractConfig<NTheEndAgain> {
     public int getOuterEndRegenHours() {
         return this.outerEndRegenHours;
     }
-
     public void setOuterEndRegenHours(final int outerEndRegenHours) {
         this.outerEndRegenHours = outerEndRegenHours;
+    }
+
+    public int getMaxTrackedChunkX() {
+        return this.maxTrackedChunkX;
+    }
+    public void setMaxTrackedChunkX(final int maxTrackedChunkX) {
+        this.maxTrackedChunkX = maxTrackedChunkX;
+    }
+
+    public int getMaxTrackedChunkZ() {
+        return this.maxTrackedChunkZ;
+    }
+    public void setMaxTrackedChunkZ(final int maxTrackedChunkZ) {
+        this.maxTrackedChunkZ = maxTrackedChunkZ;
     }
 
     public int getRegenTimer() {
         return this.regenTimer;
     }
-
     private void setRegenTimer(final int regenTimer) {
         this.regenTimer = regenTimer;
     }
@@ -1058,7 +1099,6 @@ public class Config extends AbstractConfig<NTheEndAgain> {
     public int getRegenType() {
         return this.regenType;
     }
-
     private void setRegenType(final int regenType) {
         this.regenType = regenType;
     }
@@ -1066,7 +1106,6 @@ public class Config extends AbstractConfig<NTheEndAgain> {
     public int getSlowSoftRegenChunks() {
         return this.slowSoftRegenChunks;
     }
-
     public void setSlowSoftRegenChunks(final int slowSoftRegenChunks) {
         this.slowSoftRegenChunks = slowSoftRegenChunks;
     }
@@ -1074,7 +1113,6 @@ public class Config extends AbstractConfig<NTheEndAgain> {
     public int getSlowSoftRegenTimer() {
         return this.slowSoftRegenTimer;
     }
-
     public void setSlowSoftRegenTimer(final int slowSoftRegenTimer) {
         this.slowSoftRegenTimer = slowSoftRegenTimer;
     }
@@ -1084,7 +1122,6 @@ public class Config extends AbstractConfig<NTheEndAgain> {
     public int getRespawnNumber() {
         return this.respawnNumber;
     }
-    
     private void setRespawnNumber(final int respawnNumber) {
         this.respawnNumber = respawnNumber;
     }
@@ -1092,7 +1129,6 @@ public class Config extends AbstractConfig<NTheEndAgain> {
     public int getRespawnTimerMax() {
         return this.respawnTimerMax;
     }
-
     private void setRespawnTimerMax(final int respawnTimerMax) {
         this.respawnTimerMax = respawnTimerMax;
     }
@@ -1100,7 +1136,6 @@ public class Config extends AbstractConfig<NTheEndAgain> {
     public int getRespawnTimerMin() {
         return this.respawnTimerMin;
     }
-
     private void setRespawnTimerMin(final int respawnTimerMin) {
         this.respawnTimerMin = respawnTimerMin;
     }
@@ -1137,7 +1172,6 @@ public class Config extends AbstractConfig<NTheEndAgain> {
     public int getDropTableHandling() {
         return this.dropTableHandling;
     }
-
     private void setDropTableHandling(final int dropTableHandling) {
         this.dropTableHandling = dropTableHandling;
     }
@@ -1151,7 +1185,6 @@ public class Config extends AbstractConfig<NTheEndAgain> {
     public boolean getDefaultProtected() {
         return this.defaultProtected;
     }
-
     public void setDefaultProtected(final boolean defaultProtected) {
         this.defaultProtected = defaultProtected;
     }
@@ -1161,7 +1194,6 @@ public class Config extends AbstractConfig<NTheEndAgain> {
     public boolean getVerboseRegenLogging() {
         return this.verboseRegenLogging;
     }
-
     public void setVerboseRegenLogging(final boolean verboseRegenLogging) {
         this.verboseRegenLogging = verboseRegenLogging;
     }
@@ -1201,7 +1233,6 @@ public class Config extends AbstractConfig<NTheEndAgain> {
     public int getOuterEndRegenCount() {
         return this.outerEndRegenCount;
     }
-
     public void setOuterEndRegenCount(final int regenCount) {
         this.outerEndRegenCount = regenCount;
     }
@@ -1209,7 +1240,6 @@ public class Config extends AbstractConfig<NTheEndAgain> {
     public int getCentralEndRegenCount() {
         return this.centralEndRegenCount;
     }
-
     public void setCentralEndRegenCount(final int regenCount) {
         this.centralEndRegenCount = regenCount;
     }
@@ -1219,7 +1249,6 @@ public class Config extends AbstractConfig<NTheEndAgain> {
     public String getWorldName() {
         return this.worldName;
     }
-
 
     private long nextExpectedRespawnTime = 0;
 

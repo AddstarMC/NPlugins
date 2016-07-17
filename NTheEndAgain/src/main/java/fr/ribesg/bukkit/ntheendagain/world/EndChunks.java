@@ -139,14 +139,19 @@ public class EndChunks implements Iterable<EndChunk> {
 
     public void softRegen(Boolean regenOuterEnd, Boolean verboseLogging, NTheEndAgain plugin) {
 
+        Config config = handler.getConfig();
+        final int maxTrackedChunkX = config.getMaxTrackedChunkX();
+        final int maxTrackedChunkZ = config.getMaxTrackedChunkZ();
+
         for (final EndChunk ec : this) {
             int chunkX = ec.getX();
             int chunkZ = ec.getZ();
 
             if (regenOuterEnd) {
 
-                if (Math.abs(chunkX) > plugin.MAX_TRACKED_CHUNK_X ||
-                    Math.abs(chunkZ) > plugin.MAX_TRACKED_CHUNK_Z) {
+
+                if (Math.abs(chunkX) > maxTrackedChunkX ||
+                    Math.abs(chunkZ) > maxTrackedChunkZ) {
                     if (chunkX % 10 == 0 && chunkZ % 10 == 0)
                         plugin.debug(" ... skip outer island chunk at " + ec.getCoordsString(false) + " (outside RegenCoord limits)");
                     continue;
@@ -187,6 +192,9 @@ public class EndChunks implements Iterable<EndChunk> {
     public void load(final Path pathEndChunks) {
         if (Files.exists(pathEndChunks)) {
             final YamlConfiguration config = new YamlConfiguration();
+            int maxTrackedChunkX = handler.getConfig().getMaxTrackedChunkX();
+            int maxTrackedChunkZ = handler.getConfig().getMaxTrackedChunkZ();
+
             try (BufferedReader reader = Files.newBufferedReader(pathEndChunks, CHARSET)) {
                 final StringBuilder s = new StringBuilder();
                 while (reader.ready()) {
@@ -201,6 +209,12 @@ public class EndChunks implements Iterable<EndChunk> {
                 final ConfigurationSection sec = config.getConfigurationSection(chunkCoordString);
                 if (sec != null) {
                     final EndChunk ec = EndChunk.rebuild(this, sec);
+
+                    if (Math.abs(ec.getX()) > maxTrackedChunkX || Math.abs(ec.getZ()) > maxTrackedChunkZ) {
+                        // Chunk is too far out; ignore it
+                        continue;
+                    }
+
                     this.addChunk(ec);
                 }
             }
@@ -213,7 +227,14 @@ public class EndChunks implements Iterable<EndChunk> {
         }
         try (BufferedWriter writer = Files.newBufferedWriter(pathEndChunks, CHARSET, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE)) {
             final YamlConfiguration config = new YamlConfiguration();
+            int maxTrackedChunkX = handler.getConfig().getMaxTrackedChunkX();
+            int maxTrackedChunkZ = handler.getConfig().getMaxTrackedChunkZ();
+
             for (final EndChunk c : this.chunks.values()) {
+                if (Math.abs(c.getX()) > maxTrackedChunkX || Math.abs(c.getZ()) > maxTrackedChunkZ) {
+                    // Chunk is too far out; ignore it
+                    continue;
+                }
                 c.store(config);
             }
             writer.write(config.saveToString());
