@@ -250,42 +250,70 @@ public class EndWorldHandler {
      * - EnderCrystals
      */
     private void countEntities() {
-    	if(this.endWorld.getEnvironment() == Environment.THE_END){
-    	this.plugin.getLogger().info("Counting existing EDs in " + this.endWorld.getName() + "...");
-        for (final EndChunk c : this.chunks.getSafeChunksList()) {
-            if (this.endWorld.isChunkLoaded(c.getX(), c.getZ())) {
-                final Chunk chunk = this.endWorld.getChunkAt(c.getX(), c.getZ());
-                for (final Entity e : chunk.getEntities()) {
-                    if (e.getType() == EntityType.ENDER_DRAGON) {
-                        final EnderDragon ed = (EnderDragon)e;
-                        UUID dragonId = ed.getUniqueId();
+        final int MAX_RUNTIME_MINUTES = 2;
 
-                        if (!this.dragons.containsKey(dragonId)) {
-                            int initialHealth = this.config.getEdHealth();
-                            org.bukkit.Location dragonLoc = ed.getLocation();
+    	if(this.endWorld.getEnvironment() == Environment.THE_END)
+        {
+            plugin.info("Counting existing EDs in " + this.endWorld.getName() + "...");
+            long startTime = System.currentTimeMillis();
+            long lastStatus = startTime;
 
-                            plugin.debug("EndWorldHandler.countEntities ... " +
-                                    "found EnderDragon at " +
-                                    (int)dragonLoc.getX() + " " + (int)dragonLoc.getY() + " " + (int)dragonLoc.getZ() +
-                                    ", UUID " + dragonId + ", health " + initialHealth);
+            int maxTrackedChunkX = this.config.getMaxTrackedChunkX();
+            int maxTrackedChunkZ = this.config.getMaxTrackedChunkZ();
 
-                            ed.setMaxHealth(initialHealth);
-                            ed.setHealth(ed.getMaxHealth());
+            for (final EndChunk c : this.chunks.getSafeChunksList()) {
+                int chunkX = c.getX();
+                int chunkZ = c.getZ();
 
-                            this.dragons.put(dragonId, new HashMap<>());
-                            this.loadedDragons.add(dragonId);
+                if (Math.abs(chunkX) > maxTrackedChunkX || Math.abs(chunkZ) > maxTrackedChunkZ)
+                    continue;
+
+                if (this.endWorld.isChunkLoaded(chunkX, chunkZ)) {
+                    final Chunk chunk = this.endWorld.getChunkAt(chunkX, chunkZ);
+                    for (final Entity e : chunk.getEntities()) {
+                        if (e.getType() == EntityType.ENDER_DRAGON) {
+                            final EnderDragon ed = (EnderDragon)e;
+                            UUID dragonId = ed.getUniqueId();
+
+                            if (!this.dragons.containsKey(dragonId)) {
+                                int initialHealth = this.config.getEdHealth();
+                                org.bukkit.Location dragonLoc = ed.getLocation();
+
+                                plugin.debug("EndWorldHandler.countEntities ... " +
+                                        "found EnderDragon at " +
+                                        (int)dragonLoc.getX() + " " + (int)dragonLoc.getY() + " " + (int)dragonLoc.getZ() +
+                                        ", UUID " + dragonId + ", health " + initialHealth);
+
+                                ed.setMaxHealth(initialHealth);
+                                ed.setHealth(ed.getMaxHealth());
+
+                                this.dragons.put(dragonId, new HashMap<>());
+                                this.loadedDragons.add(dragonId);
+                            }
+                        } else if (e.getType() == EntityType.ENDER_CRYSTAL) {
+                            c.addCrystalLocation(e);
                         }
-                    } else if (e.getType() == EntityType.ENDER_CRYSTAL) {
-                        c.addCrystalLocation(e);
+                    }
+                } else {
+                    this.endWorld.loadChunk(chunkX, chunkZ);
+                    c.resetSavedDragons();
+                    this.endWorld.unloadChunkRequest(chunkX, chunkZ);
+                }
+
+                float elapsedTimeSeconds = (System.currentTimeMillis() - startTime) / 1000F;
+
+                if (elapsedTimeSeconds / 60F > MAX_RUNTIME_MINUTES) {
+                    plugin.info("Aborted search for live EnderDragon(s)");
+                } else {
+                    if (System.currentTimeMillis() - lastStatus > 15000) {
+                        lastStatus = System.currentTimeMillis();
+                        long secondsToAbort = (int)(MAX_RUNTIME_MINUTES * 60 - elapsedTimeSeconds);
+                        plugin.info("  ... searching for live EnderDragon(s); " +
+                                "will abort search in " + secondsToAbort + " seconds");
                     }
                 }
-            } else {
-                this.endWorld.loadChunk(c.getX(), c.getZ());
-                c.resetSavedDragons();
-                this.endWorld.unloadChunkRequest(c.getX(), c.getZ());
             }
-        }
-        this.plugin.getLogger().info("Done, " + this.getNumberOfAliveEnderDragons() + " EnderDragon(s) found.");
+            this.plugin.getLogger().info("Done, " + this.getNumberOfAliveEnderDragons() + " EnderDragon(s) found.");
     	}
     }
 
